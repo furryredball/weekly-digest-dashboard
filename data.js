@@ -35,3 +35,37 @@ function renderSectorGrid(id, list){
   var ts=TICKERS.filter(function(t){return list.indexOf(t.ticker)>=0});
   g.innerHTML=ts.length?ts.map(tickerCard).join(''):'<div style="color:var(--text-muted);padding:40px;text-align:center;">No tracked tickers this week</div>';
 }
+
+// ============================================================
+// LINUS INVEST — 55-stock two-tier (3-lens Munger/Buffett/Bezos)
+// ============================================================
+// ⚠️ STUB MODE (2026-07-11): full 55-stock dataset with M/B/Bz scores
+// is pending population from the dashboard-deployment skill spec.
+// Tier 1 target = 15 picks (8 AGI + 7 Non-AGI), Tier 2 = 40 watchlist.
+// Pending: Pirry to supply the 55-stock spreadsheet or compute via
+// the linus-research.py pipeline.
+//
+// Current placeholder uses the 17 TICKERS above, scored as Tier 1 by default.
+// This will be replaced once the M/B/Bz 3-lens data lands.
+// Resolve sector from SECTORS map (ticker→sector name)
+var _sectorByTicker = {};
+Object.keys(SECTORS).forEach(function(k){
+  SECTORS[k].forEach(function(t){ _sectorByTicker[t] = SECTOR_NAMES[k] || k; });
+});
+const TIER1 = TICKERS.map(function(t){
+  return {
+    t: t.ticker,
+    p: t.price,
+    se: _sectorByTicker[t.ticker] || 'Other',
+    ca: 'agi', // TODO: reclassify as agi/nonagi once 55-stock dataset is in
+    roe: null,
+    roic: null,
+    bp: null,
+    ev: null,
+    mc: null,
+    ups: null,
+    mg: 0, bf: 0, bz: 0  // Munger / Buffett / Bezos lens scores — pending
+  };
+});
+const TIER2 = []; // TODO: populate 40-stock watchlist with M/B/Bz scores
+// ============================================================
