@@ -69,6 +69,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
 .nav-item-ext{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;}
 .nav-item-ext:hover{background:var(--surface-2);color:var(--text);}
+.nav-item-ext.active{background:var(--surface-3);color:var(--text);font-weight:500;}
 .nav-item-ext svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
 
 /* MAIN */
@@ -242,7 +243,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       <div class="nav-section">Sectors</div>
       <div class="nav-item" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge">6</span></div>
       <div class="nav-item" onclick="location.href='compute.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
-      <div class="nav-item" onclick="location.href='semis.html'" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
+      <div class="nav-item active" onclick="location.href='semis.html'" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
       <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">1</span></div>
       <div class="nav-section">避險</div>
       <div class="nav-item" onclick="location.href='anti-agi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Anti AGI<span class="nav-badge">5</span></div>

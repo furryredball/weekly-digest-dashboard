@@ -68,6 +68,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
 .nav-item-ext{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;}
 .nav-item-ext:hover{background:var(--surface-2);color:var(--text);}
+.nav-item-ext.active{background:var(--surface-3);color:var(--text);font-weight:500;}
 .nav-item-ext svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
 
 /* MAIN */
@@ -348,7 +349,7 @@ const buckets=[{label:'電力 Power',val:7},{label:'GPU Cloud',val:3},{label:'Ne
 document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
 
 // SECTOR CARDS
-const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Defensive',tickers:['BRK.B','WM'],tier:'4',tierName:'HEDGE',page:null},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','BRK.B'],tier:'4',tierName:'TIER 4',page:'anti-agi.html'}];
+const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','BRK.B'],tier:'4',tierName:'TIER 4',page:'anti-agi.html'}];
 document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.page?' onclick="location.href='+String.fromCharCode(39)+s.page+String.fromCharCode(39)+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.page?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
 // INCLUDE/EXCLUDE
