@@ -18,9 +18,9 @@ const TICKERS = [
   {ticker:"WCN",name:"Waste Connections",desc:"North American waste services company providing solid waste collection, transfer, disposal, and recycling across secondary and exclusive markets in US and Canada.",why:"Focus on exclusive/secondary markets provides pricing power with less competition; strategic M&A and RNG investments drive above-peer growth.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:171.07,trend:"↑",pct:"+0.55%",score:74,grade:"B",news:[{date:"06-30",title:"Waste Connections: Strong Buy Rating Amid Strategic Acquisitions and AI Data Center Investments Fueling Growth",url:"https://www.insidermonkey.com/blog/waste-connections-strong-buy-rating-amid-strategic-acquisitions-and-ai-data-center-investments-fueling-growth-1480745/",source:"insidermonkey.com"}]},
   {ticker:"GFL",name:"GFL Environmental",desc:"Fourth-largest North American environmental services company offering solid waste collection, liquid waste management, and soil remediation across Canada and the US.",why:"Best growth story among waste peers through aggressive M&A + infrastructure investment; discounted to RSG/WCN on EV/EBITDA, offering higher upside.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:39.75,trend:"↓",pct:"-0.87%",score:72,grade:"B",news:[]}
 ];
-const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW'],anti_agi:['RSG','WCN','GFL','WM','BRK.B']};
+const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW'],anti_agi:['RSG','WCN','GFL']};
 const SECTOR_NAMES = {power:'Power',compute:'Compute Infra',semis:'半導體',software:'Software',anti_agi:'Anti AGI'};
-const SECTOR_SUBTITLES = {power:'電力 bottleneck · 6 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 1 ticker',anti_agi:'避險 waste + defensive plays · 5 tickers'};
+const SECTOR_SUBTITLES = {power:'電力 bottleneck · 6 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 1 ticker',anti_agi:'避險 waste · 3 tickers'};
 
 function tickerCard(t){
   var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
