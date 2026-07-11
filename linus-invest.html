@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linus Invest — Two-Tier Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a1a1e;--surface:#222226;--surface-2:#2a2a2e;--surface-3:#323236;--border:#333338;--border-strong:#444448;--text:#e8e8e6;--text-muted:#9a9a96;--text-faint:#6a6a66;--accent:#8a8a86;--accent-light:#2e2e30;--success:#7a9d7a;--success-light:#1e2a1e;--warning:#c4a462;--warning-light:#2a2418;--error:#c87878;--error-light:#2a1e1e;--purple:#9999c0;--purple-light:#22202a;--tec:#5a9ec8;--tec-light:#1a2228;--tier1:#e4e4e0;--tier2:#a0a09c;--radius-sm:6px;--radius-md:8px;--radius-lg:12px;--shadow:0 1px 3px rgba(0,0,0,0.3);}
+[data-theme="light"]{--bg:#f5f4f2;--surface:#ffffff;--surface-2:#f0efed;--surface-3:#eae8e5;--border:#e0deda;--border-strong:#d0cec9;--text:#2a2a28;--text-muted:#8a8a85;--text-faint:#b0b0ab;--accent:#7a7a78;--accent-light:#f0efed;--success:#6b8e6b;--success-light:#eef4ee;--warning:#b8924a;--warning-light:#f7f1e8;--error:#b85c5c;--error-light:#f7eeed;--purple:#8b7dbe;--purple-light:#f1effa;--tec:#4a8eb8;--tec-light:#eef4f8;--tier1:#2a2a28;--tier2:#7a7a78;--shadow:0 1px 2px rgba(0,0,0,0.05);}
+@media (prefers-color-scheme:light){:root{--bg:#f5f4f2;--surface:#ffffff;--surface-2:#f0efed;--surface-3:#eae8e5;--border:#e0deda;--border-strong:#d0cec9;--text:#2a2a28;--text-muted:#8a8a85;--text-faint:#b0b0ab;--accent:#7a7a78;--accent-light:#f0efed;--success:#6b8e6b;--success-light:#eef4ee;--warning:#b8924a;--warning-light:#f7f1e8;--error:#b85c5c;--error-light:#f7eeed;--purple:#8b7dbe;--purple-light:#f1effa;--tec:#4a8eb8;--tec-light:#eef4f8;--tier1:#2a2a28;--tier2:#7a7a78;--shadow:0 1px 2px rgba(0,0,0,0.05);}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:var(--text);background:var(--bg);min-height:100vh;font-feature-settings:'tnum'1;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-logo{font-size:16px;font-weight:600;letter-spacing:-0.01em;padding:0 8px 20px;display:flex;align-items:center;gap:8px;}
+.sidebar-back{display:flex;align-items:center;gap:6px;padding:6px 8px;margin-bottom:12px;font-size:12px;color:var(--text-muted);border-radius:var(--radius-sm);transition:background .15s;cursor:pointer;}
+.sidebar-back:hover{background:var(--surface-2);color:var(--text);}
+.nav-section{font-size:10px;font-weight:600;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;padding:16px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;font-weight:400;transition:background .15s,color .15s;}
+.nav-item:hover{background:var(--surface-2);color:var(--text);}
+.nav-item.active{background:var(--surface-3);color:var(--text);font-weight:500;}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+.main{flex:1;min-width:0;padding:32px 40px 64px;max-width:1100px;}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;}
+.topbar-left h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;}
+.topbar-left .subtitle{font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-muted);border:1px solid var(--border);transition:background .15s;}
+.icon-btn:hover{background:var(--surface-2);color:var(--text);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.kpi-card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;}
+.kpi-value{font-size:26px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;}
+.kpi-meta{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:16px;font-weight:600;letter-spacing:-0.01em;}
+.section-meta{font-size:11px;color:var(--text-muted);}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:32px;}
+.card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);transition:border-color .15s;cursor:pointer;}
+.card:hover{border-color:var(--border-strong);}
+.card.tag-agi{border-left:3px solid var(--purple);}
+.card.tag-nonagi{border-left:3px solid var(--tec);}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.card-symbol{font-size:15px;font-weight:600;letter-spacing:-0.01em;}
+.card-price{font-size:18px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.card-metrics{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11px;margin-bottom:8px;}
+.metric-label{color:var(--text-muted);}
+.metric-val{font-variant-numeric:tabular-nums;text-align:right;font-weight:500;}
+.metric-up{color:var(--success);}
+.metric-down{color:var(--error);}
+.card-score-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.score-seg-munger{background:var(--purple);}
+.score-seg-buffett{background:var(--success);}
+.score-seg-bezos{background:var(--warning);}
+.score-seg-framework{background:var(--accent);}
+.card-score{display:flex;align-items:center;justify-content:space-between;font-size:11px;}
+.score-text{font-weight:500;color:var(--text-muted);}
+.score-num{font-weight:700;font-size:16px;font-family:'JetBrains Mono',monospace;}
+.card-sector{font-size:10px;color:var(--text-faint);margin-top:6px;text-transform:uppercase;letter-spacing:0.05em;}
+.row-grid{display:flex;flex-direction:column;gap:4px;}
+.row{display:grid;grid-template-columns:50px 2fr 1fr 1fr 1fr 70px 80px;align-items:center;padding:8px 12px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border);font-size:12px;gap:8px;transition:border-color .15s;}
+.row:hover{border-color:var(--border-strong);}
+.row-rank{font-weight:600;color:var(--text-muted);font-size:11px;}
+.row-ticker{font-weight:600;font-size:13px;}
+.row-sector{font-size:10px;color:var(--text-faint);}
+.row-price{font-family:'JetBrains Mono',monospace;text-align:right;font-weight:500;}
+.row-roe{text-align:right;font-variant-numeric:tabular-nums;font-weight:500;}
+.row-ups{text-align:right;font-variant-numeric:tabular-nums;}
+.row-score{text-align:right;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;}
+.row-grade{text-align:center;}
+.grade-pill{display:inline-block;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600;}
+.grade-A{background:var(--success-light);color:var(--success);}
+.grade-B{background:var(--surface-3);color:var(--accent);}
+.grade-C{background:var(--warning-light);color:var(--warning);}
+.meth-section{margin-bottom:24px;}
+.meth-section h2{font-size:15px;font-weight:600;margin-bottom:8px;}
+.meth-section p,.meth-section li{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.meth-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.meth-table th,.meth-table td{padding:6px 10px;text-align:left;font-size:12px;border-bottom:1px solid var(--border);}
+.meth-table th{font-weight:600;color:var(--text);}
+.meth-table td{color:var(--text-muted);}
+.panel{display:none;}
+.panel.active{display:block;}
+@media(max-width:768px){
+.app{flex-direction:column;}
+.sidebar{width:100%;height:auto;position:relative;padding:12px;border-right:none;border-bottom:1px solid var(--border);}
+.main{padding:16px 20px 48px;}
+.card-grid{grid-template-columns:1fr;}
+.row{grid-template-columns:30px 1fr 60px 50px;gap:4px;font-size:11px;}
+.row-sector,.row-roe,.row-ups{display:none;}
+.kpi-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">🐶 Linus Invest</div>
+    <div class="sidebar-back" onclick="location.href='./'">← Main Dashboard</div>
+    <div class="nav-section">STOCKS</div>
+    <div class="nav-item active" data-view="tier1">⭐ Tier 1 — Recommended<span class="nav-badge" id="badge-tier1">15</span></div>
+    <div class="nav-item" data-view="tier2">📋 Tier 2 — Watchlist<span class="nav-badge">40</span></div>
+    <div class="nav-item" data-view="all">📊 All 55 Sorted</div>
+    <div class="nav-section">INFO</div>
+    <div class="nav-item" data-view="methodology">⚙️ Methodology</div>
+  </aside>
+  <main class="main">
+    <div class="panel active" id="view-tier1">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Tier 1 — Linus 推薦</h1><div class="subtitle">Top 15 by 3-lens quality score · 8 AGI + 7 Non-AGI · Updated 2026-07-11</div></div>
+        <div class="topbar-right"><button class="icon-btn" id="themeToggle" title="Toggle theme">☀️</button></div>
+      </div>
+      <div class="kpi-grid" id="kpiTier1"></div>
+      <div class="section-header"><span class="section-title">All Tier 1 Picks</span><span class="section-meta" id="tier1Summary"></span></div>
+      <div class="card-grid" id="tier1Grid"></div>
+    </div>
+    <div class="panel" id="view-tier2">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Tier 2 — Watchlist</h1><div class="subtitle">40 framework-compatible picks · Cat 1 picks-and-shovels + Cat 3 civilization trends · Updated 2026-07-11</div></div>
+      </div>
+      <div class="section-header"><span class="section-title">Sorted by Score</span><span class="section-meta" id="tier2Summary"></span></div>
+      <div class="row-grid" id="tier2Grid"></div>
+    </div>
+    <div class="panel" id="view-all">
+      <div class="topbar">
+        <div class="topbar-left"><h1>All 55 Stocks</h1><div class="subtitle">Combined Tier 1 + Tier 2 sorted by score</div></div>
+      </div>
+      <div class="row-grid" id="allGrid"></div>
+    </div>
+    <div class="panel" id="view-methodology">
+      <div class="topbar"><div class="topbar-left"><h1>Scoring Methodology</h1><div class="subtitle">3-lens framework: Munger (inversion) + Buffett (moat) + Bezos (flywheel)</div></div></div>
+      <div class="meth-section">
+        <h2>4 Scoring Dimensions (100 pts)</h2>
+        <table class="meth-table">
+          <tr><th>Dimension</th><th>Points</th><th>What It Measures</th></tr>
+          <tr><td>Munger Inversion</td><td>25</td><td>Financial health: ROE profitability, NetDebt/EBITDA fortress, FCF yield sustainability</td></tr>
+          <tr><td>Buffett Moat</td><td>25</td><td>Quality: ROIC moat width, EV/EBITDA reasonableness, analyst buy consensus, large-cap premium</td></tr>
+          <tr><td>Bezos Flywheel</td><td>20</td><td>Compounding momentum: analyst upside %, price vs 50-day MA, recent % change</td></tr>
+          <tr><td>Framework Fit</td><td>30</td><td>AGI picks-and-shovels (30) vs Non-AGI quality compounder (15). Equalized to 25 in Tier selection.</td></tr>
+        </table>
+      </div>
+      <div class="meth-section">
+        <h2>Grade Scale</h2>
+        <table class="meth-table">
+          <tr><th>Score</th><th>Grade</th><th>Meaning</th></tr>
+          <tr><td>80+</td><td>A</td><td>Exceptional — top conviction</td></tr>
+          <tr><td>75–79</td><td>B</td><td>Strong — above-average moat</td></tr>
+          <tr><td>70–74</td><td>C</td><td>Moderate — framework-compatible</td></tr>
+          <tr><td>&lt;70</td><td>—</td><td>Tier 2 only — directional fit</td></tr>
+        </table>
+      </div>
+      <div class="meth-section">
+        <h2>Data Sources</h2>
+        <p>Real-time quotes + analyst consensus via financialmodelingprep.com. As of 2026-07-11.</p>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="data.js"></script>
+<script>
+(function(){var r=document.documentElement;var d=r.getAttribute('data-theme');if(!d){var pd=window.matchMedia('(prefers-color-scheme:dark)').matches;r.setAttribute('data-theme',pd?'dark':'light');}
+var btn=document.getElementById('themeToggle');var cur=r.getAttribute('data-theme');btn.innerHTML=cur==='dark'?'🌙':'☀️';btn.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);btn.innerHTML=n==='dark'?'🌙':'☀️';});})();
+function grade(sc){return sc>=80?'A':sc>=75?'B':sc>=70?'C':'';}
+function gradeClass(sc){return sc>=80?'grade-A':sc>=75?'grade-B':'grade-C';}
+function fm(n,d){return n!=null?(n<0?'':n.toFixed(d||1)):'—';}
+function fc(n,d){var c=n>0?'metric-up':n<0?'metric-down':'';return '<span class="'+c+'">'+(n>0?'+':'')+fm(n,d)+'%</span>';}
+(function(){var grid=document.getElementById('tier1Grid');var html='';TIER1.forEach(function(s,i){var tag=s.ca==='agi'?'tag-agi':'tag-nonagi';var ups=s.ups!=null?fc(s.ups):'—';var total=s.mg+s.bf+s.bz+25;var mgW=(s.mg/total*100).toFixed(0),bfW=(s.bf/total*100).toFixed(0),bzW=(s.bz/total*100).toFixed(0),fwW=(25/total*100).toFixed(0);html+='<div class="card '+tag+'">';html+='<div class="card-head"><span class="card-symbol">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+s.t+'</span><span class="card-price">$'+(s.p!=null?fm(s.p,2):'—')+'</span></div>';html+='<div class="card-metrics">';html+='<span class="metric-label">ROE</span><span class="metric-val">'+fm(s.roe)+'%</span>';html+='<span class="metric-label">Upside</span><span class="metric-val">'+ups+'</span>';html+='<span class="metric-label">ROIC</span><span class="metric-val">'+fm(s.roic)+'%</span>';html+='<span class="metric-label">Buy %</span><span class="metric-val">'+fm(s.bp)+'%</span>';html+='<span class="metric-label">EV/EBITDA</span><span class="metric-val">'+fm(s.ev,1)+'×</span>';html+='<span class="metric-label">MCap</span><span class="metric-val">'+(s.mc?fm(s.mc,1)+'B':'—')+'</span>';html+='</div>';html+='<div class="card-score-bar"><div class="score-seg-munger" style="width:'+mgW+'%"></div><div class="score-seg-buffett" style="width:'+bfW+'%"></div><div class="score-seg-bezos" style="width:'+bzW+'%"></div><div class="score-seg-framework" style="width:'+fwW+'%"></div></div>';
+html+='<div class="card-score"><span class="score-text">Munger '+s.mg+' · Buffett '+s.bf+' · Bezos '+s.bz+' · Framework 25</span><span class="score-num">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span></div>';
+html+='<div class="card-sector">'+s.se+'</div></div>';});grid.innerHTML=html;
+var avgScore=(TIER1.reduce(function(a,s){return a+s.mg+s.bf+s.bz+25},0)/TIER1.length).toFixed(1);var agiCount=TIER1.filter(function(s){return s.ca==='agi'}).length;var nonagiCount=TIER1.length-agiCount;var avgUps=(TIER1.reduce(function(a,s){return a+(s.ups||0)},0)/TIER1.length).toFixed(1);var avgRoe=(TIER1.reduce(function(a,s){return a+(s.roe||0)},0)/TIER1.length).toFixed(1);
+document.getElementById('kpiTier1').innerHTML='<div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">'+avgScore+'</div><div class="kpi-meta">out of 100</div></div><div class="kpi-card"><div class="kpi-label">Composition</div><div class="kpi-value">'+agiCount+' 🔌 + '+nonagiCount+' 🛡️</div><div class="kpi-meta">AGI / Non-AGI</div></div><div class="kpi-card"><div class="kpi-label">Avg Upside</div><div class="kpi-value">'+avgUps+'%</div><div class="kpi-meta">analyst consensus</div></div><div class="kpi-card"><div class="kpi-label">Avg ROE</div><div class="kpi-value">'+avgRoe+'%</div><div class="kpi-meta">profitability</div></div>';document.getElementById('tier1Summary').textContent=TIER1.length+' picks · sorted by score';})();
+(function(){var grid=document.getElementById('tier2Grid');var html='';TIER2.forEach(function(s,i){var total=s.mg+s.bf+s.bz+25;var ups=s.ups!=null?fc(s.ups):'—';html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span>'+s.t+'</span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-roe">ROE '+fm(s.roe)+'%</span>';html+='<span class="row-ups">'+ups+'</span>';html+='<span class="row-score">'+total+'</span>';html+='<span class="row-grade"><span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;document.getElementById('tier2Summary').textContent=TIER2.length+' tickers · framework-compatible';})();
+(function(){var all=TIER1.concat(TIER2);all.sort(function(a,b){return (b.mg+b.bf+b.bz+25)-(a.mg+a.bf+a.bz+25)});var grid=document.getElementById('allGrid');var html='';all.forEach(function(s,i){var total=s.mg+s.bf+s.bz+25;var ups=s.ups!=null?fc(s.ups):'—';html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span>'+s.t+'</span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-roe">ROE '+fm(s.roe)+'%</span>';html+='<span class="row-ups">'+ups+'</span>';html+='<span class="row-score">'+total+'</span>';html+='<span class="row-grade"><span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;})();
+function switchView(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});var v=document.getElementById('view-'+id);if(v)v.classList.add('active');var n=document.querySelector('[data-view="'+id+'"]');if(n)n.classList.add('active');}
+document.querySelectorAll('.nav-item').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
+</script>
+</body>
+</html>
