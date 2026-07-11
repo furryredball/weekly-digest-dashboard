@@ -340,7 +340,7 @@ document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="buck
 
 // SECTOR CARDS
 const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE','OKLO'],tier:'1',tierName:'TIER 1-3',view:'sector-power'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',view:'sector-compute'},{name:'半導體 Semi',tickers:['NVDA','CRDO','NBIS'],tier:'2',tierName:'OBSERVE',view:'sector-semis'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',view:'sector-software'},{name:'Defensive',tickers:['BRK.B','WM','DCRU.SI'],tier:'4',tierName:'HEDGE',view:null},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','DCRU.SI','BRK.B'],tier:'4',tierName:'TIER 4',view:'anti-agi'}];
-document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.view?' onclick="switchView(\''+s.view+'\')"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.view?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
+document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.view?' data-view="'+s.view+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.view?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
 // INCLUDE/EXCLUDE
 document.getElementById('includeList').innerHTML=INCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.note+'</div></div><div class="signal-upside upside-up">'+s.upside+'</div></div>'}).join('');
@@ -438,8 +438,11 @@ function switchView(viewId){
 }
 document.querySelectorAll('.nav-item').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
 
-// BACK BUTTONS (delegation)
-document.addEventListener('click',function(e){var btn=e.target.closest('.back-btn[data-view]');if(btn)switchView(btn.dataset.view);});
+// BACK BUTTONS + SECTOR CARDS (delegation)
+document.addEventListener('click',function(e){
+  var btn=e.target.closest('.back-btn[data-view]');if(btn)switchView(btn.dataset.view);
+  var card=e.target.closest('.sector-card[data-view]');if(card)switchView(card.dataset.view);
+});
 
 // MOBILE MENU
 document.getElementById('menuToggle').addEventListener('click',function(){
