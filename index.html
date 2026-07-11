@@ -143,13 +143,11 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .bucket-val{font-size:12px;font-weight:600;width:28px;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);}
 
 /* LINUS TAKE */
-.ai-overview{background:#e8e0f4;border-radius:var(--radius-md);padding:16px 20px;border:1px solid #d5c8ec;margin-bottom:20px;}
-[data-theme="dark"] .ai-overview{background:#1e1830;border-color:#353050;}
-.ai-overview-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;font-weight:600;color:#3c2a6b;}
-[data-theme="dark"] .ai-overview-header{color:#b8a8e8;}
-.ai-overview-body{display:flex;flex-direction:column;gap:10px;}
-.ai-overview-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.55;color:var(--text);}
-.ai-bullet{width:6px;height:6px;border-radius:50%;background:#7b68b0;flex-shrink:0;margin-top:7px;}
+.linus-overview{background:var(--surface);border-radius:var(--radius-md);padding:20px 24px;border:1px solid var(--border);margin-bottom:20px;border-left:3px solid var(--accent);}
+.linus-overview-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:0.03em;text-transform:uppercase;}
+.linus-overview-body{display:flex;flex-direction:column;gap:12px;}
+.linus-overview-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.65;color:var(--text);}
+.linus-dot{width:5px;height:5px;border-radius:50%;background:var(--text-muted);flex-shrink:0;margin-top:8px;}
 
 /* PRICE / SCORE IN DETAIL */
 .detail-price-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;}
@@ -265,13 +263,14 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
         <div class="topbar-right"><button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
       </div>
       <div class="section">
-        <div class="ai-overview">
-        <div class="ai-overview-header"><svg class="ai-sparkle" width="16" height="16" viewBox="0 0 24 24" fill="#5b5bd6"><path d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5L12 2z"/></svg><span>AI Overview</span></div>
-        <div class="ai-overview-body">
-          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>Power bottleneck</strong> – GEV 氣渦輪機 backlog $150B (+100% YoY)，交期 5 年；SMR 核電 conditional offtake 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地。VST (87 B+), CEG (84 B+), TLN (71 B) 維持 Tier 1。</span></div>
-          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>GPU Cloud</strong> – Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 暴跌 ~12%。H100 供應已匹配需求，B200/GB200 出貨加速定價下行，neocloud 溢價收窄。CRWV (61 B-), NBIS (50 C+)。</span></div>
-          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>半導體</strong> – TSM 26.2× vs NVDA 19.7× fwd P/E。CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 60-70%。NVDA (66 B-), CRDO (73 B)。</span></div>
-          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>Anti-AGI waste</strong> – META 2026 capex $125-145B，「燒錢」敘事加深。RSG (75 B), WCN (74 B), GFL (72 B) 必需服務不受 capex cycle 影響，資本回報確定性高於 AI 鏈。</span></div>
+        <div class="linus-overview">
+        <div class="linus-overview-header">Linus's Overview · Jul 10, 2026</div>
+        <div class="linus-overview-body">
+          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Power bottleneck</strong> — GEV 氣渦輪機 backlog 突破 $150B (+100% YoY)，交期拉到 5 年；SMR 核電 conditional offtake 已達 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地 — BE 燃料電池喺亞洲/歐洲定價具競爭力。VST (87 B+), CEG (84 B+), TLN (71 B) 維持 Tier 1。Power 結構性 bottleneck 未見緩解，核電 + 天然氣係中線確定性最高嘅 sub-theme。</span></div>
+          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>GPU Cloud</strong> — Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 單日暴跌 ~12%。H100 供應已追平需求，B200/GB200 Q1 出貨加速 GPU 定價下行，neocloud 溢價收窄。CRWV (61 B-) 面臨結構性定價壓力，NBIS (50 C+) 基本面最弱。呢個 sector 短期 avoid。</span></div>
+          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>半導體</strong> — TSM 26.2× vs NVDA 19.7× fwd P/E。CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 60-70%。NVDA (66 B-) intentional suppressed — it's "the gold" not the shovel。CRDO (73 B) 有 insider $8.3M sell 短期觀望。半導體 hold 觀察為主。</span></div>
+          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Anti-AGI waste</strong> — META 2026 capex 上調至 $125-145B，「燒錢」敘事加深。RSG (75 B), WCN (74 B), GFL (72 B) 必需服務完全不受 capex cycle 影響，資本回報確定性極高。WM (74 B) 亦穩健。整體 anti-AGI 係本週相對確定嘅避險方向。</span></div>
+          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Sentiment signals</strong> — ORCL (68 B-) 有 +88% analyst upside，sentiment + fundamental 最 align 嘅 pick；CRDO insider $8.3M sell + BE insider $2.5M sell 短期避開。整體 mixed 訊號，主倉位 VST/CEG/RSG hold，觀望 GPU cloud 壓力消化。</span></div>
         </div>
       </div>
       </div>
