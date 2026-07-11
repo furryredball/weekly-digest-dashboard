@@ -143,11 +143,13 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .bucket-val{font-size:12px;font-weight:600;width:28px;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);}
 
 /* LINUS TAKE */
-.linus-take{background:var(--surface);border-radius:var(--radius-md);padding:20px;border:1px solid var(--border);margin-top:24px;}
-.linus-take-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.linus-avatar{width:28px;height:28px;background:var(--text);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--surface);font-weight:600;font-size:12px;}
-.linus-take-title{font-size:13px;font-weight:600;}
-.linus-take-body{font-size:13px;line-height:1.6;color:var(--text-muted);}
+.ai-overview{background:#e8e0f4;border-radius:var(--radius-md);padding:16px 20px;border:1px solid #d5c8ec;margin-bottom:20px;}
+[data-theme="dark"] .ai-overview{background:#1e1830;border-color:#353050;}
+.ai-overview-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;font-weight:600;color:#3c2a6b;}
+[data-theme="dark"] .ai-overview-header{color:#b8a8e8;}
+.ai-overview-body{display:flex;flex-direction:column;gap:10px;}
+.ai-overview-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.55;color:var(--text);}
+.ai-bullet{width:6px;height:6px;border-radius:50%;background:#7b68b0;flex-shrink:0;margin-top:7px;}
 
 /* PRICE / SCORE IN DETAIL */
 .detail-price-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;}
@@ -263,8 +265,15 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
         <div class="topbar-right"><button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
       </div>
       <div class="section">
-        <div class="linus-take-head"><div class="linus-avatar">L</div><div><div class="linus-take-title">Linus 一週觀察</div><div style="font-size:10px;color:var(--text-muted);">AI Investment Research · Jul 10, 2026</div></div></div>
-        <div class="linus-take-body">本週 AGI infra 主題集中喺四個方向。（一）Power bottleneck：GEV 氣渦輪機 backlog 突破 $150B，訂單按年翻倍，交期拉到 5 年；SMR 核電 conditional offtake 已達 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地 — BE 燃料電池喺亞洲/歐洲定價具競爭力，留意 VST/CEG/TLN 維持 Tier 1。（二）GPU Cloud：Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 單日暴跌 ~12%，H100 供應已追平需求，B200/GB200 Q1 出貨加速 GPU 定價下行，neocloud 溢價收窄。（三）半導體：TSM 26.2x vs NVDA 19.7x fwd P/E，CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 六至七成。（四）Anti-AGI waste：META 2026 capex 上調至 $125-145B，「燒錢」敘事加深；避險倉位 RSG/WCN/GFL 呢類必需服務不受 capex cycle 影響，資本回報確定性高於 AI 鏈。整體而言，power 同 anti-AGI 係本週相對確定嘅方向，GPU cloud 面臨結構性定價壓力，半導體 hold 觀察。</div>
+        <div class="ai-overview">
+        <div class="ai-overview-header"><svg class="ai-sparkle" width="16" height="16" viewBox="0 0 24 24" fill="#5b5bd6"><path d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5L12 2z"/></svg><span>AI Overview</span></div>
+        <div class="ai-overview-body">
+          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>Power bottleneck</strong> – GEV 氣渦輪機 backlog $150B (+100% YoY)，交期 5 年；SMR 核電 conditional offtake 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地。VST (87 B+), CEG (84 B+), TLN (71 B) 維持 Tier 1。</span></div>
+          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>GPU Cloud</strong> – Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 暴跌 ~12%。H100 供應已匹配需求，B200/GB200 出貨加速定價下行，neocloud 溢價收窄。CRWV (61 B-), NBIS (50 C+)。</span></div>
+          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>半導體</strong> – TSM 26.2× vs NVDA 19.7× fwd P/E。CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 60-70%。NVDA (66 B-), CRDO (73 B)。</span></div>
+          <div class="ai-overview-item"><span class="ai-bullet"></span><span><strong>Anti-AGI waste</strong> – META 2026 capex $125-145B，「燒錢」敘事加深。RSG (75 B), WCN (74 B), GFL (72 B) 必需服務不受 capex cycle 影響，資本回報確定性高於 AI 鏈。</span></div>
+        </div>
+      </div>
       </div>
       <div class="kpi-grid">
         <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta">5 hits · 主導 bottleneck</div></div>
@@ -287,9 +296,6 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
           <div class="signal-col"><div class="signal-col-head"><span class="dot dot-exclude"></span>Exclude<span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;">3 picks</span></div><div id="excludeList"></div></div>
         </div>
       </div>
-      <div class="linus-take">
-        <div class="linus-take-head"><div class="linus-avatar">L</div><div><div class="linus-take-title">Linus 一週觀察</div><div style="font-size:10px;color:var(--text-muted);">AI Investment Research</div></div></div>
-        <div class="linus-take-body">本週 AGI infra 新聞一般，bottleneck 訊號未明顯，繼續觀察。電力 bucket 持續主導 (5 hits)，Tier 1 嘅 VST/CEG/TLN 全部有新聞催化；ETN 出現 Tier 2 — 留意 electrical backlog 故事比 data-center trade 更闊。Sentiment-side，ORCL +88% upside 係 sentiment + fundamental 最 align 嘅 pick；但 CRDO insider $8.3M sell + BE insider $2.5M sell 短期 avoid。整體 mixed 訊號，主倉位 hold 觀察為主。</div>
       </div>
     </div>
 
