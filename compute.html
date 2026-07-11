@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compute Infra — Weekly Investing Digest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root, [data-theme="light"]{
+--bg:#faf9f7;--surface:#ffffff;--surface-2:#f5f4f2;--surface-3:#efeeec;
+--border:#e8e6e3;--border-strong:#d9d6d2;
+--text:#2c2c2a;--text-muted:#8a8a85;--text-faint:#b5b5b0;
+--accent:#7a7a78;--accent-light:#f0f0ee;
+--success:#6b8e6b;--success-light:#eef4ee;
+--warning:#b8924a;--warning-light:#f7f1e8;
+--error:#b85c5c;--error-light:#f7eeed;
+--purple:#8b7dbe;--purple-light:#f1effa;
+--tier1:#2c2c2a;--tier2:#7a7a78;--tier3:#b8924a;--tier4:#8b7dbe;
+--radius-sm:4px;--radius-md:6px;--radius-lg:8px;
+--shadow:0 1px 2px rgba(0,0,0,0.03);
+}
+[data-theme="dark"]{
+--bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
+--border:#383836;--border-strong:#484845;
+--text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
+--accent:#a0a09c;--accent-light:#2e2e2c;
+--success:#7a9d7a;--success-light:#1e2a1e;
+--warning:#c4a462;--warning-light:#2a2418;
+--error:#c87878;--error-light:#2a1e1e;
+--purple:#9999c0;--purple-light:#22202a;
+--tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
+--shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+@media (prefers-color-scheme: dark){
+:root{
+--bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
+--border:#383836;--border-strong:#484845;
+--text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
+--accent:#a0a09c;--accent-light:#2e2e2c;
+--success:#7a9d7a;--success-light:#1e2a1e;
+--warning:#c4a462;--warning-light:#2a2418;
+--error:#c87878;--error-light:#2a1e1e;
+--purple:#9999c0;--purple-light:#22202a;
+--tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
+--shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:var(--text);background:var(--bg);min-height:100vh;font-feature-settings:'tnum' 1;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+
+/* SIDEBAR */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;transition:transform 0.25s ease;}
+.sidebar-logo{font-size:15px;font-weight:600;letter-spacing:-0.01em;padding:0 8px 20px;display:flex;align-items:center;gap:10px;}
+.logo-mark{width:28px;height:28px;background:var(--text);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--surface);font-weight:700;font-size:13px;}
+.logo-sub{font-size:11px;color:var(--text-muted);font-weight:400;margin-top:1px;}
+.nav-section{font-size:10px;font-weight:600;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;padding:16px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;font-weight:400;transition:background 0.15s,color 0.15s;}
+.nav-item:hover{background:var(--surface-2);color:var(--text);}
+.nav-item.active{background:var(--surface-3);color:var(--text);font-weight:500;}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
+.nav-item:hover svg{opacity:0.8;}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+.nav-item-ext{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;}
+.nav-item-ext:hover{background:var(--surface-2);color:var(--text);}
+.nav-item-ext svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
+
+/* MAIN */
+.main{flex:1;min-width:0;padding:32px 40px 64px;max-width:1200px;}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;}
+.topbar-left h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;}
+.topbar-left .subtitle{font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-muted);border:1px solid var(--border);}
+.icon-btn:hover{background:var(--surface-2);color:var(--text);}
+.icon-btn svg{width:15px;height:15px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.kpi-card{background:var(--surface);border-radius:var(--radius-md);padding:18px 20px;border:1px solid var(--border);}
+.kpi-card.featured{background:var(--surface-3);border-color:var(--border-strong);}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;}
+.kpi-value{font-size:28px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;}
+.kpi-meta{font-size:11px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums;}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-weight:500;}
+.delta-up{color:var(--success);}.delta-down{color:var(--error);}.delta-neutral{color:var(--text-muted);}
+
+/* SECTION */
+.section{margin-bottom:32px;}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:16px;font-weight:600;letter-spacing:-0.01em;}
+.section-meta{font-size:11px;color:var(--text-muted);}
+
+/* SECTOR CARDS */
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.sector-card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.sector-card:hover{border-color:var(--border-strong);background:var(--surface-2);}
+.sector-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sector-name{font-size:13px;font-weight:600;}
+.sector-tier-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:0.05em;text-transform:uppercase;}
+.tier-1{background:var(--tier1);color:var(--bg);}
+.tier-2{background:var(--accent-light);color:var(--accent);}
+.tier-3{background:var(--warning-light);color:var(--warning);}
+.tier-4{background:var(--purple-light);color:var(--purple);}
+.sector-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.ticker-chip{font-size:11px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--surface-2);color:var(--text);font-variant-numeric:tabular-nums;}
+.ticker-chip.up{background:var(--success-light);color:var(--success);}
+.ticker-chip.down{background:var(--error-light);color:var(--error);}
+.sector-meta{font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;}
+
+/* TICKER CARDS */
+.ticker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.ticker-card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.ticker-card:hover{border-color:var(--border-strong);background:var(--surface-2);}
+.ticker-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}
+.ticker-symbol{font-size:16px;font-weight:600;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+.ticker-name{font-size:11px;color:var(--text-muted);margin-bottom:4px;}
+.ticker-desc{font-size:11px;color:var(--text);line-height:1.45;margin-bottom:4px;}
+.ticker-why{font-size:10px;color:var(--accent);line-height:1.4;padding:4px 8px;background:var(--accent-light);border-radius:var(--radius-sm);margin-bottom:8px;}
+.ticker-news-count{font-size:10px;font-weight:500;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+.ticker-signal{font-size:12px;color:var(--text);line-height:1.5;padding-top:10px;border-top:1px solid var(--border);margin-top:8px;}
+.ticker-signal-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+
+/* SIGNAL LIST */
+.signal-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.signal-col{background:var(--surface);border-radius:var(--radius-md);padding:18px;border:1px solid var(--border);}
+.signal-col-head{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:12px;}
+.signal-col-head .dot{width:6px;height:6px;border-radius:50%;}
+.dot-include{background:var(--success);}.dot-exclude{background:var(--error);}
+.signal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border);}
+.signal-row:first-of-type{border-top:none;}
+.signal-ticker{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+.signal-tag{font-size:10px;color:var(--text-muted);font-weight:400;}
+.signal-upside{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+.upside-up{color:var(--success);}.upside-down{color:var(--error);}
+
+/* BUCKET BARS */
+.bucket-bars{background:var(--surface);border-radius:var(--radius-md);padding:18px;border:1px solid var(--border);}
+.bucket-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.bucket-label{font-size:12px;font-weight:500;width:100px;}
+.bucket-bar-wrap{flex:1;height:4px;background:var(--surface-3);border-radius:2px;overflow:hidden;}
+.bucket-bar{height:100%;background:var(--text-muted);border-radius:2px;transition:width 0.8s cubic-bezier(0.16,1,0.3,1);}
+.bucket-val{font-size:12px;font-weight:600;width:28px;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);}
+
+/* LINUS TAKE */
+.linus-overview{background:var(--surface);border-radius:var(--radius-md);padding:20px 24px;border:1px solid var(--border);margin-bottom:20px;border-left:3px solid var(--accent);}
+.linus-overview-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:0.03em;text-transform:uppercase;}
+.linus-overview-body{display:flex;flex-direction:column;gap:12px;}
+.linus-overview-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.65;color:var(--text);}
+.linus-dot{width:5px;height:5px;border-radius:50%;background:var(--text-muted);flex-shrink:0;margin-top:8px;}
+
+/* PRICE / SCORE IN DETAIL */
+.detail-price-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;}
+.detail-price{font-size:24px;font-weight:600;}
+.detail-trend{font-size:14px;color:var(--text-muted);}
+.detail-score-badge{font-size:12px;padding:4px 10px;border-radius:12px;font-weight:600;}
+.grade-A{background:#1b5e20;color:#fff;}
+.grade-B-plus{background:#2e7d32;color:#fff;}
+.grade-B{background:#f9a825;color:#000;}
+.grade-B-minus{background:#ef6c00;color:#fff;}
+.grade-C-plus{background:#d84315;color:#fff;}
+
+/* SCORING PAGE */
+.scoring-section{margin-bottom:28px;}
+.scoring-section h2{font-size:16px;font-weight:600;margin-bottom:10px;}
+.scoring-section p{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:8px;}
+.scoring-dims{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px;}
+.scoring-dim{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;}
+.scoring-dim-name{font-size:12px;font-weight:600;margin-bottom:2px;}
+.scoring-dim-pts{font-size:20px;font-weight:600;color:var(--text-muted);}
+.scoring-dim-desc{font-size:10px;color:var(--text-faint);margin-top:2px;}
+.grade-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:20px;}
+.grade-table th,.grade-table td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.grade-table th{font-weight:600;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;}
+.rank-table{width:100%;border-collapse:collapse;font-size:12px;}
+.rank-table th{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.05em;}
+.rank-table td{padding:6px 10px;border-bottom:1px solid var(--border);}
+.rank-num{color:var(--text-faint);font-weight:500;width:24px;text-align:right;}
+
+/* TICKER CARD PRICE */
+.ticker-price-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px;}
+.ticker-price{font-weight:600;font-variant-numeric:tabular-nums;}
+.ticker-price-up{color:var(--success);}
+.ticker-price-down{color:var(--error);}
+.ticker-score{font-size:9px;padding:1px 6px;border-radius:8px;font-weight:600;margin-left:auto;}
+
+/* DETAIL VIEW */
+.panel-view{display:none;}
+.panel-view.active{display:block;}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;margin-bottom:16px;font-weight:400;background:none;border:none;padding:0;}
+.back-btn:hover{color:var(--text);text-decoration:underline;}
+.detail-head{background:var(--surface);border-radius:var(--radius-md);padding:24px;border:1px solid var(--border);margin-bottom:20px;}
+.detail-head-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+.detail-symbol{font-size:36px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+.detail-name{font-size:14px;color:var(--text-muted);}
+.detail-desc{font-size:13px;color:var(--text);line-height:1.5;margin-top:8px;padding:0 0 4px 0;}
+.detail-why{font-size:12px;color:var(--accent);line-height:1.5;padding:8px 10px;background:var(--accent-light);border-radius:var(--radius-sm);margin:8px 0 12px 0;}
+.detail-news-list{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border);overflow:hidden;}
+.detail-news-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.detail-news-item:last-child{border-bottom:none;}
+.detail-news-item:hover{background:var(--surface-2);}
+.detail-news-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px;color:var(--text-muted);}
+.detail-news-source{font-weight:600;color:var(--text);}
+.detail-news-title{font-size:13px;font-weight:400;line-height:1.4;}
+
+/* MOBILE */
+.menu-toggle{display:none;}
+.sidebar-overlay{display:none;}
+@media (max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.signal-list{grid-template-columns:1fr;}}
+@media (max-width:768px){
+.menu-toggle{display:flex;position:fixed;top:12px;left:12px;z-index:99;width:36px;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);align-items:center;justify-content:center;color:var(--text);}
+.sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.sidebar-overlay.active{opacity:1;pointer-events:auto;}
+.sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);width:260px;}
+.sidebar.open{transform:translateX(0);}
+.main{padding:56px 16px 48px;}
+.topbar-left h1{font-size:22px;}
+.kpi-value{font-size:22px;}
+}
+
+</style>
+<script src="data.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">L</div>
+      <div>
+        <div>Linus Digest</div>
+        <div class="logo-sub">Weekly investing dashboard</div>
+      </div>
+    </div>
+    <div style="padding:0 8px 12px;"><a href="index.html" style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">← Main Dashboard</a></div>
+    <nav>
+      <div class="nav-section">Sectors</div>
+      <div class="nav-item" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge">6</span></div>
+      <div class="nav-item" onclick="location.href='compute.html'" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='semis.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">1</span></div>
+      <div class="nav-section">避險</div>
+      <div class="nav-item" onclick="location.href='anti-agi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Anti AGI<span class="nav-badge">5</span></div>
+      <div class="nav-section">Watchlist</div>
+      <div class="nav-item" onclick="location.href='index.html#include'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge">4</span></div>
+      <div class="nav-item" onclick="location.href='index.html#exclude'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge">2</span></div>
+      <div class="nav-section">Analysis</div>
+      <div class="nav-item" onclick="location.href='index.html#scoring'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Scoring</span></div>
+      <div class="nav-section">Linus</div>
+      <div class="nav-item-ext" onclick="location.href='linus-invest.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
+      <div class="nav-section">Theme</div>
+      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Compute Infra</h1><div class="subtitle">GPU Cloud + networking · 2 tickers</div></div>
+      <div class="topbar-right"><button class="icon-btn" onclick="location.href='index.html'" title="Back to Dashboard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button></div>
+    </div>
+    <div class="ticker-grid" id="tickerGrid"></div>
+  </main>
+</div>
+<script>
+var tickers = ['CRWV','GDS'];
+renderSectorGrid('tickerGrid', tickers);
+</script>
+</body>
+</html>

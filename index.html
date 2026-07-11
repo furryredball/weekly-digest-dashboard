@@ -243,12 +243,12 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
         Dashboard
       </div>
       <div class="nav-section">Sectors</div>
-      <div class="nav-item" data-view="sector-power"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge" id="badge-power">6</span></div>
-      <div class="nav-item" data-view="sector-compute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
-      <div class="nav-item" data-view="sector-semis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
-      <div class="nav-item" data-view="sector-software"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">1</span></div>
+      <div class="nav-item" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge">6</span></div>
+      <div class="nav-item" onclick="location.href='compute.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='semis.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">1</span></div>
       <div class="nav-section">避險</div>
-      <div class="nav-item" data-view="anti-agi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Anti AGI<span class="nav-badge">5</span></div>
+      <div class="nav-item" onclick="location.href='anti-agi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Anti AGI<span class="nav-badge">5</span></div>
       <div class="nav-section">Watchlist</div>
       <div class="nav-item" data-view="include"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge">4</span></div>
       <div class="nav-item" data-view="exclude"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge">2</span></div>
@@ -266,7 +266,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
     <div class="panel-view active" id="view-dashboard">
       <div class="topbar">
-        <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle">2026-06-28 to 2026-07-04 · 20 tickers · 40 news · 5 trading days</div></div>
+        <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle">2026-06-28 to 2026-07-04 · 17 tickers · 40 news · 5 trading days</div></div>
         <div class="topbar-right"><button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
       </div>
       <div class="section">
@@ -306,11 +306,6 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
 
     <div class="panel-view" id="view-detail"><button class="back-btn" data-view="dashboard">← Back</button><div id="detailContent"></div></div>
-    <div class="panel-view" id="view-sector-power"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Power Sector</h1><div class="subtitle">電力 bottleneck · 6 tickers · Tier 1-3</div></div></div><div class="ticker-grid" id="powerGrid"></div></div>
-    <div class="panel-view" id="view-sector-compute"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Compute Infra</h1><div class="subtitle">GPU Cloud + networking · 2 tickers</div></div></div><div class="ticker-grid" id="computeGrid"></div></div>
-    <div class="panel-view" id="view-sector-semis"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>半導體 Semiconductors</h1><div class="subtitle">Observe only · 2 tickers</div></div></div><div class="ticker-grid" id="semisGrid"></div></div>
-    <div class="panel-view" id="view-sector-software"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Software</h1><div class="subtitle">Data + apps · 1 ticker</div></div></div><div class="ticker-grid" id="softwareGrid"></div></div>
-    <div class="panel-view" id="view-anti-agi"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Anti AGI</h1><div class="subtitle">避險 waste + defensive plays · 5 tickers</div></div></div><div class="ticker-grid" id="antiAGIGrid"></div></div>
     <div class="panel-view" id="view-include"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Stocks to Include</h1><div class="subtitle">4 picks passing sentiment + fundamental filter</div></div></div><div id="includeFull"></div></div>
     <div class="panel-view" id="view-exclude"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Stocks to Exclude</h1><div class="subtitle">2 picks with overheating signal</div></div></div><div id="excludeFull"></div></div>
     <div class="panel-view" id="view-scoring">
@@ -353,8 +348,8 @@ const buckets=[{label:'電力 Power',val:7},{label:'GPU Cloud',val:3},{label:'Ne
 document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
 
 // SECTOR CARDS
-const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',view:'sector-power'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',view:'sector-compute'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',view:'sector-semis'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',view:'sector-software'},{name:'Defensive',tickers:['BRK.B','WM'],tier:'4',tierName:'HEDGE',view:null},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','BRK.B'],tier:'4',tierName:'TIER 4',view:'anti-agi'}];
-document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.view?' data-view="'+s.view+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.view?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
+const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Defensive',tickers:['BRK.B','WM'],tier:'4',tierName:'HEDGE',page:null},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','BRK.B'],tier:'4',tierName:'TIER 4',page:'anti-agi.html'}];
+document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.page?' onclick="location.href='+String.fromCharCode(39)+s.page+String.fromCharCode(39)+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.page?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
 // INCLUDE/EXCLUDE
 document.getElementById('includeList').innerHTML=INCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.note+'</div></div><div class="signal-upside upside-up">'+s.upside+'</div></div>'}).join('');
@@ -371,18 +366,7 @@ function tickerCard(t){
   return '<div class="ticker-card" data-ticker="'+t.ticker+'"><div class="ticker-head"><div class="ticker-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="ticker-price-row"><span class="ticker-price '+priceClass+'">$'+t.price.toFixed(t.price<1?4:2)+'</span><span class="'+priceClass+'">'+t.trend+' '+t.pct+'</span><span class="ticker-score '+gradeClass+'">'+t.score+' '+t.grade+'</span></div><div class="ticker-name">'+t.name+'</div><div class="ticker-desc">'+t.desc+'</div><div class="ticker-why">💡 '+t.why+'</div><div class="ticker-news-count">'+t.news.length+' news items</div><div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+(t.news[0]?t.news[0].title.slice(0,100)+'...':'No news')+'</div></div>';
 }
 
-// SECTOR GRIDS
-function renderSectorGrid(id,list){
-  var g=document.getElementById(id);if(!g)return;
-  var ts=TICKERS.filter(function(t){return list.indexOf(t.ticker)>=0});
-  g.innerHTML=ts.length?ts.map(tickerCard).join(''):'<div style="color:var(--text-muted);padding:40px;text-align:center;">No tracked tickers this week</div>';
-  g.querySelectorAll('.ticker-card').forEach(function(c){c.addEventListener('click',function(){showTickerDetail(c.dataset.ticker)})});
-}
-renderSectorGrid('powerGrid',SECTORS.power);
-renderSectorGrid('computeGrid',SECTORS.compute);
-renderSectorGrid('semisGrid',SECTORS.semis);
-renderSectorGrid('softwareGrid',SECTORS.software);
-renderSectorGrid('antiAGIGrid',SECTORS.anti_agi);
+// SECTOR GRIDS (now in separate pages: power.html, compute.html, etc.)
 
 // DETAIL VIEW
 function showTickerDetail(ticker){
@@ -450,12 +434,11 @@ function switchView(viewId){
   var n=document.querySelector('[data-view="'+viewId+'"]');if(n)n.classList.add('active');
   if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
 }
-document.querySelectorAll('.nav-item').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
+document.querySelectorAll('.nav-item[data-view]').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
 
-// BACK BUTTONS + SECTOR CARDS (delegation)
+// BACK BUTTONS (delegation)
 document.addEventListener('click',function(e){
   var btn=e.target.closest('.back-btn[data-view]');if(btn)switchView(btn.dataset.view);
-  var card=e.target.closest('.sector-card[data-view]');if(card)switchView(card.dataset.view);
 });
 
 // MOBILE MENU
