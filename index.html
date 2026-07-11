@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Investing Digest — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="light"]{
+--bg:#faf9f7;--surface:#ffffff;--surface-2:#f5f4f2;--surface-3:#efeeec;
+--border:#e8e6e3;--border-strong:#d9d6d2;
+--text:#2c2c2a;--text-muted:#8a8a85;--text-faint:#b5b5b0;
+--accent:#7a7a78;--accent-light:#f0f0ee;
+--success:#6b8e6b;--success-light:#eef4ee;
+--warning:#b8924a;--warning-light:#f7f1e8;
+--error:#b85c5c;--error-light:#f7eeed;
+--purple:#8b7dbe;--purple-light:#f1effa;
+--tier1:#2c2c2a;--tier2:#7a7a78;--tier3:#b8924a;--tier4:#8b7dbe;
+--radius-sm:4px;--radius-md:6px;--radius-lg:8px;
+--shadow:0 1px 2px rgba(0,0,0,0.03);
+}
+[data-theme="dark"]{
+--bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
+--border:#383836;--border-strong:#484845;
+--text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
+--accent:#a0a09c;--accent-light:#2e2e2c;
+--success:#7a9d7a;--success-light:#1e2a1e;
+--warning:#c4a462;--warning-light:#2a2418;
+--error:#c87878;--error-light:#2a1e1e;
+--purple:#9999c0;--purple-light:#22202a;
+--tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
+--shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+@media (prefers-color-scheme: dark){
+:root{
+--bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
+--border:#383836;--border-strong:#484845;
+--text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
+--accent:#a0a09c;--accent-light:#2e2e2c;
+--success:#7a9d7a;--success-light:#1e2a1e;
+--warning:#c4a462;--warning-light:#2a2418;
+--error:#c87878;--error-light:#2a1e1e;
+--purple:#9999c0;--purple-light:#22202a;
+--tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
+--shadow:0 1px 2px rgba(0,0,0,0.2);
+}
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:var(--text);background:var(--bg);min-height:100vh;font-feature-settings:'tnum' 1;}
+a{color:inherit;text-decoration:none;}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
+
+/* SIDEBAR */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;transition:transform 0.25s ease;}
+.sidebar-logo{font-size:15px;font-weight:600;letter-spacing:-0.01em;padding:0 8px 20px;display:flex;align-items:center;gap:10px;}
+.logo-mark{width:28px;height:28px;background:var(--text);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--surface);font-weight:700;font-size:13px;}
+.logo-sub{font-size:11px;color:var(--text-muted);font-weight:400;margin-top:1px;}
+.nav-section{font-size:10px;font-weight:600;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;padding:16px 8px 4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;font-weight:400;transition:background 0.15s,color 0.15s;}
+.nav-item:hover{background:var(--surface-2);color:var(--text);}
+.nav-item.active{background:var(--surface-3);color:var(--text);font-weight:500;}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
+.nav-item.active svg{opacity:0.8;}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+
+/* MAIN */
+.main{flex:1;min-width:0;padding:32px 40px 64px;max-width:1200px;}
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;}
+.topbar-left h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;}
+.topbar-left .subtitle{font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:400;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--text-muted);border:1px solid var(--border);}
+.icon-btn:hover{background:var(--surface-2);color:var(--text);}
+.icon-btn svg{width:15px;height:15px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.kpi-card{background:var(--surface);border-radius:var(--radius-md);padding:18px 20px;border:1px solid var(--border);}
+.kpi-card.featured{background:var(--surface-3);border-color:var(--border-strong);}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:6px;}
+.kpi-value{font-size:28px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;}
+.kpi-meta{font-size:11px;color:var(--text-muted);margin-top:6px;font-variant-numeric:tabular-nums;}
+.kpi-delta{display:inline-flex;align-items:center;gap:3px;font-weight:500;}
+.delta-up{color:var(--success);}.delta-down{color:var(--error);}.delta-neutral{color:var(--text-muted);}
+
+/* SECTION */
+.section{margin-bottom:32px;}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:16px;font-weight:600;letter-spacing:-0.01em;}
+.section-meta{font-size:11px;color:var(--text-muted);}
+
+/* SECTOR CARDS */
+.sector-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.sector-card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.sector-card:hover{border-color:var(--border-strong);background:var(--surface-2);}
+.sector-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sector-name{font-size:13px;font-weight:600;}
+.sector-tier-badge{font-size:9px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:0.05em;text-transform:uppercase;}
+.tier-1{background:var(--tier1);color:var(--bg);}
+.tier-2{background:var(--accent-light);color:var(--accent);}
+.tier-3{background:var(--warning-light);color:var(--warning);}
+.tier-4{background:var(--purple-light);color:var(--purple);}
+.sector-tickers{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px;}
+.ticker-chip{font-size:11px;font-weight:500;padding:2px 7px;border-radius:3px;background:var(--surface-2);color:var(--text);font-variant-numeric:tabular-nums;}
+.ticker-chip.up{background:var(--success-light);color:var(--success);}
+.ticker-chip.down{background:var(--error-light);color:var(--error);}
+.sector-meta{font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between;}
+
+/* TICKER CARDS */
+.ticker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.ticker-card{background:var(--surface);border-radius:var(--radius-md);padding:16px 18px;border:1px solid var(--border);cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+.ticker-card:hover{border-color:var(--border-strong);background:var(--surface-2);}
+.ticker-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2px;}
+.ticker-symbol{font-size:16px;font-weight:600;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
+.ticker-name{font-size:11px;color:var(--text-muted);margin-bottom:10px;}
+.ticker-news-count{font-size:10px;font-weight:500;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+.ticker-signal{font-size:12px;color:var(--text);line-height:1.5;padding-top:10px;border-top:1px solid var(--border);margin-top:8px;}
+.ticker-signal-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+
+/* SIGNAL LIST */
+.signal-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.signal-col{background:var(--surface);border-radius:var(--radius-md);padding:18px;border:1px solid var(--border);}
+.signal-col-head{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:12px;}
+.signal-col-head .dot{width:6px;height:6px;border-radius:50%;}
+.dot-include{background:var(--success);}.dot-exclude{background:var(--error);}
+.signal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-top:1px solid var(--border);}
+.signal-row:first-of-type{border-top:none;}
+.signal-ticker{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+.signal-tag{font-size:10px;color:var(--text-muted);font-weight:400;}
+.signal-upside{font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;}
+.upside-up{color:var(--success);}.upside-down{color:var(--error);}
+
+/* BUCKET BARS */
+.bucket-bars{background:var(--surface);border-radius:var(--radius-md);padding:18px;border:1px solid var(--border);}
+.bucket-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.bucket-label{font-size:12px;font-weight:500;width:100px;}
+.bucket-bar-wrap{flex:1;height:4px;background:var(--surface-3);border-radius:2px;overflow:hidden;}
+.bucket-bar{height:100%;background:var(--text-muted);border-radius:2px;transition:width 0.8s cubic-bezier(0.16,1,0.3,1);}
+.bucket-val{font-size:12px;font-weight:600;width:28px;text-align:right;font-variant-numeric:tabular-nums;color:var(--text-muted);}
+
+/* LINUS TAKE */
+.linus-take{background:var(--surface);border-radius:var(--radius-md);padding:20px;border:1px solid var(--border);margin-top:24px;}
+.linus-take-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.linus-avatar{width:28px;height:28px;background:var(--text);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--surface);font-weight:600;font-size:12px;}
+.linus-take-title{font-size:13px;font-weight:600;}
+.linus-take-body{font-size:13px;line-height:1.6;color:var(--text-muted);}
+
+/* DETAIL VIEW */
+.panel-view{display:none;}
+.panel-view.active{display:block;}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);cursor:pointer;margin-bottom:16px;font-weight:400;background:none;border:none;padding:0;}
+.back-btn:hover{color:var(--text);text-decoration:underline;}
+.detail-head{background:var(--surface);border-radius:var(--radius-md);padding:24px;border:1px solid var(--border);margin-bottom:20px;}
+.detail-head-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;}
+.detail-symbol{font-size:36px;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+.detail-name{font-size:14px;color:var(--text-muted);}
+.detail-news-list{background:var(--surface);border-radius:var(--radius-md);border:1px solid var(--border);overflow:hidden;}
+.detail-news-item{padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.detail-news-item:last-child{border-bottom:none;}
+.detail-news-item:hover{background:var(--surface-2);}
+.detail-news-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px;color:var(--text-muted);}
+.detail-news-source{font-weight:600;color:var(--text);}
+.detail-news-title{font-size:13px;font-weight:400;line-height:1.4;}
+
+/* MOBILE */
+.menu-toggle{display:none;}
+.sidebar-overlay{display:none;}
+@media (max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.signal-list{grid-template-columns:1fr;}}
+@media (max-width:768px){
+.menu-toggle{display:flex;position:fixed;top:12px;left:12px;z-index:99;width:36px;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);align-items:center;justify-content:center;color:var(--text);}
+.sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.sidebar-overlay.active{opacity:1;pointer-events:auto;}
+.sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);width:260px;}
+.sidebar.open{transform:translateX(0);}
+.main{padding:56px 16px 48px;}
+.topbar-left h1{font-size:22px;}
+.kpi-value{font-size:22px;}
+}
+</style>
+</head>
+<body>
+<!-- BODY placeholder -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">L</div>
+      <div>
+        <div>Linus Digest</div>
+        <div class="logo-sub">Weekly investing dashboard</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-section">Sectors</div>
+      <div class="nav-item" data-view="sector-power"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge" id="badge-power">7</span></div>
+      <div class="nav-item" data-view="sector-compute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
+      <div class="nav-item" data-view="sector-semis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">3</span></div>
+      <div class="nav-item" data-view="sector-software"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">1</span></div>
+      <div class="nav-section">避險</div>
+      <div class="nav-item" data-view="anti-agi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Anti AGI<span class="nav-badge">6</span></div>
+      <div class="nav-section">Watchlist</div>
+      <div class="nav-item" data-view="include"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge">4</span></div>
+      <div class="nav-item" data-view="exclude"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge">3</span></div>
+      <div class="nav-section">Theme</div>
+      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+
+    <div class="panel-view active" id="view-dashboard">
+      <div class="topbar">
+        <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle">2026-06-28 to 2026-07-04 · 20 tickers · 40 news · 5 trading days</div></div>
+        <div class="topbar-right"><button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta">5 hits · 主導 bottleneck</div></div>
+        <div class="kpi-card"><div class="kpi-label">Tickers tracked</div><div class="kpi-value">20</div><div class="kpi-meta"><span class="kpi-delta delta-up">+2</span> vs last week</div></div>
+        <div class="kpi-card"><div class="kpi-label">News ingested</div><div class="kpi-value">40</div><div class="kpi-meta"><span class="kpi-delta delta-up">+18</span> vs last week</div></div>
+        <div class="kpi-card"><div class="kpi-label">Frame hit rate</div><div class="kpi-value">17/20</div><div class="kpi-meta"><span class="kpi-delta delta-up">85%</span> in bottleneck</div></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">Bottleneck distribution</div><div class="section-meta">16 stocks mapped</div></div>
+        <div class="bucket-bars" id="bucketBars"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">Sector coverage</div><div class="section-meta">Click for drilldown</div></div>
+        <div class="sector-grid" id="sectorGrid"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">Sentiment signals</div><div class="section-meta">From Linus AI Research</div></div>
+        <div class="signal-list">
+          <div class="signal-col"><div class="signal-col-head"><span class="dot dot-include"></span>Include<span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;">4 picks</span></div><div id="includeList"></div></div>
+          <div class="signal-col"><div class="signal-col-head"><span class="dot dot-exclude"></span>Exclude<span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;">3 picks</span></div><div id="excludeList"></div></div>
+        </div>
+      </div>
+      <div class="linus-take">
+        <div class="linus-take-head"><div class="linus-avatar">L</div><div><div class="linus-take-title">Linus 一週觀察</div><div style="font-size:10px;color:var(--text-muted);">AI Investment Research</div></div></div>
+        <div class="linus-take-body">本週 AGI infra 新聞一般，bottleneck 訊號未明顯，繼續觀察。電力 bucket 持續主導 (5 hits)，Tier 1 嘅 VST/CEG/TLN 全部有新聞催化；ETN 出現 Tier 2 — 留意 electrical backlog 故事比 data-center trade 更闊。Sentiment-side，ORCL +88% upside 係 sentiment + fundamental 最 align 嘅 pick；但 CRDO insider $8.3M sell + BE insider $2.5M sell 短期 avoid。整體 mixed 訊號，主倉位 hold 觀察為主。</div>
+      </div>
+    </div>
+
+    <div class="panel-view" id="view-detail"><button class="back-btn" data-view="dashboard">← Back</button><div id="detailContent"></div></div>
+    <div class="panel-view" id="view-sector-power"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Power Sector</h1><div class="subtitle">電力 bottleneck · 7 tickers · Tier 1-3</div></div></div><div class="ticker-grid" id="powerGrid"></div></div>
+    <div class="panel-view" id="view-sector-compute"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Compute Infra</h1><div class="subtitle">GPU Cloud + networking · 2 tickers</div></div></div><div class="ticker-grid" id="computeGrid"></div></div>
+    <div class="panel-view" id="view-sector-semis"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>半導體 Semiconductors</h1><div class="subtitle">Observe only · 3 tickers</div></div></div><div class="ticker-grid" id="semisGrid"></div></div>
+    <div class="panel-view" id="view-sector-software"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Software</h1><div class="subtitle">Data + apps · 1 ticker</div></div></div><div class="ticker-grid" id="softwareGrid"></div></div>
+    <div class="panel-view" id="view-anti-agi"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Anti AGI</h1><div class="subtitle">避險 waste + defensive plays · 6 tickers</div></div></div><div class="ticker-grid" id="antiAGIGrid"></div></div>
+    <div class="panel-view" id="view-include"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Stocks to Include</h1><div class="subtitle">4 picks passing sentiment + fundamental filter</div></div></div><div id="includeFull"></div></div>
+    <div class="panel-view" id="view-exclude"><button class="back-btn" data-view="dashboard">← Back</button><div class="topbar"><div class="topbar-left"><h1>Stocks to Exclude</h1><div class="subtitle">3 picks with overheating signal</div></div></div><div id="excludeFull"></div></div>
+  </main>
+</div>
+<script>
+const TICKERS = [{"ticker":"VST","name":"Vistra Energy","tier":"本週 Tier 1 (Power bottleneck): VST, CEG, TLN","tier_emoji":"🔋","news":[{"date":"06-29","title":"The Ultimate AI Power Supercycle Winner: NextEra Energy or Vistra Stock?","url":"https://www.fool.com/coverage/better-buy/2026/06/28/the-ultimate-ai-power-supercycle-winner-nextera-energy-or-vistra-stock/","source":"fool.com"},{"date":"06-30","title":"Vistra or Public Service Enterprise: Which Utility Stock Stands Out?","url":"https://www.zacks.com/stock/news/2944733/vistra-or-public-service-enterprise-which-utility-stock-stands-out?cid=CS-STOCKNEWSAPI-FT-analyst_blog|most_popular_stocks-2944733","source":"zacks.com"}]},{"ticker":"CEG","name":"Constellation Energy","tier":"本週 Tier 1 (Power bottleneck): VST, CEG, TLN","tier_emoji":"🔋","news":[{"date":"06-28","title":"Constellation Energy Corporation (CEG) Sees a More Significant Dip Than Broader Market: Some Facts …","url":"https://www.zacks.com/stock/news/2944009/constellation-energy-corporation-ceg-sees-a-more-significant-dip-than-broader-market-some-facts-to-know?cid=CS-STOCKNEWSAPI-FT-tale_of_the_tape|yseop_template_6-2944009","source":"zacks.com"},{"date":"06-30","title":"Will Constellation's Long-Term Nuclear PPAs Drive Sustainable Growth?","url":"https://www.zacks.com/stock/news/2944604/will-constellation-s-long-term-nuclear-ppas-drive-sustainable-growth?cid=CS-STOCKNEWSAPI-FT-analyst_blog|quick_take-2944604","source":"zacks.com"},{"date":"07-04","title":"America just cleared the path for an 835-megawatt reactor to come back at full power in 2027, shift…","url":"https://news.google.com/rss/articles/CBMidEFVX3lxTE9uZk5KdDRZZTZERXI4bEZIaXFwc0pkNDNmaGdiVXhXWURoSVp0RUFJYTBHS21UcUdtMkpDTldPRjFFSXdvdlpGWDExNC1yRE5GU3BGSHRrdFZ1V1gyRWo1Y29vSzI3M1hEdDFtQnB4eDNjem9h?oc=5","source":"Autonocion.com"}]},{"ticker":"TLN","name":"Talen Energy","tier":"本週 Tier 1 (Power bottleneck): VST, CEG, TLN","tier_emoji":"🔋","news":[{"date":"06-30","title":"Talen Energy, Stock Of The Day, Delivers For Amazon, AI Data Centers - Investor's Business Daily","url":"https://news.google.com/rss/articles/CBMinwFBVV95cUxOVEZzbWYzdDlZLUozQlZqSHd6NU0zVG0xUUhRSmg5WUtqWTZDUXdFdlhFYmVUWno0SkxTdUhOaUJjZzBMRVB5a3Y0dHVVUjdHaEpzMEc3TWZ1RkVGR004bC0zR1ZVWDdra05ZOWJwZGJCZC1ZUHUxeUI0RlBtMEpRV252WndrYVgtQnZZVVdwa2xGWWZDWjk2VHRTckVtSFk?oc=5","source":"Investor's Business Daily"},{"date":"06-30","title":"Talen Energy, Stock Of The Day, Delivers For Amazon, AI Data Centers","url":"https://www.investors.com/research/ibd-stock-of-the-day/talen-energy-stock-amazon-ai-data-centers/","source":"investors.com"}]},{"ticker":"VRT","name":"Vertiv Holdings","tier":"本週 Tier 2 (Compute infra): VRT, CRWV, ETN, SNOW","tier_emoji":"🟠","news":[{"date":"06-28","title":"Vertiv (VRT) Expands AI Cooling Reach With ThermoKey And Strategic Thermal Labs - Yahoo Finance","url":"https://news.google.com/rss/articles/CBMimAFBVV95cUxNSlU4TVFpTTdjWWZmaXJnV0VmMzhZVXNZVF9xQ0F3MkRtYmJCMmRXRk5pNklZdmNqQmtsMDJzYzRXU2hwaTVyaEUyZkc5MEtRZ09fS3JldFRTRVh3UlhSdW9hNEZVNjM2SDhwVmoybmp0SVZ5dW1GZGxfT05xb2xacU1obkc4T1V0OVNGSTgtZldyMHR6X3ZkVw?oc=5","source":"Yahoo Finance"},{"date":"07-04","title":"Vertiv Increases Manufacturing Capacity with New Facility in Malaysia, to Support Growing Demand fo…","url":"https://news.google.com/rss/articles/CBMiowJBVV95cUxONEhJZm16eGRQY0F3YUdTUGNHSHQzNDVveGhoZ3FZV1FPbDRlTjFOclRHR3ZJVHIyZ0VDanBzZ2J0cGp4eFdHXzhxb2tUcnN1Nl9rMG9oaU15RlVleHpGcTZKVHRHellyNGlZQkRsR0tOUTVMZTcwaUtkUnBQVG5JbTVwMmRHcEE3QS1rWEpmRHVKOExlakh5SG14ZHVheHRwbC0xWFd5SHFBNGc4eUJ4Q1NfdmZoTGR6OHZrVnRYcE45cG51aG9Nd1Rld1lkZjhWZHlQZ0loMEltSm5SYzlXTkNtTzBiV285MmdqREVDWjl1S3BUZ0lMMlZjbFc4NE1MdFF3ME5pMFdYSUNIV1hPSkFfVkduMjFBdDJ3OS1nTWZ0anc?oc=5","source":"PR Newswire"}]},{"ticker":"CRWV","name":"CoreWeave","tier":"本週 Tier 2 (Compute infra): VRT, CRWV, ETN, SNOW","tier_emoji":"🟠","news":[{"date":"06-29","title":"This Nvidia-Backed Artificial Intelligence (AI) Infrastructure Stock Has Multibagger Potential. It …","url":"https://www.fool.com/investing/2026/06/28/this-nvidia-backed-artificial-intelligence-ai-infr/","source":"fool.com"},{"date":"06-30","title":"CoreWeave Price Prediction: The Case for 70% Upside","url":"https://247wallst.com/investing/2026/06/29/coreweave-price-prediction-the-case-for-70-upside/","source":"247wallst.com"},{"date":"07-03","title":"Bull v. Bear: META Selling AI Compute Rattles CRWV & NBIS","url":"https://www.youtube.com/watch?v=qz2Qs7pA4RU","source":"youtube.com"}]},{"ticker":"ETN","name":"Eaton Corporation","tier":"本週 Tier 2 (Compute infra): VRT, CRWV, ETN, SNOW","tier_emoji":"🟠","news":[{"date":"06-30","title":"Eaton (ETN) Has a Broader Electrical Backlog Story Than the Data-Center Trade - AlphaStreet","url":"https://news.google.com/rss/articles/CBMiqAFBVV95cUxOUWFIZEdtWlgzQ0hfVEpxX2dGN2M4YldjZFU5ME9aQnRocWJTMkVFUjlpZDhaQTA2bmdIazc2U3NiUUU2MnNQRVkyQms4RnN5Z1FoaXJBb1E4WVQzMnYyd3lLZ0hyT2thdHB6Z1RlNzBxUGpQdHBmNDdnRWlweXQ4MmlsRERBN2ZhSFlybXhwSVY3OHpCYkRRZ1VxUmZrNmpqYlpnbmlEYWLSAagBQVVfeXFMTlFhSGRHbVpYM0NIX1RKcV9nRjdjOGJXY2RVOTBPWkJ0aHFiUzJFRVI5aWQ4WkEwNm5nSGs3NlNzYlFFNjJzUEVZMkJrOEZzeWdRaGlyQW9ROFlUMzJ2Mnd5S2dIck9rYXRwemdUZTcwcVBqUHRwZjQ3Z0VpcHl0ODJpbEREQTdmYUhZcm14cElWNzh6QmJEUWdVcVJmazZqamJaZ25pRGFi?oc=5","source":"AlphaStreet"},{"date":"07-03","title":"Eaton Corporation, PLC (ETN) Is a Trending Stock: Facts to Know Before Betting on It","url":"https://www.zacks.com/stock/news/2946806/eaton-corporation-plc-etn-is-a-trending-stock-facts-to-know-before-betting-on-it?cid=CS-STOCKNEWSAPI-FT-tale_of_the_tape|most_searched_stocks-2946806","source":"zacks.com"},{"date":"07-04","title":"3 AI Data Center Power Stocks to Buy in July - 24/7 Wall St.","url":"https://news.google.com/rss/articles/CBMikgFBVV95cUxPYzdkR1ZoaUZGSWk4VTVkNG90OHNtT1UzcldIbzJyajNQMUhGckFaQjg3aVBxWXNuT01lUGJXeS15SkJhMVJiWURCdWp3Y183bGtZMTdHZV8ybjdHQzAzTmZNNG5IX2tIbk9Ubkx3YjJPOGVzVzBtZGRFaklSNGRPcW80QndBcElLV29KVzVGeWMxUQ?oc=5","source":"24/7 Wall St."}]},{"ticker":"SNOW","name":"Snowflake Inc.","tier":"本週 Tier 2 (Compute infra): VRT, CRWV, ETN, SNOW","tier_emoji":"🟠","news":[{"date":"06-30","title":"5 Tech Stocks to Buy on the July Pullback","url":"https://www.marketbeat.com/articles/5-tech-stocks-to-buy-on-the-july-pullback/","source":"marketbeat.com"},{"date":"07-03","title":"The greatest asset that a CMO has is trust, says Snowflake's Denise Persson","url":"https://www.businessinsider.com/snowflake-denise-persson-cannes-lions-2026-7","source":"businessinsider.com"},{"date":"07-04","title":"ZoomInfo, Recognized as \"One to Watch\" in Snowflake’s Modern Marketing Data Stack Report - Yahoo Fi…","url":"https://news.google.com/rss/articles/CBMikgFBVV95cUxPZGF2MEh2clZkYU1qYjVIQ0g0bldXOWZpRzdaTFZBVjFXSXpRRGpIN21LbFhXQlZ5b0xqbUhZUFVCT2QxYS1kTzFXWUtUSHdUR09QbXhyMHJ3bHZ5UThQUHRYZkVlMjRKbFBPNnltVDl4NWZteEJOTFJrNVViOFpkcDdlNTFDN09GVExXdkNPUWxZZw?oc=5","source":"Yahoo Finance Singapore"}]},{"ticker":"BE","name":"Bloom Energy","tier":"本週 Tier 3 (Enablers): BE, GDS, OKLO","tier_emoji":"🟡","news":[{"date":"06-28","title":"Bloom Energy: Why The 22% Plunge Was Mechanical, Not Fundamental. Reiterate Buy","url":"https://seekingalpha.com/article/4918271-bloom-energy-why-22-percent-plunge-was-mechanical-not-fundamental-reiterate-buy","source":"seekingalpha.com"},{"date":"06-28","title":"The Insane Number HPE’s CEO Just Threw Out Shows Why Bloom Energy Is a Buy Today - 24/7 Wall St.","url":"https://news.google.com/rss/articles/CBMiwAFBVV95cUxPUUY0Ry1LWmlINTR0dUhXazljNUtZLTNXR0ZWbUxSWUpQUVEyZEVVWFRLNXQzSzRGZU5QTEpianlJWUprZmkta3VXZkd1d1hxVnZEU1F2SkN1UW1lOVhESncxSnczYnRZQXBoSmtnMS0tVTVEZFJSa3YyZU9HOUlCMG5aMEpUY3E5QlB4ZXhXc3dlQW1TUzlFaTNJVnREWEFKVG1USF9VMk1DSURid2NyNzBIX1BBWjJfU3ZDOUFvVEU?oc=5","source":"24/7 Wall St."},{"date":"06-28","title":"The Insane Number HPE's CEO Just Threw Out Shows Why Bloom Energy Is a Buy Today","url":"https://247wallst.com/investing/2026/06/27/the-insane-number-hpes-ceo-just-threw-out-shows-why-bloom-energy-is-a-buy-today/","source":"247wallst.com"}]},{"ticker":"GDS","name":"GDS Holdings (萬國數據)","tier":"本週 Tier 3 (Enablers): BE, GDS, OKLO","tier_emoji":"🟡","news":[{"date":"06-28","title":"GDS Holding: A Sum-Of-The-Parts Opportunity With AI As The Growth Engine","url":"https://seekingalpha.com/article/4918251-gds-holding-a-sum-of-the-parts-opportunity-with-ai-as-the-growth-engine","source":"seekingalpha.com"},{"date":"06-29","title":"GDS Investors Have Opportunity to Join GDS Holdings Limited Fraud Investigation with the Schall Law…","url":"https://www.businesswire.com/news/home/20260628056489/en/GDS-Investors-Have-Opportunity-to-Join-GDS-Holdings-Limited-Fraud-Investigation-with-the-Schall-Law-Firm/","source":"businesswire.com"}]},{"ticker":"OKLO","name":"Oklo Inc.","tier":"本週 Tier 3 (Enablers): BE, GDS, OKLO","tier_emoji":"🟡","news":[{"date":"07-03","title":"Got $1,000 to Invest? Buy These 2 Stocks Right Now and Hold Them for Decades.","url":"https://www.fool.com/investing/2026/07/02/got-1000-to-invest-buy-these-x-stocks-right-now-an/","source":"fool.com"}]},{"ticker":"DCRU.SI","name":"Digital Core REIT","tier":"本週 Tier 4 (Anti-bubble hedge): DCRU.SI, BRK.B, WM","tier_emoji":"⚪","news":[{"date":"06-28","title":"Digital Core REIT Actuals & Estimates (SGX:DCRU) - TradingView","url":"https://news.google.com/rss/articles/CBMiggFBVV95cUxPR19VNWxPSllzdHpYSWNzaGdEN2ZWUi1OeXFMR1dMMm8tZndxcWsyT2lYMDBzSkxBYTRMdmRSYmlSa0dXVk9vMDVSOTA2SnBsa180aTlfTi1WYWo2Zk9Bd3J4b3BJWC1MM2hTelpKcU1TVk16ZFhPaURhQUFnWnBfYlF3?oc=5","source":"TradingView"},{"date":"07-04","title":"DCRU Forecast — Price Target — Prediction for 2027 - TradingView","url":"https://news.google.com/rss/articles/CBMidkFVX3lxTE93aXJham9RMkRWOUFTNWlQSkthQ3VYSlNmNVFJc1RQOWJlaWxrQTYtcmpUWU1rbG5BdDhNQWRUYW1Mdndfd3RWVUoyY1Etd1Z0cGhhdThTRHM5dG5vd2RXNHVFZmExYmhRT2hncU8zVnZIVWVCNmc?oc=5","source":"TradingView"}]},{"ticker":"BRK.B","name":"Berkshire Hathaway","tier":"本週 Tier 4 (Anti-bubble hedge): DCRU.SI, BRK.B, WM","tier_emoji":"⚪","news":[{"date":"07-04","title":"Warren Buffett's Berkshire Hathaway Is Sitting on Nearly $400 Billion in Cash. Is a Stock Market Cr…","url":"https://news.google.com/rss/articles/CBMiqwFBVV95cUxPSmtkbjd5R1BwcVAzamdOaVNSQkxhMWZjXzA3OFhkUF9sem45R2xNdTNqYVZXV1hCQmx4d283Z2cxcHBrVGdkUDZBWWJJWVZQaUxCWndKNHVwUnJQaXA3X3ppX3F1UkF4dGlNdko5Z2lSM0FKcHB5R1lDVjZEbTQ1bDU2R0toTGNEWkYycm5oanJRU05TZnZkek10cmp3ZUNQc2dCOUNNOUc1c1U?oc=5","source":"Yahoo Finance"},{"date":"07-04","title":"Berkshire Hathaway's Giant Cash Pile Earns More When Rates Stay High. Here's Why That Matters. - Ya…","url":"https://news.google.com/rss/articles/CBMiogFBVV95cUxObmJoZVZDd2lpZEpSbzhTSWdORktoR1Zrd2RuNGQ3Vm5neWZuRzFBa1pnRDZ2UFpGeHhibXdBVGxGRGludFN6VmdZZjMxeHRnV09RczF4RldBT2tXSktjMXV2Rl9mRW5mR0szYnFsTnJCTXdzRGtBX2Q4MUZLcXRwY2J3TTEwbHRURTFSX0FOSDNfbkN4dktDT2hvVXRfLU10ZVE?oc=5","source":"Yahoo Finance"}]},{"ticker":"WM","name":"Waste Management","tier":"本週 Tier 4 (Anti-bubble hedge): DCRU.SI, BRK.B, WM","tier_emoji":"⚪","news":[{"date":"06-28","title":"3 Waste Stocks Turning AI Investments into Growth","url":"https://www.marketbeat.com/articles/3-waste-stocks-turning-ai-investments-into-growth/","source":"marketbeat.com"},{"date":"06-28","title":"WM Sets Date for Second Quarter 2026 Earnings Conference Call - Business Wire","url":"https://news.google.com/rss/articles/CBMiugFBVV95cUxPUEFlaE9FWEZBQVpEdWlWUmJtX21IZzRSc2hWUzVoV08xSmFneWtLd2JUeUlBa3gyNGl2ZGtubmE4U09oRU5TZVdfdm5Jd0pYYlpDTjZJb0c2UFRsc01iN3JadjVmSmVHVUVNb2tSMGIxR1JHYkNBSEVfVXcyZ2J5TE5BSEJUY3hTN2ZCdThVYVhRWVlwU1pQSDZiQmlHNVZ4anVDUWJraDZSZk9leFVCcU9KQkxNRmJaS0E?oc=5","source":"Business Wire"},{"date":"06-29","title":"WM Sets Date for Second Quarter 2026 Earnings Conference Call - Yahoo Finance","url":"https://news.google.com/rss/articles/CBMilwFBVV95cUxOV0VUWDMyQWFsck1UaU5fUmJNdjY1U1hsYjE2VUlaNGRYcDYxNHBzZ0w4cTlIT1RONEpOamdjTjhFaFhETktlRzNNSGxRV2liczJpMlVWV2xxampJN3lSMVM1c3lBYUotTGlpMDlhMTJtVWlzcUdDRkl1ajJrd3BDM1hGRWhldGlNcVM3MndMWmQ0RWRlajdR?oc=5","source":"Yahoo Finance"}]},{"ticker":"NVDA","name":"NVIDIA","tier":"本週 Tier 2 (Observe): NVDA, CRDO, NBIS","tier_emoji":"🟠","news":[{"date":"06-30","title":"NVIDIA Leads AI Chip Market with New Blackwell Ultra Launch","url":"https://www.reuters.com/technology/nvidia-blackwell-ultra-ai-chip-2026-06-30/","source":"Reuters"}]},{"ticker":"CRDO","name":"Credo Technology","tier":"本週 Tier 2 (Observe): NVDA, CRDO, NBIS","tier_emoji":"🟠","news":[{"date":"07-01","title":"Credo Technology AI Networking Solutions See Rising Demand from Hyperscalers","url":"https://www.fool.com/investing/2026/07/01/credo-technology-ai-networking-demand/","source":"fool.com"}]},{"ticker":"NBIS","name":"Nebius Group","tier":"本週 Tier 2 (Observe): NVDA, CRDO, NBIS","tier_emoji":"🟠","news":[{"date":"07-02","title":"Nebius Group Expands GPU Cloud Capacity in European Data Centers","url":"https://www.reuters.com/technology/nebius-group-gpu-cloud-europe-2026-07-02/","source":"Reuters"}]},{"ticker":"ORCL","name":"Oracle Corporation","tier":"本週 Tier 2 (Software): ORCL","tier_emoji":"🟠","news":[{"date":"07-01","title":"Oracle Cloud Infrastructure Gains Momentum as AI Workloads Shift to Enterprise","url":"https://www.fool.com/investing/2026/06/30/oracle-cloud-infrastructure-ai-enterprise/","source":"fool.com"}]},{"ticker":"RSG","name":"Republic Services","tier":"本週 Tier 4 (Anti AGI waste): RSG, WCN, GFL, WM","tier_emoji":"⚪","news":[{"date":"07-02","title":"Republic Services Expands Recycling Infrastructure to Meet Data Center E-Waste Demand","url":"https://www.reuters.com/business/republic-services-recycling-e-waste-2026-07-02/","source":"Reuters"},{"date":"07-03","title":"RSG: Waste Management Giant Sees Steady Growth in Commercial Collection","url":"https://www.fool.com/investing/2026/07/02/republic-services-waste-management-growth/","source":"fool.com"}]},{"ticker":"WCN","name":"Waste Connections","tier":"本週 Tier 4 (Anti AGI waste): RSG, WCN, GFL, WM","tier_emoji":"⚪","news":[{"date":"07-01","title":"Waste Connections Acquires Regional Landfill Assets in Texas, Expands Footprint","url":"https://www.marketbeat.com/stocks/waste-connections-texas-landfill-2026-07-01/","source":"marketbeat.com"},{"date":"07-04","title":"WCN: Defensive Waste Play Benefits from AI Data Center Construction Waste","url":"https://www.zacks.com/stock/news/waste-connections-ai-data-center-construction-waste/","source":"zacks.com"}]},{"ticker":"GFL","name":"GFL Environmental","tier":"本週 Tier 4 (Anti AGI waste): RSG, WCN, GFL, WM","tier_emoji":"⚪","news":[{"date":"06-29","title":"GFL Environmental Announces New Sustainability Initiatives for E-Waste Recycling","url":"https://www.businesswire.com/news/20260629/gfl-environmental-sustainability-e-waste/","source":"Business Wire"}]}];
+const INCLUDE = [{"ticker":"ORCL","sector":"其他","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"半導體","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"電力","upside":"+56%","note":"PPA tailwind"}];
+const EXCLUDE = [{"ticker":"CRDO","sector":"半導體","reason":"insider sells $8.3M (7d, red flag)"},{"ticker":"BE","sector":"電力","reason":"insider sells $2.5M (7d, red flag)"},{"ticker":"NBIS","sector":"GPU Cloud","reason":"PE TTM 285 > 200 (extreme overheat)"}];
+const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE','OKLO'],compute:['CRWV','GDS'],semis:['NVDA','CRDO','NBIS'],software:['SNOW'],anti_agi:['RSG','WCN','GFL','WM','DCRU.SI','BRK.B']};
+
+
+// BUCKET BARS
+const buckets=[{label:'電力 Power',val:8},{label:'GPU Cloud',val:3},{label:'Networking',val:1},{label:'半導體 Semi',val:4},{label:'Anti AGI',val:6}];
+document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
+
+// SECTOR CARDS
+const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE','OKLO'],tier:'1',tierName:'TIER 1-3',view:'sector-power'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',view:'sector-compute'},{name:'半導體 Semi',tickers:['NVDA','CRDO','NBIS'],tier:'2',tierName:'OBSERVE',view:'sector-semis'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',view:'sector-software'},{name:'Defensive',tickers:['BRK.B','WM','DCRU.SI'],tier:'4',tierName:'HEDGE',view:null},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','DCRU.SI','BRK.B'],tier:'4',tierName:'TIER 4',view:'anti-agi'}];
+document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.view?' onclick="switchView(\''+s.view+'\')"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.view?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
+
+// INCLUDE/EXCLUDE
+document.getElementById('includeList').innerHTML=INCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.note+'</div></div><div class="signal-upside upside-up">'+s.upside+'</div></div>'}).join('');
+document.getElementById('excludeList').innerHTML=EXCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.reason+'</div></div><div class="signal-upside upside-down">AVOID</div></div>'}).join('');
+document.getElementById('includeFull').innerHTML='<div class="signal-col" style="margin-bottom:0;"><div class="signal-col-head"><span class="dot dot-include"></span>Include<span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;">'+INCLUDE.length+' picks</span></div>'+INCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.note+'</div></div><div class="signal-upside upside-up">'+s.upside+'</div></div>'}).join('')+'</div>';
+document.getElementById('excludeFull').innerHTML='<div class="signal-col" style="margin-bottom:0;"><div class="signal-col-head"><span class="dot dot-exclude"></span>Exclude<span style="margin-left:auto;font-size:11px;color:var(--text-muted);font-weight:400;">'+EXCLUDE.length+' picks</span></div>'+EXCLUDE.map(function(s){return '<div class="signal-row"><div><div class="signal-ticker">'+s.ticker+'</div><div class="signal-tag">'+s.sector+' · '+s.reason+'</div></div><div class="signal-upside upside-down">AVOID</div></div>'}).join('')+'</div>';
+
+// TICKER CARD
+function tickerCard(t){
+  var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
+  var tl=t.tier.match(/Tier\s*\d+/i)?.[0]?.toUpperCase() || 'TIER 4';
+  return '<div class="ticker-card" data-ticker="'+t.ticker+'"><div class="ticker-head"><div class="ticker-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="ticker-name">'+t.name+'</div><div class="ticker-news-count">'+t.news.length+' news items</div><div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+(t.news[0]?t.news[0].title.slice(0,100)+'...':'No news')+'</div></div>';
+}
+
+// SECTOR GRIDS
+function renderSectorGrid(id,list){
+  var g=document.getElementById(id);if(!g)return;
+  var ts=TICKERS.filter(function(t){return list.indexOf(t.ticker)>=0});
+  g.innerHTML=ts.length?ts.map(tickerCard).join(''):'<div style="color:var(--text-muted);padding:40px;text-align:center;">No tracked tickers this week</div>';
+  g.querySelectorAll('.ticker-card').forEach(function(c){c.addEventListener('click',function(){showTickerDetail(c.dataset.ticker)})});
+}
+renderSectorGrid('powerGrid',SECTORS.power);
+renderSectorGrid('computeGrid',SECTORS.compute);
+renderSectorGrid('semisGrid',SECTORS.semis);
+renderSectorGrid('softwareGrid',SECTORS.software);
+renderSectorGrid('antiAGIGrid',SECTORS.anti_agi);
+
+// DETAIL VIEW
+function showTickerDetail(ticker){
+  var t=TICKERS.find(function(x){return x.ticker===ticker});if(!t)return;
+  var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
+  var tl=t.tier.match(/Tier\s*\d+/i)?.[0]?.toUpperCase() || 'TIER 4';
+  document.getElementById('detailContent').innerHTML='<div class="detail-head"><div class="detail-head-row"><div class="detail-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="detail-name">'+t.name+'</div></div><div class="detail-news-list">'+t.news.map(function(n){return '<a href="'+n.url.replace(/"/g, '&quot;')+'" target="_blank" rel="noopener" class="detail-news-item" style="display:block;"><div class="detail-news-meta"><span class="detail-news-source">'+n.source+'</span><span>·</span><span>'+n.date+'</span></div><div class="detail-news-title">'+n.title+'</div></a>'}).join('')+'</div>';
+  switchView('detail');
+}
+
+// NAVIGATION
+function switchView(viewId){
+  document.querySelectorAll('.panel-view').forEach(function(v){v.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  var t=document.getElementById('view-'+viewId);if(t)t.classList.add('active');
+  var n=document.querySelector('[data-view="'+viewId+'"]');if(n)n.classList.add('active');
+  if(window.innerWidth<=768)document.getElementById('sidebar').classList.remove('open');
+}
+document.querySelectorAll('.nav-item').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
+
+// BACK BUTTONS (delegation)
+document.addEventListener('click',function(e){var btn=e.target.closest('.back-btn[data-view]');if(btn)switchView(btn.dataset.view);});
+
+// MOBILE MENU
+document.getElementById('menuToggle').addEventListener('click',function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+});
+document.getElementById('sidebarOverlay').addEventListener('click',function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+});
+
+// THEME TOGGLE
+(function(){
+  var root=document.documentElement;
+  var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme',prefersDark?'dark':'light');
+  var btn=document.getElementById('themeToggle');
+  var moon='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  var sun='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  btn.innerHTML=prefersDark?moon:sun;
+  btn.addEventListener('click',function(){
+    var d=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    root.setAttribute('data-theme',d);
+    btn.innerHTML=d==='dark'?moon:sun;
+  });
+})();
+
+</script>
+</body>
+</html>

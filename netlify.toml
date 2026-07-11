@@ -1,0 +1,28 @@
+[build]
+  publish = "."
+
+# SPA redirect: all non-file routes serve index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[context.production]
+  environment = { NODE_VERSION = "18" }
+
+[context.deploy-preview]
+  environment = { NODE_VERSION = "18" }
