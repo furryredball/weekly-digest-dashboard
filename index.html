@@ -64,8 +64,11 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .nav-item:hover{background:var(--surface-2);color:var(--text);}
 .nav-item.active{background:var(--surface-3);color:var(--text);font-weight:500;}
 .nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
-.nav-item.active svg{opacity:0.8;}
+.nav-item:hover svg{opacity:0.8;}
 .nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+.nav-item-ext{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;}
+.nav-item-ext:hover{background:var(--surface-2);color:var(--text);}
+.nav-item-ext svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
 
 /* MAIN */
 .main{flex:1;min-width:0;padding:32px 40px 64px;max-width:1200px;}
@@ -248,7 +251,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       <div class="nav-section">Analysis</div>
       <div class="nav-item" data-view="scoring"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Scoring</span></div>
       <div class="nav-section">Linus</div>
-      <div class="nav-item-ext" onclick="location.href='linus-invest.html'" style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
+      <div class="nav-item-ext" onclick="location.href='linus-invest.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
       <div class="nav-section">Theme</div>
       <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
     </nav>

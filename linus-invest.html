@@ -25,7 +25,11 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;font-weight:400;transition:background .15s,color .15s;}
 .nav-item:hover{background:var(--surface-2);color:var(--text);}
 .nav-item.active{background:var(--surface-3);color:var(--text);font-weight:500;}
+.nav-item svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
 .nav-badge{margin-left:auto;font-size:11px;font-weight:500;color:var(--text-faint);font-variant-numeric:tabular-nums;}
+.nav-item-ext{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:var(--radius-sm);font-size:13px;color:var(--text-muted);cursor:pointer;margin-bottom:1px;transition:background .15s,color .15s;}
+.nav-item-ext:hover{background:var(--surface-2);color:var(--text);}
+.nav-item-ext svg{width:14px;height:14px;flex-shrink:0;opacity:0.5;}
 .main{flex:1;min-width:0;padding:32px 40px 64px;max-width:1100px;}
 .topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;}
 .topbar-left h1{font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;}
