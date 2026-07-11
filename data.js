@@ -39,20 +39,47 @@ function renderSectorGrid(id, list){
 // ============================================================
 // LINUS INVEST — 55-stock two-tier (3-lens Munger/Buffett/Bezos)
 // ============================================================
-// ⚠️ STUB MODE (2026-07-11): full 55-stock dataset with M/B/Bz scores
-// is pending population from the dashboard-deployment skill spec.
-// Tier 1 target = 15 picks (8 AGI + 7 Non-AGI), Tier 2 = 40 watchlist.
-// Pending: Pirry to supply the 55-stock spreadsheet or compute via
-// the linus-research.py pipeline.
+// ⚠️ PROXY HEURISTIC MODE (2026-07-11, 2 days per Pirry directive):
+// M/B/Bz scores computed from sector baseline + data.js score linear boost.
+// NOT real Munger/Buffett/Bezos lens scores — placeholder until 55-stock
+// dataset arrives. Replace TIER1/TIER2 once real scores land.
 //
-// Current placeholder uses the 17 TICKERS above, scored as Tier 1 by default.
-// This will be replaced once the M/B/Bz 3-lens data lands.
-// Resolve sector from SECTORS map (ticker→sector name)
+// Sector bias:
+//   power:    M=17 B=14 Bz=10  (structural moat, moderate ROE, low growth)
+//   compute:  M=10 B=8  Bz=16  (weak moat, low ROE, high growth)
+//   semis:    M=11 B=11 Bz=14  (mixed)
+//   software: M=10 B=12 Bz=16  (switching cost + growth)
+//   anti_agi: M=16 B=17 Bz=8   (strong moat + FCF, low growth)
+//   other:    M=17 B=17 Bz=6   (classic Munger/Buffett archetype)
+var _sectorBias = {
+  power:    [17, 14, 10],
+  compute:  [10,  8, 16],
+  semis:    [11, 11, 14],
+  software: [10, 12, 16],
+  anti_agi: [16, 17,  8],
+  other:    [17, 17,  6]
+};
+function _proxyScore(t){
+  var sector = 'other';
+  Object.keys(SECTORS).forEach(function(k){
+    if(SECTORS[k].indexOf(t.ticker) >= 0) sector = k;
+  });
+  var b = _sectorBias[sector] || _sectorBias.other;
+  var boost = (t.score - 60) * 0.20;
+  function c(v){return Math.max(0, Math.min(25, v));}
+  return {
+    mg: c(Math.round(b[0] + boost * 0.9)),
+    bf: c(Math.round(b[1] + boost * 0.7)),
+    bz: c(Math.round(b[2] + boost * 1.1))
+  };
+}
+// Resolve sector name from SECTORS map (ticker→sector name)
 var _sectorByTicker = {};
 Object.keys(SECTORS).forEach(function(k){
   SECTORS[k].forEach(function(t){ _sectorByTicker[t] = SECTOR_NAMES[k] || k; });
 });
 const TIER1 = TICKERS.map(function(t){
+  var ps = _proxyScore(t);
   return {
     t: t.ticker,
     p: t.price,
@@ -67,7 +94,7 @@ const TIER1 = TICKERS.map(function(t){
     ev: null,
     mc: null,
     ups: null,
-    mg: 0, bf: 0, bz: 0  // Munger / Buffett / Bezos lens scores — pending
+    mg: ps.mg, bf: ps.bf, bz: ps.bz  // PROXY scores — replace when 55-stocks CSV arrives
   };
 });
 const TIER2 = []; // TODO: populate 40-stock watchlist with M/B/Bz scores
