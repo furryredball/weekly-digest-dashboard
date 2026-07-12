@@ -81,16 +81,27 @@ Object.keys(SECTORS).forEach(function(k){
 });
 const TIER1 = TICKERS.map(function(t){
   var ps = _proxyScore(t);
-  // Real 3-lens (Munger/Buffett/Bezos) scores for anti_agi (Tier 4 non-AGI) names.
+  // Real 3-lens (Munger/Buffett/Bezos) scores for Bucket B (Tier 4 non-AGI) names.
   // Computed via business-model-quality-gate 2026-07-05 (replace proxy heuristic).
   var _realMbbz = {
-    WM:  {mg:22, bf:22, bz:16},  // scale king, landfill moat, RNG kicker
-    RSG: {mg:22, bf:20, bz:16},  // fortress BS, EBITDA margin leader
-    WCN: {mg:18, bf:20, bz:16},  // insider signal + recycling transition
-    AMT: {mg:14, bf:20, bz:18}   // 3-5% escalator, REIT leverage caveat
-  };
-  var real = _realMbbz[t.ticker];
-  var ca = SECTORS.anti_agi.indexOf(t.ticker) >= 0 ? 'nonagi' : 'agi';
+      WM:  {mg:22, bf:22, bz:16},  // scale king, landfill moat, RNG kicker
+      RSG: {mg:22, bf:20, bz:16},  // fortress BS, EBITDA margin leader
+      WCN: {mg:18, bf:20, bz:16},  // insider signal + recycling transition
+      AMT: {mg:14, bf:20, bz:18}   // 3-5% escalator, REIT leverage caveat
+    };
+    var real = _realMbbz[t.ticker];
+    // Three-bucket cut (locked 2026-07-12 per Pirry): A=bottleneck picks-and-shovels,
+    // B=defensive non-AGI, C=demand-side beneficiary (hyperscaler cloud + AI services).
+    // See FRAMEWORK_THREE_BUCKETS.md for canonical taxonomy.
+    // - Bucket A (bottleneck): power/compute/semis infra that sells picks-and-shovels into the AGI buildout
+    // - Bucket B (defensive): anti_agi sector (waste + cell tower REIT) + BRK.B (conglomerate wrapper)
+    // - Bucket C (demand-side): SNOW/ORCL — enterprise data + cloud platforms that capture AGI end-demand
+    var _demandSide = {SNOW: 1, ORCL: 1};  // demand-side beneficiaries
+    var _defensive = {BRK: 1, 'BRK.B': 1, WM: 1, RSG: 1, WCN: 1, GFL: 1, AMT: 1};  // defensive non-AGI
+    var ca;
+    if (_demandSide[t.ticker]) ca = 'demand';        // Bucket C
+    else if (_defensive[t.ticker]) ca = 'nonagi';    // Bucket B
+    else ca = 'agi';                                  // Bucket A (bottleneck picks-and-shovels)
   return {
     t: t.ticker,
     p: t.price,
