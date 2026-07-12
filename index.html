@@ -341,15 +341,15 @@ const TICKERS = [
 ];
 const INCLUDE = [{"ticker":"ORCL","sector":"\u5176\u4ed6","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"\u534a\u5c0e\u9ad4","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"\u96fb\u529b","upside":"+56%","note":"PPA tailwind"}];
 const EXCLUDE = [{"ticker":"CRDO","sector":"半導體","reason":"insider sells $8.3M (7d, red flag)"},{"ticker":"BE","sector":"電力","reason":"insider sells $2.5M (7d, red flag)"}];
-const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW'],anti_agi:['RSG','WCN','GFL','WM','BRK.B']};
+const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW','ORCL'],anti_agi:['RSG','WCN','GFL','WM','AMT']};
 
 
 // BUCKET BARS
-const buckets=[{label:'電力 Power',val:7},{label:'GPU Cloud',val:3},{label:'Networking',val:1},{label:'半導體 Semi',val:3},{label:'Anti AGI',val:5}];
+const buckets=[{label:'電力 Power',val:7},{label:'GPU Cloud',val:3},{label:'Networking',val:1},{label:'半導體 Semi',val:3},{label:'Anti AGI',val:6}];
 document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
 
 // SECTOR CARDS
-const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','BRK.B'],tier:'4',tierName:'TIER 4',page:'anti-agi.html'}];
+const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW','ORCL'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Anti AGI',tickers:['RSG','WCN','GFL','WM','AMT'],tier:'4',tierName:'TIER 4',page:'anti-agi.html'}];
 document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.page?' onclick="location.href='+String.fromCharCode(39)+s.page+String.fromCharCode(39)+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.page?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
 // INCLUDE/EXCLUDE

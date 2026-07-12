@@ -16,11 +16,12 @@ const TICKERS = [
   {ticker:"ORCL",name:"Oracle",desc:"Enterprise software giant with a deep database moat, pivoting to cloud infrastructure. Oracle Cloud (OCI) offers GPU clusters and database services for enterprise AI workloads, leveraging decades of customer data and enterprise relationships.",why:"Oracle's moat is the database — decades of enterprise data live inside Oracle's ecosystem and migrating is painful and risky for any CIO. OCI adds a cloud layer that ties database and AI workloads together. The multi-cloud database strategy — running Oracle DB on AWS, Azure, GCP — is clever because it extends Oracle's reach rather than fighting the hyperscalers head-on. A genuine switching-cost moat at a reasonable valuation.",tier:"本週 Tier 2 (Software): ORCL",tier_emoji:"🟡",price:140.64,trend:"↓",pct:"-2.14%",score:68,grade:"B-",news:[{date:"06-28",title:"This Magnificent AI Growth Stock Has 88% Upside, According to Wall Street",url:"https://www.fool.com/investing/2026/06/28/this-magnificent-ai-growth-stock-has-88-upside-according-to-wall-street/",source:"fool.com"}]},
   {ticker:"RSG",name:"Republic Services",desc:"Second-largest waste services company in the US, serving ~14 million customers across 40-plus states. Vertically integrated from collection trucks to landfills to recycling and renewable natural gas operations.",why:"Waste is the ultimate non-discretionary service. People and businesses generate trash in any economic environment. RSG's local market positions approach monopolies — few towns want multiple landfills, and municipal contracts run for decades. Contractual price escalators provide inflation protection built into every agreement. The anti-AGI thesis is straightforward: no matter what happens in AI, this business compounds steadily with minimal capital friction.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:219.20,trend:"↑",pct:"+0.23%",score:75,grade:"B",news:[{date:"06-30",title:"Republic Services: Side- Stepping AI Capex Madness",url:"https://www.fool.com/coverage/better-buy/2026/06/28/the-ultimate-ai-power-supercycle-winner-nextera-energy-or-vistra-stock/",source:"fool.com"}]},
   {ticker:"WCN",name:"Waste Connections",desc:"North American waste services company focused on secondary and exclusive markets in the US and Canada. Prefers being the only service provider in a market rather than competing head-to-head in urban centers.",why:"WCN's strategy is different from RSG's — it targets smaller markets where municipal contracts create near-monopoly positions with multi-year terms. This yields higher margins and more predictable pricing than competitive urban markets. Disciplined M&A and renewable natural gas investments add a growth layer on top of a steady compounding base. The combination of monopoly-like local economics and accretive capital deployment is a proven compounding formula.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:171.07,trend:"↑",pct:"+0.55%",score:74,grade:"B",news:[{date:"06-30",title:"Waste Connections: Strong Buy Rating Amid Strategic Acquisitions and AI Data Center Investments Fueling Growth",url:"https://www.insidermonkey.com/blog/waste-connections-strong-buy-rating-amid-strategic-acquisitions-and-ai-data-center-investments-fueling-growth-1480745/",source:"insidermonkey.com"}]},
-  {ticker:"GFL",name:"GFL Environmental",desc:"Fourth-largest environmental services company in North America, operating across solid waste, liquid waste, and soil remediation in both Canada and the US. The smallest and most aggressive compounder in the waste group.",why:"GFL is the smallest of the three waste names in the anti-AGI basket, and it carries the highest growth expectations. Growth comes from aggressive M&A — rolling up smaller operators and realizing cost synergies. It trades at a discount to RSG and WCN on EBITDA multiples, which is appropriate given higher leverage and integration risk. If management executes well, the multiple compresses and the stock compounds faster than peers. If they stumble on integration, the discount widens. A higher-risk pick within a defensive sector.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:39.75,trend:"↓",pct:"-0.87%",score:72,grade:"B",news:[]}
+  {ticker:"GFL",name:"GFL Environmental",desc:"Fourth-largest environmental services company in North America, operating across solid waste, liquid waste, and soil remediation in both Canada and the US. The smallest and most aggressive compounder in the waste group.",why:"GFL is the smallest of the three waste names in the anti-AGI basket, and it carries the highest growth expectations. Growth comes from aggressive M&A — rolling up smaller operators and realizing cost synergies. It trades at a discount to RSG and WCN on EBITDA multiples, which is appropriate given higher leverage and integration risk. If management executes well, the multiple compresses and the stock compounds faster than peers. If they stumble on integration, the discount widens. A higher-risk pick within a defensive sector.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL, WM, AMT",tier_emoji:"🟢",price:39.75,trend:"↓",pct:"-0.87%",score:72,grade:"B",news:[]},
+  {ticker:"AMT",name:"American Tower",desc:"Global independent cell tower REIT operating ~150,000 tower sites across the US, India, Africa, Latin America, and Europe. Long-term contracts (5-10 year) with wireless carriers include 3-5% annual escalators and CPI-linked pricing — one of the most predictable revenue models in real assets.",why:"The moat is physical asset scarcity + switching cost + structural pricing power. Permits for new towers are nearly impossible to obtain in mature markets, and carriers cannot economically replicate AMT's network. The 39% drawdown from 2021 reflects leverage concern and rate sensitivity, not business deterioration. As long as 5G densification and emerging-market tower growth continue, AMT compounds the dividend while rerating.",tier:"本週 Tier 4 (Anti AGI): RSG, WCN, GFL, WM, AMT",tier_emoji:"🟢",price:168.59,trend:"↑",pct:"+2.18%",score:81,grade:"B+",news:[{date:"07-09",title:"Analyst Research Calls: American Tower, Intuitive Surgical, Salesforce, Toast, and More",url:"https://247wallst.com/investing/2026/07/09/here-are-thursdays-best-wall-street-analyst-research-calls-align-technology-american-tower-caesars-entertainment-cohu-five-below-intuitive-surgical-salesforce-toast-and-more/",source:"247wallst.com"},{date:"07-08",title:"CoreSite (American Tower) Releases 2026 State of the Data Center Report",url:"https://www.businesswire.com/news/home/20260708111412/en/New-State-of-the-Data-Center-Report-Hybrid-IT-Now-Dominates-Enterprise-Architecture-with-Colocation-Anchoring-Critical-Workloads/",source:"businesswire.com"}]}
 ];
-const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW','ORCL'],anti_agi:['RSG','WCN','GFL','WM']};
+const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW','ORCL'],anti_agi:['RSG','WCN','GFL','WM','AMT']};
 const SECTOR_NAMES = {power:'Power',compute:'Compute Infra',semis:'半導體',software:'Software',anti_agi:'Anti AGI'};
-const SECTOR_SUBTITLES = {power:'電力 bottleneck · 6 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 2 tickers',anti_agi:'避險 waste + compounder · 4 tickers'};
+const SECTOR_SUBTITLES = {power:'電力 bottleneck · 6 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 2 tickers',anti_agi:'避險 waste + infra compounder · 5 tickers'};
 
 function tickerCard(t){
   var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
@@ -39,10 +40,10 @@ function renderSectorGrid(id, list){
 // ============================================================
 // LINUS INVEST — 55-stock two-tier (3-lens Munger/Buffett/Bezos)
 // ============================================================
-// ⚠️ PROXY HEURISTIC MODE (2026-07-11, 2 days per Pirry directive):
-// M/B/Bz scores computed from sector baseline + data.js score linear boost.
-// NOT real Munger/Buffett/Bezos lens scores — placeholder until 55-stock
-// dataset arrives. Replace TIER1/TIER2 once real scores land.
+// ⚠️ MIXED MODE (2026-07-05):
+// Anti-AGI basket (WM/RSG/WCN/AMT) has REAL Munger/Buffett/Bezos scores
+// from business-model-quality-gate 2026-07-05 evaluation. AGI bucket still
+// uses proxy heuristic until 55-stock dataset arrives.
 //
 // Sector bias:
 //   power:    M=17 B=14 Bz=10  (structural moat, moderate ROE, low growth)
@@ -80,11 +81,21 @@ Object.keys(SECTORS).forEach(function(k){
 });
 const TIER1 = TICKERS.map(function(t){
   var ps = _proxyScore(t);
+  // Real 3-lens (Munger/Buffett/Bezos) scores for anti_agi (Tier 4 non-AGI) names.
+  // Computed via business-model-quality-gate 2026-07-05 (replace proxy heuristic).
+  var _realMbbz = {
+    WM:  {mg:22, bf:22, bz:16},  // scale king, landfill moat, RNG kicker
+    RSG: {mg:22, bf:20, bz:16},  // fortress BS, EBITDA margin leader
+    WCN: {mg:18, bf:20, bz:16},  // insider signal + recycling transition
+    AMT: {mg:14, bf:20, bz:18}   // 3-5% escalator, REIT leverage caveat
+  };
+  var real = _realMbbz[t.ticker];
+  var ca = SECTORS.anti_agi.indexOf(t.ticker) >= 0 ? 'nonagi' : 'agi';
   return {
     t: t.ticker,
     p: t.price,
     se: _sectorByTicker[t.ticker] || 'Other',
-    ca: 'agi', // TODO: reclassify as agi/nonagi once 55-stock dataset is in
+    ca: ca, // anti_agi = nonagi; everything else stays agi until reclassified
     name: t.name,
     desc: t.desc,
     why: t.why,
@@ -94,7 +105,9 @@ const TIER1 = TICKERS.map(function(t){
     ev: null,
     mc: null,
     ups: null,
-    mg: ps.mg, bf: ps.bf, bz: ps.bz  // PROXY scores — replace when 55-stocks CSV arrives
+    mg: real ? real.mg : ps.mg,
+    bf: real ? real.bf : ps.bf,
+    bz: real ? real.bz : ps.bz
   };
 });
 const TIER2 = []; // TODO: populate 40-stock watchlist with M/B/Bz scores
