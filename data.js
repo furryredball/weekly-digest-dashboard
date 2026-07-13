@@ -6,12 +6,50 @@ const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','GEV','BE'],compute:['CRWV
 const SECTOR_NAMES = {power:'Power',compute:'Compute Infra',semis:'半導體',software:'Software',nonagi:'Non AGI'};
 const SECTOR_SUBTITLES = {power:'電力 bottleneck · 7 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 2 tickers',nonagi:'避險 waste compounder · 3 tickers'};
 
+function _esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function _yahooUrl(ticker){
+  // BRK.B → BRK-B; everything else passes through
+  var enc = String(ticker).replace(/\./g,'-');
+  return 'https://finance.yahoo.com/quote/'+encodeURIComponent(enc)+'/';
+}
+function _fmtN(v,d){
+  if(v==null||v===''||(typeof v==='number'&&isNaN(v)))return '—';
+  if(typeof v==='string')v=parseFloat(v);
+  if(isNaN(v))return '—';
+  return v.toLocaleString('en-US',{minimumFractionDigits:(d==null?2:d),maximumFractionDigits:(d==null?2:d)});
+}
+function _fmtBig(v){
+  // Format big numbers: 1234567890 → "1.23B", 12345678 → "12.3M", 12345 → "12.3K"
+  if(v==null||v===''||isNaN(parseFloat(v)))return '—';
+  v=parseFloat(v);
+  if(Math.abs(v)>=1e12)return (v/1e12).toFixed(2)+'T';
+  if(Math.abs(v)>=1e9)return (v/1e9).toFixed(2)+'B';
+  if(Math.abs(v)>=1e6)return (v/1e6).toFixed(1)+'M';
+  if(Math.abs(v)>=1e3)return (v/1e3).toFixed(1)+'K';
+  return v.toFixed(0);
+}
 function tickerCard(t){
   var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
-  var tl=t.tier.match(/Tier\s*\d+/i)?.[0]?.toUpperCase() || 'TIER 4';
+  var tl=(t.tier.match(/Tier\s*\d+/i)||['','TIER 4'])[0].toUpperCase();
   var priceClass=t.trend==='↑'?'ticker-price-up':'ticker-price-down';
-  var gradeClass='grade-'+(t.grade==='B+'?'B-plus':t.grade.replace('+','-plus'));
-  return '<div class="ticker-card" data-ticker="'+t.ticker+'"><div class="ticker-head"><div class="ticker-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="ticker-price-row"><span class="ticker-price '+priceClass+'">$'+t.price.toFixed(t.price<1?4:2)+'</span><span class="'+priceClass+'">'+t.trend+' '+t.pct+'</span><span class="ticker-score '+gradeClass+'">'+t.score+' '+t.grade+'</span></div><div class="ticker-name">'+t.name+'</div><div class="ticker-desc">'+t.desc+'</div><div class="ticker-why">💡 '+t.why+'</div><div class="ticker-news-count">'+(t.news.length?t.news.length+' news items':'No news')+'</div>'+(t.news[0]?'<div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+t.news[0].title.slice(0,100)+'...</div>':'')+'</div></div>';
+  var gradeClass='grade-'+(t.grade==='B+'?'B-plus':String(t.grade).replace('+','-plus'));
+  var p=parseFloat(t.price);
+  var priceStr=!isNaN(p)?'$'+p.toFixed(p<1?4:2):'—';
+  // Build fundamentals row (PE / MCap / Upside) + Yahoo link button
+  var pe=t.pe!=null&&t.pe!==''?'<span class="ticker-fund"><span class="ticker-fund-label">PE</span>'+_fmtN(t.pe,1)+'</span>':'';
+  var mc=t.mc!=null&&t.mc!==''?'<span class="ticker-fund"><span class="ticker-fund-label">MCap</span>'+_fmtBig(t.mc)+'</span>':'';
+  var up=t.upside!=null&&t.upside!==''?'<span class="ticker-fund"><span class="ticker-fund-label">Upside</span><span class="'+(t.upside>=0?'up-pos':'up-neg')+'">'+(t.upside>=0?'+':'')+_fmtN(t.upside,1)+'%</span></span>':'';
+  return '<div class="ticker-card" data-ticker="'+_esc(t.ticker)+'">'
+    +'<div class="ticker-head"><div class="ticker-symbol"><a href="'+_yahooUrl(t.ticker)+'" target="_blank" rel="noopener">'+_esc(t.ticker)+'</a></div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div>'
+    +'<div class="ticker-price-row"><span class="ticker-price '+priceClass+'">'+priceStr+'</span><span class="'+priceClass+'">'+t.trend+' '+_esc(t.pct||'—')+'</span><span class="ticker-score '+gradeClass+'">'+_esc(t.score)+' '+_esc(t.grade||'')+'</span></div>'
+    +(pe||mc||up?'<div class="ticker-fund-row">'+pe+mc+up+'</div>':'')
+    +'<div class="ticker-name">'+_esc(t.name)+'</div>'
+    +(t.desc?'<div class="ticker-desc">'+_esc(t.desc)+'</div>':'')
+    +(t.why?'<div class="ticker-why">💡 '+_esc(t.why)+'</div>':'')
+    +'<div class="ticker-news-count">'+(t.news&&t.news.length?t.news.length+' news items':'No news')+'</div>'
+    +(t.news&&t.news[0]?'<div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+_esc((t.news[0].title||'').slice(0,100))+'...</div>':'')
+    +'<div class="ticker-yahoo"><a href="'+_yahooUrl(t.ticker)+'" target="_blank" rel="noopener">Yahoo Finance ↗</a></div>'
+    +'</div>';
 }
 
 function renderSectorGrid(id, list, _tickersMap){
@@ -22,7 +60,6 @@ function renderSectorGrid(id, list, _tickersMap){
   var ts=src.filter(function(t){return list.indexOf(t.ticker)>=0});
   g.innerHTML=ts.length?ts.map(tickerCard).join(''):'<div style="color:var(--text-muted);padding:40px;text-align:center;">No tracked tickers this week</div>';
 }
-
 // ============================================================
 // LINUS INVEST — 55-stock two-tier (3-lens Munger/Buffett/Bezos)
 // ============================================================

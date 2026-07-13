@@ -128,6 +128,18 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .ticker-signal{font-size:12px;color:var(--text);line-height:1.5;padding-top:10px;border-top:1px solid var(--border);margin-top:8px;}
 .ticker-signal-label{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
 
+/* FUNDAMENTALS ROW */
+.ticker-fund-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;padding:8px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.ticker-fund{display:inline-flex;flex-direction:column;gap:1px;background:var(--surface-2);padding:4px 8px;border-radius:var(--radius-sm);min-width:54px;}
+.ticker-fund-label{font-size:9px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;}
+.ticker-fund .up-pos{color:var(--success);font-weight:600;}
+.ticker-fund .up-neg{color:var(--error);font-weight:600;}
+.ticker-head .ticker-symbol a{color:inherit;text-decoration:none;}
+.ticker-head .ticker-symbol a:hover{color:var(--accent);text-decoration:underline;}
+.ticker-yahoo{margin-top:8px;text-align:right;}
+.ticker-yahoo a{font-size:11px;color:var(--accent);text-decoration:none;font-weight:500;}
+.ticker-yahoo a:hover{text-decoration:underline;color:var(--text);}
+
 /* SIGNAL LIST */
 .signal-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .signal-col{background:var(--surface);border-radius:var(--radius-md);padding:18px;border:1px solid var(--border);}
@@ -226,7 +238,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 }
 
 </style>
-<script src="data.js"></script>
+<script src="data.js?v=20260713"></script>
 <script>
 // Build minimal legacy-shape TICKERS map for this sector from TIER1+TIER2 (data.js).
 // Sector pages need tickerCard() shape (ticker, tier_emoji, tier, price, score, grade, news[]).
@@ -241,7 +253,9 @@ var TICKERS = (function(){
       ticker: t.t, name: t.name || t.t, desc: t.desc || '', why: t.why || '',
       tier: '本週 ' + _scTierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
       tier_emoji: _scTierEmoji(t.se),
-      price: t.p, trend: '↑', pct: '+0.00%', score: score, grade: _scGradeForScore(score),
+      price: t.p, trend: t.ups!=null?(t.ups>=0?'↑':'↓'):'↑', pct: t.ups!=null?((t.ups>=0?'+':'')+t.ups.toFixed(1)+'%':'—'),
+      score: score, grade: _scGradeForScore(score),
+      pe: t.pe||'', mc: t.mc||'', upside: t.ups||'',
       news: []
     });
   });
