@@ -79,47 +79,63 @@ var _sectorByTicker = {};
 Object.keys(SECTORS).forEach(function(k){
   SECTORS[k].forEach(function(t){ _sectorByTicker[t] = SECTOR_NAMES[k] || k; });
 });
-const TIER1 = TICKERS.map(function(t){
-  var ps = _proxyScore(t);
-  // Real 3-lens (Munger/Buffett/Bezos) scores for Bucket B (Tier 4 non-AGI) names.
-  // Computed via business-model-quality-gate 2026-07-05 (replace proxy heuristic).
-  var _realMbbz = {
-      WM:  {mg:22, bf:22, bz:16},  // scale king, landfill moat, RNG kicker
-      RSG: {mg:22, bf:20, bz:16},  // fortress BS, EBITDA margin leader
-      WCN: {mg:18, bf:20, bz:16},  // insider signal + recycling transition
-      AMT: {mg:14, bf:20, bz:18}   // 3-5% escalator, REIT leverage caveat
-    };
-    var real = _realMbbz[t.ticker];
-    // Three-bucket cut (locked 2026-07-12 per Pirry): A=bottleneck picks-and-shovels,
-    // B=defensive non-AGI, C=demand-side beneficiary (hyperscaler cloud + AI services).
-    // See FRAMEWORK_THREE_BUCKETS.md for canonical taxonomy.
-    // - Bucket A (bottleneck): power/compute/semis infra that sells picks-and-shovels into the AGI buildout
-    // - Bucket B (defensive): nonagi sector (waste + cell tower REIT) + BRK.B (conglomerate wrapper)
-    // - Bucket C (demand-side): SNOW/ORCL — enterprise data + cloud platforms that capture AGI end-demand
-    var _demandSide = {SNOW: 1, ORCL: 1};  // demand-side beneficiaries
-    var _defensive = {BRK: 1, 'BRK.B': 1, WM: 1, RSG: 1, WCN: 1, GFL: 1, AMT: 1};  // defensive non-AGI
-    var ca;
-    if (_demandSide[t.ticker]) ca = 'demand';        // Bucket C
-    else if (_defensive[t.ticker]) ca = 'nonagi';    // Bucket B
-    else ca = 'agi';                                  // Bucket A (bottleneck picks-and-shovels)
-  return {
-    t: t.ticker,
-    p: t.price,
-    se: _sectorByTicker[t.ticker] || 'Other',
-    ca: ca, // nonagi = nonagi; everything else stays agi until reclassified
-    name: t.name,
-    desc: t.desc,
-    why: t.why,
-    roe: null,
-    roic: null,
-    bp: null,
-    ev: null,
-    mc: null,
-    ups: null,
-    mg: real ? real.mg : ps.mg,
-    bf: real ? real.bf : ps.bf,
-    bz: real ? real.bz : ps.bz
-  };
-});
-const TIER2 = []; // TODO: populate 40-stock watchlist with M/B/Bz scores
+const TIER1 = [
+  { t:"VST", p:158.86, se:"power", ca:"agi", name:"Vistra Energy", desc:"Texas-based integrated utility with the lowest-cost nuclear and gas fleet in the most load-growth-rich region of the US.", why:"Geographic moat in ERCOT/PJM scarcity-priced markets", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:22, bf:20, bz:21 },
+  { t:"CEG", p:251.38, se:"power", ca:"agi", name:"Constellation Energy", desc:"Largest US nuclear power operator with 33GW of irreplaceable assets.", why:"Hyperscaler PPA tailwind + Three Mile Island restart validates nuclear pricing power", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:21, bf:17, bz:15 },
+  { t:"VRT", p:318.86, se:"power", ca:"agi", name:"Vertiv", desc:"Dominant global supplier of thermal management and power distribution for data centers.", why:"Liquid cooling bottleneck as GPU density rises above 100kW per rack", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:22, bf:18, bz:16 },
+  { t:"ETN", p:407.28, se:"power", ca:"agi", name:"Eaton Corp", desc:"Diversified power management for data centers and grid upgrades transformers/switchgear.", why:"2-3 year transformer lead times lock in pricing power through decade", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:22, bf:18, bz:16 },
+  { t:"GEV", p:1091.57, se:"power", ca:"agi", name:"GE Vernova", desc:"Gas turbine + wind power equipment maker benefiting from US/EU data center grid buildout.", why:"Gas turbine order backlog multi-year direct AI infrastructure beneficiary", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:21, bf:17, bz:18 },
+  { t:"BE", p:244.61, se:"power", ca:"agi", name:"Bloom Energy", desc:"Solid-oxide fuel cell manufacturer for onsite power without grid interconnection.", why:"Grid interconnection 4-7 year waits make fuel cells a niche but valuable option", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:19, bf:15, bz:12 },
+  { t:"CRWV", p:88.88, se:"compute", ca:"agi", name:"CoreWeave", desc:"GPU cloud provider built for AI workloads with 20+ data centers running tens of thousands of NVIDIA GPUs.", why:"No proprietary technology pricing pressure when GPU supply normalizes", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:10, bf:8, bz:16 },
+  { t:"GDS", p:32.78, se:"compute", ca:"agi", name:"GDS Holdings", desc:"China carrier-neutral data center operator serving Chinese cloud providers.", why:"China AI buildout leverage but entirely China-risk-laden watchlist speculation", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:11, bf:8, bz:17 },
+  { t:"NVDA", p:210.96, se:"semis", ca:"agi", name:"NVIDIA", desc:"Designer of AI accelerators and CUDA ecosystem that defines AI training and inference.", why:"CUDA moat is years of developer tooling pricing power into next decade", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:15, bz:19 },
+  { t:"CRDO", p:257.79, se:"semis", ca:"agi", name:"Credo Technology", desc:"High-speed connectivity serdes and retimers for AI networking at 800G/1.6T.", why:"Networking fabric bottleneck as GPU clusters scale to hundreds of thousands of chips", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:16, bz:21 },
+  { t:"RSG", p:219.20, se:"nonagi", ca:"nonagi", name:"Republic Services", desc:"Second-largest US waste services with 14M customers across 40+ states.", why:"Contractual price escalators + landfill permits provide inflation-protected compounding", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:22, bf:20, bz:16 },
+  { t:"WM", p:233.33, se:"nonagi", ca:"nonagi", name:"Waste Management", desc:"North America's largest waste services with 300 landfills and 25000 collection vehicles.", why:"Best landfill network and route density natural monopoly economics", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:22, bf:22, bz:16 },
+  { t:"WCN", p:171.07, se:"nonagi", ca:"nonagi", name:"Waste Connections", desc:"North American waste services focused on secondary and exclusive markets with multi-year contracts.", why:"Higher margins from monopolistic small-market positions", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:20, bz:16 },
+  { t:"SNOW", p:261.45, se:"software", ca:"demand", name:"Snowflake", desc:"Cloud data platform for warehousing/analytics/AI across multi-cloud.", why:"Switching cost moat in enterprise data + multi-cloud architecture", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:13, bf:17, bz:15 },
+  { t:"ORCL", p:140.64, se:"software", ca:"demand", name:"Oracle", desc:"Enterprise software + cloud infrastructure OCI with database moat pivoting to AI.", why:"OCI multi-cloud strategy extends database moat to AI workloads", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:17, bz:15 }
+];
+const TIER2 = [
+  { t:"NEE", p:87.96, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:16, bz:15 },
+  { t:"TLN", p:385.80, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:19, bf:16, bz:12 },
+  { t:"GE", p:193.0, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:15, bz:15 },
+  { t:"EQIX", p:1051.21, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:12, bz:15 },
+  { t:"DLR", p:165.0, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:12, bz:15 },
+  { t:"ANET", p:420.0, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:15, bz:20 },
+  { t:"CRWD", p:440.0, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:12, bz:18 },
+  { t:"PANW", p:170.0, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:13, bz:17 },
+  { t:"AMD", p:158.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:12, bf:9, bz:21 },
+  { t:"AVGO", p:1280.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:15, bz:18 },
+  { t:"MRVL", p:68.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:13, bf:10, bz:19 },
+  { t:"ARM", p:135.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:12, bz:20 },
+  { t:"MU", p:108.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:12, bf:10, bz:18 },
+  { t:"MSFT", p:440.0, se:"software", ca:"demand", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:17, bz:21 },
+  { t:"GOOG", p:182.0, se:"software", ca:"demand", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:15, bz:22 },
+  { t:"CRM", p:275.0, se:"software", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:13, bz:17 },
+  { t:"PLTR", p:48.0, se:"software", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:14, bf:10, bz:20 },
+  { t:"META", p:585.0, se:"software", ca:"demand", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:15, bz:22 },
+  { t:"AMZN", p:210.0, se:"software", ca:"demand", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:18, bf:15, bz:22 },
+  { t:"TSLA", p:242.0, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:14, bf:9, bz:22 },
+  { t:"HON", p:210.0, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:16, bz:14 },
+  { t:"RTX", p:128.0, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:16, bz:12 },
+  { t:"LMT", p:545.0, se:"power", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:17, bz:11 },
+  { t:"UNH", p:535.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:17, bz:11 },
+  { t:"LLY", p:790.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:15, bz:16 },
+  { t:"JNJ", p:160.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:18, bz:12 },
+  { t:"JPM", p:210.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:17, bz:12 },
+  { t:"BAC", p:42.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:16, bz:11 },
+  { t:"XOM", p:118.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:17, bz:10 },
+  { t:"CVX", p:148.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:17, bz:10 },
+  { t:"WMT", p:113.9, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:16, bz:13 },
+  { t:"COST", p:955.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:17, bz:12 },
+  { t:"HD", p:355.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:15, bf:15, bz:12 },
+  { t:"NKE", p:80.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:14, bf:12, bz:12 },
+  { t:"DIS", p:98.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:14, bf:12, bz:13 },
+  { t:"NBIS", p:219.65, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:10, bf:8, bz:16 },
+  { t:"NET", p:118.0, se:"compute", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:16, bf:13, bz:18 },
+  { t:"SMCI", p:42.0, se:"semis", ca:"agi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:12, bf:10, bz:19 },
+  { t:"MRK", p:118.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:18, bz:11 },
+  { t:"TMO", p:512.0, se:"nonagi", ca:"nonagi", roe:null, roic:null, bp:null, ev:null, mc:null, ups:null, mg:17, bf:18, bz:12 }
+]; // TODO: populate 40-stock watchlist with M/B/Bz scores
 // ============================================================
