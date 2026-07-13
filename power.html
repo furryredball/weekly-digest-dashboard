@@ -227,6 +227,27 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
 </style>
 <script src="data.js"></script>
+<script>
+// Build minimal legacy-shape TICKERS map for this sector from TIER1+TIER2 (data.js).
+// Sector pages need tickerCard() shape (ticker, tier_emoji, tier, price, score, grade, news[]).
+function _scTierLabel(se){return ({power:'Tier 1',compute:'Tier 2',semis:'Tier 2',software:'Tier 2',nonagi:'Tier 4'})[se] || 'Tier 2';}
+function _scTierEmoji(se){return ({power:'🔋',compute:'🟠',semis:'🟡',software:'🟡',nonagi:'🟢'})[se] || '🟡';}
+function _scGradeForScore(s){if(s>=80)return 'B+';if(s>=70)return 'B';if(s>=60)return 'B-';if(s>=50)return 'C+';return 'C';}
+var TICKERS = (function(){
+  var out = [];
+  [].concat(TIER1, TIER2).forEach(function(t){
+    var score = Math.round((t.mg||0)+(t.bf||0)+(t.bz||0)+25);
+    out.push({
+      ticker: t.t, name: t.name || t.t, desc: t.desc || '', why: t.why || '',
+      tier: '本週 ' + _scTierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
+      tier_emoji: _scTierEmoji(t.se),
+      price: t.p, trend: '↑', pct: '+0.00%', score: score, grade: _scGradeForScore(score),
+      news: []
+    });
+  });
+  return out;
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -241,7 +262,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     <div style="padding:0 8px 12px;"><a href="index.html" style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">← Main Dashboard</a></div>
     <nav>
       <div class="nav-section">Sectors</div>
-      <div class="nav-item active" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge">6</span></div>
+      <div class="nav-item active" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge" id="navBadgePower">7</span></div>
       <div class="nav-item" onclick="location.href='compute.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
       <div class="nav-item" onclick="location.href='semis.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
       <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">2</span></div>
@@ -255,19 +276,19 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       <div class="nav-section">Linus</div>
       <div class="nav-item-ext" onclick="location.href='linus-invest.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
       <div class="nav-section">Theme</div>
-      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
+      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 7 hits</strong><br><span style="font-size:11px;" id="themePowerDetail">(BE, CEG, ETN, GEV, TLN, VRT, VST)</span></div>
     </nav>
   </aside>
   <main class="main">
     <div class="topbar">
-      <div class="topbar-left"><h1>Power Sector</h1><div class="subtitle">電力 bottleneck · 6 tickers · Tier 1-3</div></div>
+      <div class="topbar-left"><h1>Power Sector</h1><div class="subtitle" id="powerSubtitle">電力 bottleneck · 7 tickers · Tier 1-3</div></div>
       <div class="topbar-right"><button class="icon-btn" onclick="location.href='index.html'" title="Back to Dashboard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button></div>
     </div>
     <div class="ticker-grid" id="tickerGrid"></div>
   </main>
 </div>
 <script>
-var tickers = ['VST','CEG','TLN','VRT','ETN','BE'];
+var tickers = ['VST','CEG','TLN','VRT','ETN','GEV','BE'];
 renderSectorGrid('tickerGrid', tickers);
 </script>
 </body>

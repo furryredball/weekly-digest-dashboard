@@ -227,6 +227,20 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
 </style>
 <script src="data.js"></script>
+<script>
+// Sector pages build minimal legacy-shape TICKERS map from TIER1+TIER2 (data.js) for tickerCard().
+function _scTierLabel(se){return ({power:'Tier 1',compute:'Tier 2',semis:'Tier 2',software:'Tier 2',nonagi:'Tier 4'})[se] || 'Tier 2';}
+function _scTierEmoji(se){return ({power:'🔋',compute:'🟠',semis:'🟡',software:'🟡',nonagi:'🟢'})[se] || '🟡';}
+function _scGradeForScore(s){if(s>=80)return 'B+';if(s>=70)return 'B';if(s>=60)return 'B-';if(s>=50)return 'C+';return 'C';}
+var TICKERS = (function(){
+  var out = [];
+  [].concat(TIER1, TIER2).forEach(function(t){
+    var score = Math.round((t.mg||0)+(t.bf||0)+(t.bz||0)+25);
+    out.push({ticker:t.t, name:t.name||t.t, desc:t.desc||'', why:t.why||'', tier:'本週 '+_scTierLabel(t.se)+' ('+(SECTOR_NAMES[t.se]||t.se)+')', tier_emoji:_scTierEmoji(t.se), price:t.p, trend:'↑', pct:'+0.00%', score:score, grade:_scGradeForScore(score), news:[]});
+  });
+  return out;
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -267,7 +281,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
   </main>
 </div>
 <script>
-var tickers = ['RSG','WCN','GFL','WM','AMT'];
+var tickers = ['RSG','WM','WCN'];
 renderSectorGrid('tickerGrid', tickers);
 </script>
 </body>

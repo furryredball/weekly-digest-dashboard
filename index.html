@@ -258,7 +258,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       <div class="nav-section">Linus</div>
       <div class="nav-item-ext" onclick="location.href='linus-invest.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
       <div class="nav-section">Theme</div>
-      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
+      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 7 hits</strong><br><span style="font-size:11px;" id="powerHitsList">(BE, CEG, ETN, GEV, TLN, VRT, VST)</span></div>
     </nav>
   </aside>
 
@@ -283,13 +283,13 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       </div>
       </div>
       <div class="kpi-grid">
-        <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta">5 hits · 主導 bottleneck</div></div>
-        <div class="kpi-card"><div class="kpi-label">Tickers tracked</div><div class="kpi-value">17</div><div class="kpi-meta"><span class="kpi-delta delta-neutral">-3</span> filtered (score < 60)</div></div>
-        <div class="kpi-card"><div class="kpi-label">News ingested</div><div class="kpi-value">40</div><div class="kpi-meta"><span class="kpi-delta delta-up">+18</span> vs last week</div></div>
-        <div class="kpi-card"><div class="kpi-label">Scored</div><div class="kpi-value">17/17</div><div class="kpi-meta"><span class="kpi-delta delta-up">100%</span> conviction coverage</div></div>
+        <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta" id="kpiFeaturedTheme">7 hits · 主導 bottleneck</div></div>
+        <div class="kpi-card"><div class="kpi-label">Tickers tracked</div><div class="kpi-value" id="kpiTickers">55</div><div class="kpi-meta"><span class="kpi-delta delta-up">+38</span> vs legacy 17</div></div>
+        <div class="kpi-card"><div class="kpi-label">News ingested</div><div class="kpi-value" id="kpiNews">—</div><div class="kpi-meta"><span class="kpi-delta delta-up">from anysearch</span> news API</div></div>
+        <div class="kpi-card"><div class="kpi-label">Scored</div><div class="kpi-value" id="kpiScored">55/55</div><div class="kpi-meta"><span class="kpi-delta delta-up">100%</span> conviction coverage</div></div>
       </div>
       <div class="section">
-        <div class="section-header"><div class="section-title">Bottleneck distribution</div><div class="section-meta">17 stocks mapped</div></div>
+        <div class="section-header"><div class="section-title">Bottleneck distribution</div><div class="section-meta" id="kpiBottleneckCount">55 stocks mapped</div></div>
         <div class="bucket-bars" id="bucketBars"></div>
       </div>
       <div class="section">
@@ -316,42 +316,84 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
   </main>
 </div>
+<script src="data.js"></script>
 <script>
-const TICKERS = [
-  {ticker:"VST",name:"Vistra Energy",desc:"Texas-based integrated power utility with ~40GW generation fleet including nuclear, natural gas, solar, and battery storage.",why:"Direct AI data center power beneficiary — PJM capacity repricing + Texas load growth create multi-year earnings tailwind.",tier:"本週 Tier 1 (Power bottleneck): VST, CEG, TLN",tier_emoji:"🔋",price:158.86,trend:"↑",pct:"+0.56%",score:87,grade:"B+",news:[{date:"06-29",title:"The Ultimate AI Power Supercycle Winner: NextEra Energy or Vistra Stock?",url:"https://www.fool.com/coverage/better-buy/2026/06/28/the-ultimate-ai-power-supercycle-winner-nextera-energy-or-vistra-stock/",source:"fool.com"},{date:"06-30",title:"Vistra or Public Service Enterprise: Which Utility Stock Stands Out?",url:"https://www.zacks.com/stock/news/2944733/vistra-or-public-service-enterprise-which-utility-stock-stands-out?cid=CS-STOCKNEWSAPI-FT-analyst_blog|most_popular_stocks-2944733",source:"zacks.com"}]},
-  {ticker:"CEG",name:"Constellation Energy",desc:"Largest U.S. nuclear power operator with ~33GW fleet, supplying carbon-free baseload electricity to hyperscale data centers.",why:"Nuclear PPAs with Amazon/Microsoft provide contracted revenue growth; Three Mile Island restart for Microsoft AI data center shows unique value proposition.",tier:"本週 Tier 1 (Power bottleneck): VST, CEG, TLN",tier_emoji:"🔋",price:251.38,trend:"↑",pct:"+0.26%",score:84,grade:"B+",news:[{date:"06-28",title:"Constellation Energy Corporation (CEG) Sees a More Significant Dip Than Broader Market: Some Facts …",url:"https://www.zacks.com/stock/news/2944009/constellation-energy-corporation-ceg-sees-a-more-significant-dip-than-broader-market-some-facts-to-know?cid=CS-STOCKNEWSAPI-FT-tale_of_the_tape|yseop_template_6-2944009",source:"zacks.com"},{date:"06-30",title:"Will Constellation's Long-Term Nuclear PPAs Drive Sustainable Growth?",url:"https://www.zacks.com/stock/news/2944604/will-constellation-s-long-term-nuclear-ppas-drive-sustainable-growth?cid=CS-STOCKNEWSAPI-FT-analyst_blog|quick_take-2944604",source:"zacks.com"},{date:"07-04",title:"America just cleared the path for an 835-megawatt reactor to come back at full power in 2027, shift…",url:"https://news.google.com/rss/articles/CBMidEFVX3lxTE9uZk5KdDRZZTZERXI4bEZIaXFwc0pkNDNmaGdiVXhXWURoSVp0RUFJYTBHS21UcUdtMkpDTldPRjFFSXdvdlpGWDExNC1yRE5GU3BGSHRrdFZ1V1gyRWo1Y29vSzI3M1hEdDFtQnB4eDNjem9h?oc=5",source:"Autonocion.com"}]},
-  {ticker:"TLN",name:"Talen Energy",desc:"Independent power producer with ~6GW fleet; owns the 1.2GW Susquehanna nuclear plant and is redeveloping site for the 300MW Nautilus AI data center campus.",why:"First-of-its-kind behind-the-meter nuclear + data center colocation; Amazon AWS 960MW PPA validates the 'co-location' thesis for AI workloads.",tier:"本週 Tier 1 (Power bottleneck): VST, CEG, TLN",tier_emoji:"🔋",price:385.80,trend:"↑",pct:"+0.35%",score:71,grade:"B",news:[{date:"06-30",title:"Talen Energy, Stock Of The Day, Delivers For Amazon, AI Data Centers - Investor's Business Daily",url:"https://www.investors.com/research/ibd-stock-of-the-day/talen-energy-stock-amazon-ai-data-centers/",source:"investors.com"}]},
-  {ticker:"VRT",name:"Vertiv",desc:"Global leader in digital infrastructure thermal management (precision cooling, power distribution, UPS) for data centers.",why:"Every AI data center needs Vertiv cooling — GPU power density >1kW/rack requires liquid cooling that only Vertiv and a few others can deliver at scale.",tier:"本週 Tier 2 (Cooling bottleneck): VRT, CRWV",tier_emoji:"🔋",price:318.86,trend:"↓",pct:"-1.56%",score:86,grade:"B+",news:[{date:"06-30",title:"Vertiv Holdings (VRT) PT Lowered to $183.00 at Needham & Company LLC",url:"https://www.marketbeat.com/instant-alerts/nyse-vrt-pt-lowered-to-183-00-at-needham-company-llc-2026-06-30/",source:"marketbeat.com"}]},
-  {ticker:"CRWV",name:"CoreWeave",desc:"GPU cloud provider purpose-built for AI/ML workloads, operating tens of thousands of NVIDIA H100/B200 GPUs across 20+ data centers.",why:"Pure-play neocloud exposed to GPU pricing pressure from Meta's cloud entry; structural oversupply risk makes this a watch-only until margins stabilize.",tier:"本週 Tier 2 (GPU Cloud): CRWV, GDS",tier_emoji:"🟠",price:88.88,trend:"↓",pct:"-0.91%",score:61,grade:"B-",news:[{date:"07-01",title:"Meta Platform Announces AI Cloud Services; CRWV, NBIS Plunge",url:"https://www.nasdaq.com/articles/meta-platform-announces-ai-cloud-services-crwv-nbis-plunge",source:"nasdaq.com"}]},
-  {ticker:"ETN",name:"Eaton Corp",desc:"Diversified power management company supplying electrical components (transformers, switchgear, busway) critical for data center and grid construction.",why:"Electrical equipment is the longest-lead-time bottleneck in data center construction — Eaton's transformer backlog extends 2+ years with pricing power.",tier:"本週 Tier 2 (Electrical): ETN",tier_emoji:"🔋",price:407.28,trend:"↑",pct:"+0.36%",score:87,grade:"B+",news:[{date:"06-30",title:"Eaton Has Become A Top Industrial Growth Story Since 2020 (Rating Upgrade)",url:"https://seekingalpha.com/article/4779018-eaton-has-become-a-top-industrial-growth-story-since-2020",source:"seekingalpha.com"}]},
-  {ticker:"SNOW",name:"Snowflake",desc:"Cloud-native data platform for data warehousing, data lakes, AI/ML workloads, and data sharing across multi-cloud environments.",why:"Data infrastructure is picks-and-shovels for enterprise AI; Snowflake's consumption-based model aligns with growing enterprise AI data pipeline demand.",tier:"本週 Tier 2 (Software): SNOW",tier_emoji:"🟡",price:261.45,trend:"↓",pct:"-2.26%",score:65,grade:"B-",news:[{date:"06-30",title:"Snowflake RISKS: Still upside potential after successful KPI performance update",url:"https://www.wallstreet-online.de/nachricht/19178315-snowflake-risks-still-upside-potential-successful-kpi-performance-update",source:"wallstreet-online.de"}]},
-  {ticker:"BE",name:"Bloom Energy",desc:"Fuel cell manufacturer producing solid-oxide fuel cell systems for onsite clean power generation, targeting data centers and industrial applications.",why:"Fuel cells offer dispatchable backup power solution for data centers without grid interconnection delays; BE's Asia/Europe pricing competitive vs diesel.",tier:"本週 Tier 3 (Fuel cell): BE",tier_emoji:"🔋",price:244.61,trend:"↓",pct:"-4.83%",score:70,grade:"B",news:[{date:"06-29",title:"Bloom Energy: Fuel Cells For AI Data Centers — A Great Fit, But Check Valuation",url:"https://seekingalpha.com/article/4778583-bloom-energy-fuel-cells-for-ai-data-centers-a-great-fit-but-check-valuation",source:"seekingalpha.com"}]},
-  {ticker:"GDS",name:"GDS Holdings",desc:"Leading carrier-neutral data center operator in China, providing colocation and managed services to cloud providers and enterprises.",why:"China AI buildout is in early stages; GDS benefits from Chinese hyperscaler expansion while trading at significant discount to US data center REITs.",tier:"本週 Tier 3 (GPU Cloud): GDS",tier_emoji:"🟠",price:32.78,trend:"↓",pct:"-0.06%",score:63,grade:"B-",news:[{date:"06-29",title:"GDS Holdings: Worse Than You Think",url:"https://seekingalpha.com/article/4778797-gds-holdings-worse-than-you-think",source:"seekingalpha.com"}]},
-  {ticker:"OKLO",name:"Oklo",desc:"Advanced nuclear fission company developing small modular reactors (SMRs) using liquid metal fast reactor technology, targeting 15-50MW installations.",why:"SMRs are the long-term solution for data center baseload power; Oklo's compact design and regulatory engagement with NRC position it for post-2030 deployment.",tier:"本週 Tier 3 (SMR nuclear): OKLO",tier_emoji:"🔋",price:48.85,trend:"↓",pct:"-0.85%",score:55,grade:"C+",news:[{date:"06-30",title:"3 Key Reasons Oklo Inc (OKLO) Stock Is a Strong Buy According to Analysts",url:"https://www.insidermonkey.com/blog/3-key-reasons-oklo-inc-oklo-stock-is-a-strong-buy-according-to-analysts-1480890/",source:"insidermonkey.com"}]},
-  {ticker:"DCRU.SI",name:"Digital Core REIT",desc:"Singapore-listed data center REIT with a portfolio of stabilized data centers in North America and Europe, managed by Digital Realty.",why:"Data center REIT provides steady income from AI infrastructure without construction risk; Singapore listing offers currency diversification for Asian investors.",tier:"本週 Tier 4 (避險): DCRU.SI, BRK.B, WM",tier_emoji:"🟢",price:0.4950,trend:"↓",pct:"-1.00%",score:58,grade:"C+",news:[]},
-  {ticker:"BRK.B",name:"Berkshire Hathaway B",desc:"Warren Buffett's conglomerate holding company with businesses spanning insurance (Geico, Gen Re), railroads (BNSF), utilities (BHE), manufacturing, and a massive equity portfolio.",why:"Defensive anchor with $325B+ cash pile, zero net-debt; benefits from rising insurance premiums and utility investments while avoiding AI capex arms race.",tier:"本週 Tier 4 (避險): DCRU.SI, BRK.B, WM",tier_emoji:"🟢",price:493.71,trend:"↓",pct:"-0.35%",score:72,grade:"B",news:[]},
-  {ticker:"WM",name:"Waste Management",desc:"North America's largest waste collection, transfer, recycling, and disposal company with ~300 landfills and a fleet of ~25,000 collection vehicles.",why:"Essential service with monopoly-like local market positions; pricing power + capex-light model generates steady FCF regardless of AI investment cycle.",tier:"本週 Tier 4 (避險): DCRU.SI, BRK.B, WM",tier_emoji:"🟢",price:233.33,trend:"↑",pct:"+0.72%",score:74,grade:"B",news:[{date:"06-30",title:"Waste Management Inc (WM) Stock: A Value Investment with Steady Dividends and Growth Prospects",url:"https://www.insidermonkey.com/blog/waste-management-inc-wm-stock-a-value-investment-with-steady-dividends-and-growth-prospects-1480731/",source:"insidermonkey.com"}]},
-  {ticker:"NVDA",name:"NVIDIA",desc:"World's leading GPU and AI accelerator designer; its CUDA platform, H100/B200/GB200 GPUs power the majority of AI training and inference workloads globally.",why:"The 'gold' of AI — intentional suppressed in this framework because everyone already owns it; core pick-and-shovel but valuation reflects perfection already.",tier:"本週 Tier 2 (Semiconductor): NVDA, CRDO, NBIS",tier_emoji:"🟡",price:210.96,trend:"↑",pct:"+4.03%",score:66,grade:"B-",news:[{date:"06-30",title:"Move Over Nvidia Stock, There's a New AI Semiconductor Diamond in the Rough You Should Watch",url:"https://www.fool.com/investing/2026/06/30/move-over-nvidia-stock-theres-a-new-ai-semiconductor-diamond-in-the-rough-you-should-watch/",source:"fool.com"},{date:"06-30",title:"NVIDIA Corporation (NVDA) is Benefiting from Growing Adoption of Blackwell GPUs",url:"https://www.insidermonkey.com/blog/nvidia-corporation-nvda-is-benefiting-from-growing-adoption-of-blackwell-gpus-1480713/",source:"insidermonkey.com"}]},
-  {ticker:"CRDO",name:"Credo Technology",desc:"Semiconductor company specializing in high-speed serial connectivity (serdes, retimers, optical DSPs) for data center and AI network infrastructure.",why:"Every GPU needs high-speed connectivity — Credo's 100G/200G per-lane serdes is critical for scale-up and scale-out AI fabric; strong AI networking tailwind.",tier:"本週 Tier 2 (Semiconductor): NVDA, CRDO, NBIS",tier_emoji:"🟡",price:257.79,trend:"↓",pct:"-2.96%",score:73,grade:"B",news:[{date:"06-30",title:"CREDO TECHNOLOGY GROUP HOLDING (CRDO) Stock Analysis: Peter Lynch and Innovation in Data Infrastructure",url:"https://www.insidermonkey.com/blog/credo-technology-group-holding-crdo-stock-analysis-peter-lynch-and-innovation-in-data-infrastructure-1480732/",source:"insidermonkey.com"}]},
-  {ticker:"NBIS",name:"Nebius Group",desc:"European GPU cloud provider operating AI infrastructure across Europe and North America, offering NVIDIA-based compute for AI training and inference.",why:"EU AI compute demand is growing but NBIS faces structural headwinds from GPU oversupply and Meta cloud competition; highest risk in the GPU Cloud cohort.",tier:"本週 Tier 2 (GPU Cloud): NBIS",tier_emoji:"🟠",price:219.65,trend:"↑",pct:"+1.60%",score:50,grade:"C+",news:[{date:"07-01",title:"Meta's Surprise AI Cloud Move Sparks Chaos: CRWV Stock Crashes, NBIS, IonQ, Rigetti Hit Hard",url:"https://www.benzinga.com/markets/equities/26/07/43326970/metas-surprise-ai-cloud-move-sparks-chaos-crwv-stock-crashes-nbis-ionq-rigetti-hit-hard",source:"benzinga.com"}]},
-  {ticker:"ORCL",name:"Oracle",desc:"Enterprise software giant transitioning to cloud infrastructure; Oracle Cloud (OCI) provides GPU clusters and database services for enterprise AI workloads.",why:"OCI's multi-cloud database + AI GPU offering differentiates from AWS/Azure; strong analyst upside (+88%) and enterprise AI adoption tailwind for database workloads.",tier:"本週 Tier 2 (Software): ORCL",tier_emoji:"🟡",price:140.64,trend:"↓",pct:"-2.14%",score:68,grade:"B-",news:[{date:"06-28",title:"This Magnificent AI Growth Stock Has 88% Upside, According to Wall Street",url:"https://www.fool.com/investing/2026/06/28/this-magnificent-ai-growth-stock-has-88-upside-according-to-wall-street/",source:"fool.com"}]},
-  {ticker:"RSG",name:"Republic Services",desc:"Second-largest waste collection and recycling company in the US, serving ~14 million customers across 40+ states with collection, transfer, and disposal operations.",why:"Completely uncorrelated from AI capex — essential service with contractual pricing escalators and growing recycling/renewable natural gas diversification.",tier:"本週 Tier 4 (Non AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:219.20,trend:"↑",pct:"+0.23%",score:75,grade:"B",news:[{date:"06-30",title:"Republic Services: Side- Stepping AI Capex Madness",url:"https://www.fool.com/coverage/better-buy/2026/06/28/the-ultimate-ai-power-supercycle-winner-nextera-energy-or-vistra-stock/",source:"fool.com"}]},
-  {ticker:"WCN",name:"Waste Connections",desc:"North American waste services company providing solid waste collection, transfer, disposal, and recycling across secondary and exclusive markets in US and Canada.",why:"Focus on exclusive/secondary markets provides pricing power with less competition; strategic M&A and RNG investments drive above-peer growth.",tier:"本週 Tier 4 (Non AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:171.07,trend:"↑",pct:"+0.55%",score:74,grade:"B",news:[{date:"06-30",title:"Waste Connections: Strong Buy Rating Amid Strategic Acquisitions and AI Data Center Investments Fueling Growth",url:"https://www.insidermonkey.com/blog/waste-connections-strong-buy-rating-amid-strategic-acquisitions-and-ai-data-center-investments-fueling-growth-1480745/",source:"insidermonkey.com"}]},
-  {ticker:"GFL",name:"GFL Environmental",desc:"Fourth-largest North American environmental services company offering solid waste collection, liquid waste management, and soil remediation across Canada and the US.",why:"Best growth story among waste peers through aggressive M&A + infrastructure investment; discounted to RSG/WCN on EV/EBITDA, offering higher upside.",tier:"本週 Tier 4 (Non AGI): RSG, WCN, GFL",tier_emoji:"🟢",price:39.75,trend:"↓",pct:"-0.87%",score:72,grade:"B",news:[]}
-];
-const INCLUDE = [{"ticker":"ORCL","sector":"\u5176\u4ed6","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"\u534a\u5c0e\u9ad4","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"\u96fb\u529b","upside":"+56%","note":"PPA tailwind"}];
+// ============================================================
+// Synthesize legacy TICKERS array from TIER1+TIER2 for backward
+// compatibility with downstream tickerCard() / showTickerDetail().
+// data.js (TIER1+TIER2) is the single source of truth.
+// Schema mapping:
+//   TIER1.t → TICKERS.ticker
+//   TIER1.tier (use the corresponding string built from se)
+//   TIER1.p → TICKERS.price
+//   TIER1.desc → TICKERS.desc
+//   TIER1.why → TICKERS.why
+//   TIER1.ca → TICKERS.ca
+// news array, trend, pct, score, grade are not in TIER1+TIER2 — derive from score=mg+bf+bz
+// ============================================================
+function _tierLabel(se) {
+  const map = {power:'Tier 1', compute:'Tier 2', semis:'Tier 2', software:'Tier 2', nonagi:'Tier 4'};
+  return map[se] || 'Tier 2';
+}
+function _tierEmoji(se) {
+  const map = {power:'🔋', compute:'🟠', semis:'🟡', software:'🟡', nonagi:'🟢'};
+  return map[se] || '🟡';
+}
+function _gradeForScore(s) {
+  if (s >= 80) return 'B+';
+  if (s >= 70) return 'B';
+  if (s >= 60) return 'B-';
+  if (s >= 50) return 'C+';
+  return 'C';
+}
+const TICKERS = (function() {
+  const out = [];
+  [...TIER1, ...TIER2].forEach(function(t) {
+    const total = (t.mg || 0) + (t.bf || 0) + (t.bz || 0) + 25; // +25 framework
+    const score = Math.round(total / 1.0);  // total already in 0-100
+    out.push({
+      ticker: t.t,
+      name: t.name || t.t,
+      desc: t.desc || '',
+      why: t.why || '',
+      tier: '本週 ' + _tierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
+      tier_emoji: _tierEmoji(t.se),
+      price: t.p,
+      trend: '↑',
+      pct: '+0.00%',
+      score: score,
+      grade: _gradeForScore(score),
+      ca: t.ca,
+      se: t.se,
+      news: []
+    });
+  });
+  return out;
+})();
+const INCLUDE = [{"ticker":"ORCL","sector":"其他","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"半導體","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"電力","upside":"+56%","note":"PPA tailwind"}];
 const EXCLUDE = [{"ticker":"CRDO","sector":"半導體","reason":"insider sells $8.3M (7d, red flag)"},{"ticker":"BE","sector":"電力","reason":"insider sells $2.5M (7d, red flag)"}];
-const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW','ORCL'],nonagi:['RSG','WCN','GFL','WM','AMT']};
-
-
+</script>
+<script>
 // BUCKET BARS — 3-bucket cut (locked 2026-07-12 per Pirry):
 // Bucket A (bottleneck picks-and-shovels) + Bucket B (defensive non-AGI) + Bucket C (demand-side)
-// Counts derived from TICKERS.map at runtime; static labels here.
-const buckets=[{label:'🔌 A · Bottleneck',val:10},{label:'⚡ C · Demand',val:2},{label:'🛡️ B · Defensive',val:6}];
+// Counts computed from TICKERS at runtime — single source of truth.
+const _bktCounts = {agi: 0, nonagi: 0, demand: 0};
+TICKERS.forEach(function(t){ if(_bktCounts[t.ca] !== undefined) _bktCounts[t.ca]++; });
+const buckets=[
+  {label:'🔌 A · Bottleneck',val:_bktCounts.agi},
+  {label:'⚡ C · Demand',val:_bktCounts.demand},
+  {label:'🛡️ B · Defensive',val:_bktCounts.nonagi}
+];
 document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
 
-// SECTOR CARDS
-const sectorData=[{name:'電力 Power',tickers:['VST','CEG','TLN','VRT','ETN','BE'],tier:'1',tierName:'TIER 1-3',page:'power.html'},{name:'Compute Infra',tickers:['CRWV','GDS'],tier:'2',tierName:'TIER 2-3',page:'compute.html'},{name:'半導體 Semi',tickers:['NVDA','CRDO'],tier:'2',tierName:'OBSERVE',page:'semis.html'},{name:'Software',tickers:['SNOW','ORCL'],tier:'2',tierName:'TIER 2',page:'software.html'},{name:'Non AGI',tickers:['RSG','WCN','GFL','WM','AMT'],tier:'4',tierName:'TIER 4',page:'nonagi.html'}];
+// SECTOR CARDS — derived from SECTORS map (data.js) — single source of truth.
+const _tierForSector = {power:'1',compute:'2',semis:'2',software:'2',nonagi:'4'};
+const _tierNameForSector = {power:'TIER 1-3',compute:'TIER 2-3',semis:'OBSERVE',software:'TIER 2',nonagi:'TIER 4'};
+const _pageForSector = {power:'power.html',compute:'compute.html',semis:'semis.html',software:'software.html',nonagi:'nonagi.html'};
+const _labelForSector = {power:'電力 Power',compute:'Compute Infra',semis:'半導體 Semi',software:'Software',nonagi:'Non AGI'};
+const sectorData = Object.keys(SECTORS).map(function(k){
+  return {name: _labelForSector[k] || k, tickers: SECTORS[k], tier: _tierForSector[k] || '2', tierName: _tierNameForSector[k] || 'TIER 2', page: _pageForSector[k] || ''};
+});
 document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.page?' onclick="location.href='+String.fromCharCode(39)+s.page+String.fromCharCode(39)+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.page?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
 // INCLUDE/EXCLUDE
