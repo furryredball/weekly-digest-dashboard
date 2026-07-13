@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Linus Invest — Two-Tier Dashboard</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -182,7 +185,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
   </main>
 </div>
-<script src="data.js"></script>
+<script src="data.js?v=20260713"></script>
 <script>
 (function(){var r=document.documentElement;var d=localStorage.getItem('linus-theme');if(d){r.setAttribute('data-theme',d);}else{var pd=window.matchMedia('(prefers-color-scheme:dark)').matches;r.setAttribute('data-theme',pd?'dark':'light');}var btn=document.getElementById('themeToggle');var cur=r.getAttribute('data-theme');btn.innerHTML=cur==='dark'?'☀️':'🌙';btn.addEventListener('click',function(){var n=r.getAttribute('data-theme')==='dark'?'light':'dark';r.setAttribute('data-theme',n);localStorage.setItem('linus-theme',n);btn.innerHTML=n==='dark'?'☀️':'🌙';});})();
 function grade(sc){return sc>=80?'A':sc>=75?'B':sc>=70?'C':'';}
