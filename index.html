@@ -8,44 +8,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root, [data-theme="light"]{
---bg:#faf9f7;--surface:#ffffff;--surface-2:#f5f4f2;--surface-3:#efeeec;
---border:#e8e6e3;--border-strong:#d9d6d2;
---text:#2c2c2a;--text-muted:#8a8a85;--text-faint:#b5b5b0;
---accent:#7a7a78;--accent-light:#f0f0ee;
---success:#6b8e6b;--success-light:#eef4ee;
---warning:#b8924a;--warning-light:#f7f1e8;
---error:#b85c5c;--error-light:#f7eeed;
---purple:#8b7dbe;--purple-light:#f1effa;
---tier1:#2c2c2a;--tier2:#7a7a78;--tier3:#b8924a;--tier4:#8b7dbe;
---radius-sm:4px;--radius-md:6px;--radius-lg:8px;
---shadow:0 1px 2px rgba(0,0,0,0.03);
-}
-[data-theme="dark"]{
---bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
---border:#383836;--border-strong:#484845;
---text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
---accent:#a0a09c;--accent-light:#2e2e2c;
---success:#7a9d7a;--success-light:#1e2a1e;
---warning:#c4a462;--warning-light:#2a2418;
---error:#c87878;--error-light:#2a1e1e;
---purple:#9999c0;--purple-light:#22202a;
---tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
---shadow:0 1px 2px rgba(0,0,0,0.2);
-}
-@media (prefers-color-scheme: dark){
 :root{
---bg:#1a1a19;--surface:#232321;--surface-2:#2a2a28;--surface-3:#30302e;
---border:#383836;--border-strong:#484845;
---text:#e4e4e0;--text-muted:#90908c;--text-faint:#60605c;
---accent:#a0a09c;--accent-light:#2e2e2c;
---success:#7a9d7a;--success-light:#1e2a1e;
---warning:#c4a462;--warning-light:#2a2418;
---error:#c87878;--error-light:#2a1e1e;
---purple:#9999c0;--purple-light:#22202a;
---tier1:#e4e4e0;--tier2:#a0a09c;--tier3:#c4a462;--tier4:#9999c0;
---shadow:0 1px 2px rgba(0,0,0,0.2);
-}
+/* Notion-inspired warm palette — locked, no dark mode */
+--bg:#fbfaf7;--surface:#ffffff;--surface-2:#f6f5f1;--surface-3:#efede7;
+--border:#e7e4dd;--border-strong:#d6d2c7;
+--text:#37352f;--text-muted:#787774;--text-faint:#b6b4ad;
+--accent:#787774;--accent-light:#efede7;
+--success:#4d7c5e;--success-light:#e8f0ea;
+--warning:#b08d4a;--warning-light:#f5eeda;
+--error:#b34747;--error-light:#f5e7e7;
+--purple:#8b7dbe;--purple-light:#f0edf8;
+--teal:#4a7d8b;--teal-light:#e8eff1;
+--tier1:#37352f;--tier2:#787774;--tier3:#b08d4a;--tier4:#8b7dbe;
+--radius-sm:4px;--radius-md:6px;--radius-lg:8px;
+--shadow:0 1px 2px rgba(0,0,0,0.04);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{-webkit-font-smoothing:antialiased;}
@@ -54,7 +30,7 @@ a{color:inherit;text-decoration:none;}
 button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
 /* SIDEBAR */
-.app{display:flex;min-height:100vh;}
+.app{display:flex;min-height:100vh;align-items:flex-start;}
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:24px 12px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;transition:transform 0.25s ease;}
 .sidebar-logo{font-size:15px;font-weight:600;letter-spacing:-0.01em;padding:0 8px 20px;display:flex;align-items:center;gap:10px;}
 .logo-mark{width:28px;height:28px;background:var(--text);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--surface);font-weight:700;font-size:13px;}
@@ -268,7 +244,6 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     <div class="panel-view active" id="view-dashboard">
       <div class="topbar">
         <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle">2026-06-28 to 2026-07-04 · 17 tickers · 40 news · 5 trading days</div></div>
-        <div class="topbar-right"><button class="icon-btn" id="themeToggle" aria-label="Toggle theme"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div>
       </div>
       <div class="section">
         <div class="linus-overview">
@@ -500,18 +475,8 @@ document.getElementById('sidebarOverlay').addEventListener('click',function(){
 
 // THEME TOGGLE
 (function(){
-  var root=document.documentElement;
-  var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-  root.setAttribute('data-theme',prefersDark?'dark':'light');
-  var btn=document.getElementById('themeToggle');
-  var moon='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  var sun='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  btn.innerHTML=prefersDark?moon:sun;
-  btn.addEventListener('click',function(){
-    var d=root.getAttribute('data-theme')==='dark'?'light':'dark';
-    root.setAttribute('data-theme',d);
-    btn.innerHTML=d==='dark'?moon:sun;
-  });
+  // Theme locked — Notion-style warm palette only. No toggle.
+  document.documentElement.setAttribute('data-theme','light');
 })();
 
 </script>
