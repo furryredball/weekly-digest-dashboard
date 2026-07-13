@@ -248,7 +248,7 @@ var TICKERS = (function(){
   var out = [];
   [].concat(TIER1, TIER2).forEach(function(t){
     var score = Math.round((t.mg||0)+(t.bf||0)+(t.bz||0)+25);
-    out.push({ticker:t.t, name:t.name||t.t, desc:t.desc||'', why:t.why||'', tier:'本週 '+_scTierLabel(t.se)+' ('+(SECTOR_NAMES[t.se]||t.se)+')', tier_emoji:_scTierEmoji(t.se), price:t.p, trend:t.ups!=null?(t.ups>=0?'↑':'↓'):'↑', pct:t.ups!=null?((t.ups>=0?'+':'')+t.ups.toFixed(1)+'%':'—'), score:score, grade:_scGradeForScore(score), pe:t.pe||'', mc:t.mc||'', upside:t.ups||'', news:[]});
+    out.push({ticker:t.t, name:t.name||t.t, desc:t.desc||'', why:t.why||'', tier:'本週 '+_scTierLabel(t.se)+' ('+(SECTOR_NAMES[t.se]||t.se)+')', tier_emoji:_scTierEmoji(t.se), price:t.p, trend:(t.ups!=null?(t.ups>=0?'↑':'↓'):'—'), pct:(t.ups!=null?(t.ups>=0?'+':'')+t.ups.toFixed(1)+'%':'—'), score:score, grade:_scGradeForScore(score), pe:t.pe||'', mc:t.mc||'', upside:t.ups||'', news:[]});
   });
   return out;
 })();
