@@ -314,31 +314,171 @@ function _tierEmoji(se) {
   return map[se] || '🟡';
 }
 function _gradeForScore(s) {
-  if (s >= 80) return 'B+';
-  if (s >= 70) return 'B';
-  if (s >= 60) return 'B-';
-  if (s >= 50) return 'C+';
-  return 'C';
+  if (s >= 85) return 'A';
+  if (s >= 75) return 'B+';
+  if (s >= 65) return 'B';
+  if (s >= 55) return 'B-';
+  if (s >= 45) return 'C+';
+  if (s >= 35) return 'C';
+  return 'D/F';
 }
+
+// ============================================================
+// 5-DIMENSION SCORING — Leopold Aschenbrenner Situational Awareness
+// ============================================================
+//
+// Each stock = 5 dimensions × 20 pts = 100 pts max.
+//
+// Dim 1: FRAMEWORK FIT (max 20) — picks-and-shovels / bottleneck alignment
+//   - Hard cap 10 for non-AGI (ca==='nonagi') per Pirry 2026-07-13.
+//   - AGI bottleneck direct (power transmission / cooling / nuclear
+//     / GPU sub-vertical): highest score, ~18-20.
+//   - AGI enablement (compute infra, semis): 14-17.
+//   - AGI demand beneficiary (software / cloud consumer): 12-15.
+//   - Tier-2 / watchlist AGI: 10-13.
+//   - Non-AGI terminal value: capped 8-10 (RSG/WM/WCN defensive).
+//
+// Dim 2: FUNDAMENTAL QUALITY (max 20) — ROE / ROIC derived
+//
+// Dim 3: TECHNICAL MOMENTUM (max 20) — analyst upside %
+//
+// Dim 4: SENTIMENT & FLOW (max 20) — analyst buy %
+//
+// Dim 5: BOTTLENECK SCARCITY (max 20) — supply tightness / lead times
+//   AGI beta-weighted: highest bottleneck moats get 18-20.
+//   Non-AGI hard cap 10.
+//
+// Each stock ends up with 5 sub-scores that sum to the conviction
+// grade. No flat +25 inflation: every dimension varies by ticker.
+// ============================================================
+
+function _dimFramework(t) {
+  // Hard cap non-AGI at 10
+  if (t.ca === 'nonagi') {
+    return 9; // defensive waste/services — terminal value, no AGI beta
+  }
+  // AGI categories
+  if (t.ca === 'agi') {
+    // Tier-1 directly in bottleneck sectors (power + semis) score highest
+    if (t.tier === 1 && (t.se === 'power' || t.se === 'semis')) return 19;
+    if (t.tier === 1 && t.se === 'compute') return 16; // GPU cloud / DC REIT
+    // Tier-2 AGI watchlist
+    return 12;
+  }
+  // Demand-side beneficiary (ca='demand')
+  if (t.ca === 'demand') {
+    return t.tier === 1 ? 14 : 10;
+  }
+  return 8;
+}
+
+function _dimFundamental(t) {
+  // ROE/ROIC driven. Pre-revenue tickers (negative or missing ROIC) get low.
+  const roe = t.roe;
+  const roic = t.roic;
+  if (roe == null && roic == null) {
+    // No fundamentals available — penalty, but don't zero
+    return 9;
+  }
+  // Negative ROIC = pre-profit / speculative
+  if (roic != null && roic < 0) return 5;
+  // Map ROE tier; ROIC adjusts
+  let base;
+  if (roe == null) {
+    // Have roic only
+    if (roic >= 20) base = 17;
+    else if (roic >= 10) base = 14;
+    else if (roic >= 5) base = 11;
+    else base = 8;
+  } else {
+    if (roe >= 25) base = 18;
+    else if (roe >= 20) base = 16;
+    else if (roe >= 15) base = 14;
+    else if (roe >= 10) base = 12;
+    else if (roe >= 5) base = 9;
+    else base = 6;
+    // ROIC bonus/penalty within ±2
+    if (roic != null) {
+      if (roic >= 15) base += 2;
+      else if (roic < 3 && roe > 10) base -= 2;
+    }
+  }
+  return Math.max(4, Math.min(20, base));
+}
+
+function _dimMomentum(t) {
+  const ups = t.ups;
+  if (ups == null) return 9; // missing data
+  if (ups >= 50) return 19;
+  if (ups >= 30) return 17;
+  if (ups >= 15) return 14;
+  if (ups >= 5) return 12;
+  if (ups >= 0) return 10;
+  if (ups >= -10) return 7;
+  if (ups >= -25) return 5;
+  return 3;
+}
+
+function _dimSentiment(t) {
+  const bp = t.bp;
+  if (bp == null) return 9; // missing
+  if (bp >= 85) return 19;
+  if (bp >= 70) return 16;
+  if (bp >= 55) return 13;
+  if (bp >= 40) return 10;
+  if (bp >= 25) return 8;
+  return 5;
+}
+
+function _dimScarcity(t) {
+  // Non-AGI hard cap 10
+  if (t.ca === 'nonagi') return 8;
+  if (t.ca === 'agi') {
+    if (t.tier === 1 && (t.se === 'power' || t.se === 'semis')) return 18;
+    if (t.tier === 1 && t.se === 'compute') return 14;
+    return 11;
+  }
+  if (t.ca === 'demand') return 10;
+  return 6;
+}
+
+function _scoreStock(t) {
+  const dims = {
+    framework: _dimFramework(t),
+    fundamental: _dimFundamental(t),
+    momentum: _dimMomentum(t),
+    sentiment: _dimSentiment(t),
+    scarcity: _dimScarcity(t)
+  };
+  const total = dims.framework + dims.fundamental + dims.momentum + dims.sentiment + dims.scarcity;
+  return { total: total, dims: dims };
+}
+
 const TICKERS = (function() {
   const out = [];
   [...TIER1, ...TIER2].forEach(function(t) {
-    const total = (t.mg || 0) + (t.bf || 0) + (t.bz || 0) + 25; // +25 framework
-    const score = Math.round(total / 1.0);  // total already in 0-100
+    // Tier number (1 or 2) comes from which array the stock originated in.
+    // We attach it before scoring: this script runs after TIER1/TIER2 are
+    // defined and the legacy shorthand here is `t.t` for ticker.
+    // Compute tier by examining which source — easiest: re-detect.
+    const isInTier1 = Array.isArray(TIER1) && TIER1.indexOf(t) >= 0;
+    const enriched = Object.assign({}, t, { tier: isInTier1 ? 1 : 2 });
+    const s = _scoreStock(enriched);
     out.push({
-      ticker: t.t,
-      name: t.name || t.t,
-      desc: t.desc || '',
-      why: t.why || '',
-      tier: '本週 ' + _tierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
-      tier_emoji: _tierEmoji(t.se),
-      price: t.p,
+      ticker: enriched.t,
+      name: enriched.name || enriched.t,
+      desc: enriched.desc || '',
+      why: enriched.why || '',
+      tier: '本週 ' + _tierLabel(enriched.se) + ' (' + (SECTOR_NAMES[enriched.se] || enriched.se) + ')',
+      tier_emoji: _tierEmoji(enriched.se),
+      price: enriched.p,
       trend: '↑',
       pct: '+0.00%',
-      score: score,
-      grade: _gradeForScore(score),
-      ca: t.ca,
-      se: t.se,
+      score: s.total,
+      dims: s.dims,
+      grade: _gradeForScore(s.total),
+      ca: enriched.ca,
+      se: enriched.se,
       news: []
     });
   });
@@ -401,42 +541,43 @@ function showTickerDetail(ticker){
 // SCORING PAGE
 function renderScoringPage(){
   var dims=[
-    {name:'Framework Fit',pts:30,desc:'Picks-and-shovels alignment'},
-    {name:'Fundamental Quality',pts:25,desc:'P/E, growth, margins'},
-    {name:'Technical Momentum',pts:15,desc:'Trend, relative strength'},
-    {name:'Sentiment & Flow',pts:15,desc:'Analyst revisions, insider activity'},
-    {name:'Bottleneck Scarcity',pts:15,desc:'Supply tightness, lead times'}
+    {key:'framework',name:'Framework Fit',pts:20,desc:'Picks-and-shovels alignment. Non-AGI hard-capped at 10. AGI beta = highest score.'},
+    {key:'fundamental',name:'Fundamental Quality',pts:20,desc:'ROE / ROIC compounding quality'},
+    {key:'momentum',name:'Technical Momentum',pts:20,desc:'Analyst upside % vs consensus price target'},
+    {key:'sentiment',name:'Sentiment & Flow',pts:20,desc:'% analysts on Buy / Strong-Buy'},
+    {key:'scarcity',name:'Bottleneck Scarcity',pts:20,desc:'Supply tightness, lead times, multi-year backlog moats (Aschenbrenner)'}
   ];
   var grades=[
-    {range:'90\u2013100',grade:'A',emoji:'\u{1F7E2}',meaning:'Top conviction'},
-    {range:'80\u201389',grade:'B+',emoji:'\u{1F7E2}',meaning:'Strong conviction'},
-    {range:'70\u201379',grade:'B',emoji:'\u{1F7E1}',meaning:'Moderate'},
-    {range:'60\u201369',grade:'B-',emoji:'\u{1F7E1}',meaning:'Watchlist'},
-    {range:'50\u201359',grade:'C+',emoji:'\u{1F7E0}',meaning:'Speculative'},
-    {range:'40\u201349',grade:'C',emoji:'\u{1F7E0}',meaning:'Marginal'},
-    {range:'<40',grade:'D/F',emoji:'\u{1F534}',meaning:'Avoid'}
+    {range:'\u226585',grade:'A',emoji:'\u{1F7E2}',meaning:'Top conviction'},
+    {range:'75\u201384',grade:'B+',emoji:'\u{1F7E2}',meaning:'Strong conviction'},
+    {range:'65\u201374',grade:'B',emoji:'\u{1F7E1}',meaning:'Moderate conviction'},
+    {range:'55\u201364',grade:'B-',emoji:'\u{1F7E1}',meaning:'Watchlist'},
+    {range:'45\u201354',grade:'C+',emoji:'\u{1F7E0}',meaning:'Speculative'},
+    {range:'35\u201344',grade:'C',emoji:'\u{1F7E0}',meaning:'Marginal'},
+    {range:'<35',grade:'D/F',emoji:'\u{1F534}',meaning:'Avoid'}
   ];
   var ranked=TICKERS.slice().sort(function(a,b){return b.score-a.score});
-  var gradeClassMap={'A':'grade-A','B+':'grade-B-plus','B':'grade-B','B-':'grade-B-minus','C+':'grade-C-plus'};
+  var gradeClassMap={'A':'grade-A','B+':'grade-B-plus','B':'grade-B','B-':'grade-B-minus','C+':'grade-C-plus','C':'grade-C','D/F':'grade-D'};
+  var sectorMap={};
+  var secKeys=Object.keys(SECTORS);
+  secKeys.forEach(function(k){SECTORS[k].forEach(function(t){sectorMap[t]=k})});
+  var sectorNames={'power':'Power','compute':'Compute','semis':'Semi','software':'Software','nonagi':'Non AGI'};
   var html='';
-  html+='<div class="scoring-section"><h2>Methodology</h2><p>Each stock is scored on 5 dimensions (0\u2013100 total) to produce a conviction grade. The framework evaluates picks-and-shovels alignment, fundamentals, technicals, sentiment, and supply-chain scarcity.</p></div>';
-  html+='<div class="scoring-section"><h2>5 Dimensions ('+dims.reduce(function(s,d){return s+d.pts},0)+' pts)</h2><div class="scoring-dims">';
+  html+='<div class="scoring-section"><h2>Methodology \u2014 Aschenbrenner Situational Awareness</h2><p>Each stock is scored on <strong>5 dimensions \u00d7 20 pts = 100 pts</strong> conviction grade. Framework Fit <strong>hard-capped at 10 for non-AGI</strong> tickers (terminal value, no AGI beta). The biggest, longest bottleneck wins the highest scarcity + framework score.</p><p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Framework inspired by <em>Situational Awareness</em> (Leopold Aschenbrenner, 2023): power scarcity \u2192 compute bottleneck \u2192 AGI \u2192 superintelligence.</p></div>';
+  html+='<div class="scoring-section"><h2>5 Dimensions (100 pts)</h2><div class="scoring-dims">';
   dims.forEach(function(d){html+='<div class="scoring-dim"><div class="scoring-dim-name">'+d.name+'</div><div class="scoring-dim-pts">'+d.pts+'</div><div class="scoring-dim-desc">'+d.desc+'</div></div>'});
   html+='</div></div>';
   html+='<div class="scoring-section"><h2>Grade Conversion</h2><table class="grade-table"><tr><th>Score</th><th>Grade</th><th>Meaning</th></tr>';
   grades.forEach(function(g){html+='<tr><td>'+g.range+'</td><td>'+g.emoji+' '+g.grade+'</td><td>'+g.meaning+'</td></tr>'});
   html+='</table></div>';
-  html+='<div class="scoring-section"><h2>Rankings</h2><table class="rank-table"><tr><th>#</th><th>Ticker</th><th>Score</th><th>Grade</th><th>Sector</th></tr>';
-  var sectorMap={};
-  var secKeys=Object.keys(SECTORS);
-  secKeys.forEach(function(k){SECTORS[k].forEach(function(t){sectorMap[t]=k})});
-  var sectorNames={'power':'Power','compute':'Compute','semis':'Semi','software':'Software','nonagi':'Non AGI'};
+  html+='<div class="scoring-section"><h2>Rankings \u2014 5-Dimension Breakdown</h2><div style="overflow-x:auto;"><table class="rank-table rank-table-wide"><tr><th>#</th><th>Ticker</th><th>Total</th><th>Grade</th><th>Fw</th><th>Fund</th><th>Mom</th><th>Sent</th><th>Scar</th><th>Sector</th></tr>';
   ranked.forEach(function(t,i){
     var sec=sectorNames[sectorMap[t.ticker]]||'Other';
     var gc=gradeClassMap[t.grade]||'grade-B';
-    html+='<tr><td class="rank-num">'+(i+1)+'</td><td><strong>'+t.ticker+'</strong></td><td>'+t.score+'</td><td><span class="detail-score-badge '+gc+'">'+t.grade+'</span></td><td>'+sec+'</td></tr>';
+    var d=t.dims||{};
+    html+='<tr><td class="rank-num">'+(i+1)+'</td><td><strong>'+t.ticker+'</strong></td><td><strong>'+t.score+'</strong></td><td><span class="detail-score-badge '+gc+'">'+t.grade+'</span></td><td>'+(d.framework!=null?d.framework:'\u2014')+'</td><td>'+(d.fundamental!=null?d.fundamental:'\u2014')+'</td><td>'+(d.momentum!=null?d.momentum:'\u2014')+'</td><td>'+(d.sentiment!=null?d.sentiment:'\u2014')+'</td><td>'+(d.scarcity!=null?d.scarcity:'\u2014')+'</td><td>'+sec+'</td></tr>';
   });
-  html+='</table></div>';
+  html+='</table></div><p style="font-size:11px;color:var(--text-muted);margin-top:12px;">Cols: Fw = Framework Fit \u00b7 Fund = Fundamental Quality \u00b7 Mom = Technical Momentum \u00b7 Sent = Sentiment &amp; Flow \u00b7 Scar = Bottleneck Scarcity. Each column max 20 pts; row sums to total score.</p></div>';
   document.getElementById('scoringContent').innerHTML=html;
 }
 

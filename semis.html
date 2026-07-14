@@ -219,11 +219,15 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 // Sector pages build minimal legacy-shape TICKERS map from TIER1+TIER2 (data.js) for tickerCard().
 function _scTierLabel(se){return ({power:'Tier 1',compute:'Tier 2',semis:'Tier 2',software:'Tier 2',nonagi:'Tier 4'})[se] || 'Tier 2';}
 function _scTierEmoji(se){return ({power:'🔋',compute:'🟠',semis:'🟡',software:'🟡',nonagi:'🟢'})[se] || '🟡';}
-function _scGradeForScore(s){if(s>=80)return 'B+';if(s>=70)return 'B';if(s>=60)return 'B-';if(s>=50)return 'C+';return 'C';}
+
 var TICKERS = (function(){
   var out = [];
   [].concat(TIER1, TIER2).forEach(function(t){
-    var score = Math.round((t.mg||0)+(t.bf||0)+(t.bz||0)+25);
+    var isIn1=Array.isArray(TIER1)&&TIER1.indexOf(t)>=0;
+    var enriched=Object.assign({},t,{tier:isIn1?1:2});
+    var sc=_scScoreStock(enriched);
+    var score=sc.total;
+    var ups=t.ups;
     out.push({ticker:t.t, name:t.name||t.t, desc:t.desc||'', why:t.why||'', tier:'本週 '+_scTierLabel(t.se)+' ('+(SECTOR_NAMES[t.se]||t.se)+')', tier_emoji:_scTierEmoji(t.se), price:t.p, trend:(t.ups!=null?(t.ups>=0?'↑':'↓'):'—'), pct:(t.ups!=null?(t.ups>=0?'+':'')+t.ups.toFixed(1)+'%':'—'), score:score, grade:_scGradeForScore(score), pe:t.pe||'', mc:t.mc||'', upside:t.ups||'', news:[]});
   });
   return out;
