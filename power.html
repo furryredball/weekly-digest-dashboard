@@ -214,45 +214,6 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
 </style>
 <script src="data.js?v=20260713"></script>
-<script>
-// 5-DIMENSION SCORING (Aschenbrenner Situational Awareness)
-function _scGradeForScore(s){if(s>=85)return 'A';if(s>=75)return 'B+';if(s>=65)return 'B';if(s>=55)return 'B-';if(s>=45)return 'C+';if(s>=35)return 'C';return 'D/F';}
-function _scDimFramework(t){if(t.ca==='nonagi')return 9;if(t.ca==='agi'){if(t.tier===1&&(t.se==='power'||t.se==='semis'))return 19;if(t.tier===1&&t.se==='compute')return 16;return 12;}if(t.ca==='demand')return t.tier===1?14:10;return 8;}
-function _scDimFundamental(t){const roe=t.roe,roic=t.roic;if(roe==null&&roic==null)return 9;if(roic!=null&&roic<0)return 5;let base;if(roe==null){if(roic>=20)base=17;else if(roic>=10)base=14;else if(roic>=5)base=11;else base=8;}else{if(roe>=25)base=18;else if(roe>=20)base=16;else if(roe>=15)base=14;else if(roe>=10)base=12;else if(roe>=5)base=9;else base=6;if(roic!=null){if(roic>=15)base+=2;else if(roic<3&&roe>10)base-=2;}}return Math.max(4,Math.min(20,base));}
-function _scDimMomentum(t){const u=t.ups;if(u==null)return 9;if(u>=50)return 19;if(u>=30)return 17;if(u>=15)return 14;if(u>=5)return 12;if(u>=0)return 10;if(u>=-10)return 7;if(u>=-25)return 5;return 3;}
-function _scDimSentiment(t){const bp=t.bp;if(bp==null)return 9;if(bp>=85)return 19;if(bp>=70)return 16;if(bp>=55)return 13;if(bp>=40)return 10;if(bp>=25)return 8;return 5;}
-function _scDimScarcity(t){if(t.ca==='nonagi')return 8;if(t.ca==='agi'){if(t.tier===1&&(t.se==='power'||t.se==='semis'))return 18;if(t.tier===1&&t.se==='compute')return 14;return 11;}if(t.ca==='demand')return 10;return 6;}
-function _scScoreStock(t){const d={fw:_scDimFramework(t),fund:_scDimFundamental(t),mom:_scDimMomentum(t),sent:_scDimSentiment(t),scar:_scDimScarcity(t)};return{total:d.fw+d.fund+d.mom+d.sent+d.scar,dims:d};}
-
-// Build minimal legacy-shape TICKERS map for this sector from TIER1+TIER2 (data.js).
-// Sector pages need tickerCard() shape (ticker, tier_emoji, tier, price, score, grade, news[]).
-function _scTierLabel(se){return ({power:'Tier 1',compute:'Tier 2',semis:'Tier 2',software:'Tier 2',nonagi:'Tier 4'})[se] || 'Tier 2';}
-function _scTierEmoji(se){return ({power:'🔋',compute:'🟠',semis:'🟡',software:'🟡',nonagi:'🟢'})[se] || '🟡';}
-
-var TICKERS = (function(){
-  var out = [];
-  [].concat(TIER1, TIER2).forEach(function(t){
-    var isIn1=Array.isArray(TIER1)&&TIER1.indexOf(t)>=0;
-    var enriched=Object.assign({},t,{tier:isIn1?1:2});
-    var sc=_scScoreStock(enriched);
-    var score=sc.total;
-    var ups=t.ups;
-    var ups = t.ups;
-    out.push({
-      ticker: t.t, name: t.name || t.t, desc: t.desc || '', why: t.why || '',
-      tier: '本週 ' + _scTierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
-      tier_emoji: _scTierEmoji(t.se),
-      price: t.p,
-      trend: ups != null ? (ups >= 0 ? '↑' : '↓') : '—',
-      pct:  ups != null ? (ups >= 0 ? '+' : '') + ups.toFixed(1) + '%' : '—',
-      score: score, dims: sc.dims, grade: _scGradeForScore(score),
-      pe: t.pe || '', mc: t.mc || '', upside: t.ups || '',
-      news: []
-    });
-  });
-  return out;
-})();
-</script>
 </head>
 <body>
 <div class="app">
