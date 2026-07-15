@@ -2,6 +2,31 @@
 
 // OLD inline TICKERS array (lines 2-21) removed 2026-07-13. Single source of truth = TIER1 + TIER2.
 
+// ============================================================
+// NEWS FEED (added 2026-07-15) — injected daily by `news-tier1-daily`
+// cron and weekly by `news-tier2-weekly` cron. Each entry shape:
+//   {ticker:'VST', tier:1, ts:'2026-07-15T08:30:00Z', source:'Reuters',
+//    title:'...', url:'...', sentiment:'bullish'|'bearish'|'neutral'}
+// 3-day rolling cap enforced by cron trim logic.
+// ============================================================
+const NEWS = [];
+
+// ============================================================
+// LINUS'S OVERVIEW (added 2026-07-15) — narrative commentary by
+// sector, refreshed every 3 days by `overview-refresh` cron. Shape:
+//   {sector:'power'|'compute'|'semis'|'nonagi'|'sentiment',
+//    ts:'2026-07-15T09:00:00Z', body:'paragraph text...'}
+// Voice: 港式英文混繁中 (matches existing dashboard tone).
+// Seed entries below preserve the original hardcoded content.
+// ============================================================
+const OVERVIEW = [
+  {sector:'power',     ts:'2026-07-15T09:00:00Z', body:'<strong>Power bottleneck</strong> — GEV 氣渦輪機 backlog 突破 $150B (+100% YoY)，交期拉到 5 年；SMR 核電 conditional offtake 已達 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地 — BE 燃料電池喺亞洲/歐洲定價具競爭力。VST (87 B+), CEG (84 B+), TLN (71 B) 維持 Tier 1。Power 結構性 bottleneck 未見緩解，核電 + 天然氣係中線確定性最高嘅 sub-theme。'},
+  {sector:'compute',   ts:'2026-07-15T09:00:00Z', body:'<strong>GPU Cloud</strong> — Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 單日暴跌 ~12%。H100 供應已追平需求，B200/GB200 Q1 出貨加速 GPU 定價下行，neocloud 溢價收窄。CRWV (61 B-) 面臨結構性定價壓力，NBIS (50 C+) 基本面最弱。呢個 sector 短期 avoid。'},
+  {sector:'semis',     ts:'2026-07-15T09:00:00Z', body:'<strong>半導體</strong> — TSM 26.2× vs NVDA 19.7× fwd P/E。CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 60-70%。NVDA (66 B-) intentional suppressed — it\'s "the gold" not the shovel。CRDO (73 B) 有 insider $8.3M sell 短期觀望。半導體 hold 觀察為主。'},
+  {sector:'nonagi',    ts:'2026-07-15T09:00:00Z', body:'<strong>Non-AGI waste</strong> — META 2026 capex 上調至 $125-145B，「燒錢」敘事加深。RSG (75 B), WCN (74 B), GFL (72 B) 必需服務完全不受 capex cycle 影響，資本回報確定性極高。WM (74 B) 亦穩健。整體 non-AGI 係本週相對確定嘅避險方向。'},
+  {sector:'sentiment', ts:'2026-07-15T09:00:00Z', body:'<strong>Sentiment signals</strong> — ORCL (68 B-) 有 +88% analyst upside，sentiment + fundamental 最 align 嘅 pick；CRDO insider $8.3M sell + BE insider $2.5M sell 短期避開。整體 mixed 訊號，主倉位 VST/CEG/RSG hold，觀望 GPU cloud 壓力消化。'}
+];
+
 const SECTORS = {power:['VST','CEG','TLN','VRT','ETN','GEV','BE'],compute:['CRWV','GDS'],semis:['NVDA','CRDO'],software:['SNOW','ORCL'],nonagi:['RSG','WM','WCN']};
 const SECTOR_NAMES = {power:'Power',compute:'Compute Infra',semis:'半導體',software:'Software',nonagi:'Non AGI'};
 const SECTOR_SUBTITLES = {power:'電力 bottleneck · 7 tickers · Tier 1-3',compute:'GPU Cloud + networking · 2 tickers',semis:'Observe only · 2 tickers',software:'Data + apps · 2 tickers',nonagi:'避險 waste compounder · 3 tickers'};

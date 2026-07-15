@@ -133,6 +133,25 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .linus-overview-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.65;color:var(--text);}
 .linus-dot{width:5px;height:5px;border-radius:50%;background:var(--text-muted);flex-shrink:0;margin-top:8px;}
 
+/* NEWS TICKER */
+.news-ticker-wrap{overflow:hidden;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface);}
+.news-ticker{display:flex;gap:8px;padding:8px;overflow-x:auto;scrollbar-width:thin;scroll-behavior:smooth;}
+.news-ticker::-webkit-scrollbar{height:6px;}
+.news-ticker::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px;}
+.news-ticker::-webkit-scrollbar-track{background:var(--surface-2);}
+.news-card{flex:0 0 280px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;transition:border-color .15s,background .15s;cursor:pointer;}
+.news-card:hover{border-color:var(--border-strong);background:var(--surface-3);}
+.news-card-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text-muted);font-weight:500;}
+.news-card-ticker{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:0.02em;}
+.news-card-time{color:var(--text-faint);}
+.news-card-source{font-style:italic;color:var(--text-faint);font-weight:600;}
+.news-card-title{font-size:12px;line-height:1.4;color:var(--text);font-weight:500;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;}
+.news-card-sentiment{font-size:9px;font-weight:600;padding:1px 5px;border-radius:2px;text-transform:uppercase;letter-spacing:0.05em;}
+.sentiment-bullish{background:var(--success-light);color:var(--success);}
+.sentiment-bearish{background:var(--error-light);color:var(--error);}
+.sentiment-neutral{background:var(--surface-3);color:var(--text-muted);}
+.news-empty{padding:24px;text-align:center;color:var(--text-muted);font-size:12px;font-style:italic;}
+
 /* PRICE / SCORE IN DETAIL */
 .detail-price-row{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px 16px;background:var(--surface-2);border-radius:8px;}
 .detail-price{font-size:24px;font-weight:600;}
@@ -249,17 +268,21 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       </div>
       <div class="section">
         <div class="linus-overview">
-        <div class="linus-overview-header">Linus's Overview · Jul 10, 2026</div>
-        <div class="linus-overview-body">
-          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Power bottleneck</strong> — GEV 氣渦輪機 backlog 突破 $150B (+100% YoY)，交期拉到 5 年；SMR 核電 conditional offtake 已達 45GW，OpenAI+Oracle 2.3GW Texas 天然氣電廠落地 — BE 燃料電池喺亞洲/歐洲定價具競爭力。VST (87 B+), CEG (84 B+), TLN (71 B) 維持 Tier 1。Power 結構性 bottleneck 未見緩解，核電 + 天然氣係中線確定性最高嘅 sub-theme。</span></div>
-          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>GPU Cloud</strong> — Meta 7/1 宣布 Meta Compute 進軍雲端，CRWV、NBIS 單日暴跌 ~12%。H100 供應已追平需求，B200/GB200 Q1 出貨加速 GPU 定價下行，neocloud 溢價收窄。CRWV (61 B-) 面臨結構性定價壓力，NBIS (50 C+) 基本面最弱。呢個 sector 短期 avoid。</span></div>
-          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>半導體</strong> — TSM 26.2× vs NVDA 19.7× fwd P/E。CoWoS 擴至 130K WPM，memory+packaging 佔 AI accelerator COGS 60-70%。NVDA (66 B-) intentional suppressed — it's "the gold" not the shovel。CRDO (73 B) 有 insider $8.3M sell 短期觀望。半導體 hold 觀察為主。</span></div>
-          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Non-AGI waste</strong> — META 2026 capex 上調至 $125-145B，「燒錢」敘事加深。RSG (75 B), WCN (74 B), GFL (72 B) 必需服務完全不受 capex cycle 影響，資本回報確定性極高。WM (74 B) 亦穩健。整體 non-AGI 係本週相對確定嘅避險方向。</span></div>
-          <div class="linus-overview-item"><span class="linus-dot"></span><span><strong>Sentiment signals</strong> — ORCL (68 B-) 有 +88% analyst upside，sentiment + fundamental 最 align 嘅 pick；CRDO insider $8.3M sell + BE insider $2.5M sell 短期避開。整體 mixed 訊號，主倉位 VST/CEG/RSG hold，觀望 GPU cloud 壓力消化。</span></div>
+        <div class="linus-overview-header" id="linusOverviewHeader">Linus's Overview · <span id="linusOverviewDate">Jul 10, 2026</span></div>
+        <div class="linus-overview-body" id="linusOverviewBody">
+          <!-- Data-driven render: each OVERVIEW[] entry becomes one .linus-overview-item -->
         </div>
       </div>
       </div>
-      <div class="kpi-grid">
+
+      <div class="section" id="newsSection" style="margin-top:-12px;">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:14px;font-weight:600;letter-spacing:-0.01em;">📰 News</div>
+          <div style="font-size:11px;color:var(--text-muted);">近 3 日 · TIER 1 每日 · TIER 2 每週日</div>
+        </div>
+        <div class="news-ticker-wrap"><div class="news-ticker" id="newsTicker"></div></div>
+      </div>
+<div class="kpi-grid">
         <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta" id="kpiFeaturedTheme">7 hits · 主導 bottleneck</div></div>
         <div class="kpi-card"><div class="kpi-label">Tickers tracked</div><div class="kpi-value" id="kpiTickers">55</div><div class="kpi-meta"><span class="kpi-delta delta-up">+38</span> vs legacy 17</div></div>
         <div class="kpi-card"><div class="kpi-label">News ingested</div><div class="kpi-value" id="kpiNews">—</div><div class="kpi-meta"><span class="kpi-delta delta-up">from anysearch</span> news API</div></div>
@@ -292,7 +315,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
   </main>
 </div>
-<script src="data.js?v=20260715"></script>
+<script src="data.js?v=20260715b"></script>
 <script>
 // ============================================================
 // Synthesize legacy TICKERS array from TIER1+TIER2 for backward
@@ -501,6 +524,73 @@ const buckets=[
   {label:'🛡️ B · Defensive',val:_bktCounts.nonagi}
 ];
 document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="bucket-row"><div class="bucket-label">'+b.label+'</div><div class="bucket-bar-wrap"><div class="bucket-bar" style="width:'+(b.val*10)+'%"></div></div><div class="bucket-val">'+b.val+'</div></div>').join('');
+// LINUS'S OVERVIEW — render from OVERVIEW[] (data.js single source of truth).
+// Each entry: {sector, ts, body}. Body may include HTML (e.g. <strong>...</strong>).
+(function(){
+  var ob = document.getElementById('linusOverviewBody');
+  if(!ob) return;
+  var ov = (typeof OVERVIEW !== 'undefined') ? OVERVIEW : [];
+  if(!ov.length) return;
+  var dates = ov.map(function(o){return o.ts;}).filter(Boolean).sort();
+  var label = '';
+  if(dates.length){
+    var dd = new Date(dates[dates.length-1]);
+    if(!isNaN(dd.getTime())) label = dd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }
+  var ds = document.getElementById('linusOverviewDate');
+  if(ds && label) ds.textContent = label;
+  ob.innerHTML = ov.map(function(o){
+    return '<div class="linus-overview-item"><span class="linus-dot"></span><span>'+o.body+'</span></div>';
+  }).join('');
+})();
+
+// NEWS FEED — render ticker (horizontal scroll) from NEWS[] (data.js).
+// Each entry: {ticker, tier, ts, source, title, url, sentiment}.
+(function(){
+  var nt = document.getElementById('newsTicker');
+  if(!nt) return;
+  var list = (typeof NEWS !== 'undefined' ? NEWS : []).slice().sort(function(a,b){
+    return (b.ts||'').localeCompare(a.ts||'');
+  });
+  function esc(s){return (s==null?'':String(s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function rel(iso){
+    var t = new Date(iso).getTime();
+    if(isNaN(t)) return '';
+    var d = Math.floor((Date.now() - t) / 60000);
+    if(d < 60) return d+'m ago';
+    if(d < 1440) return Math.floor(d/60)+'h ago';
+    return Math.floor(d/1440)+'d ago';
+  }
+  function sentCls(s){return s==='bullish'?'sentiment-bullish':s==='bearish'?'sentiment-bearish':'sentiment-neutral';}
+  if(!list.length){
+    nt.innerHTML = '<div class="news-empty">No news yet. TIER 1 cron runs 08:00 HKT daily · TIER 2 runs Sun 10:00 HKT weekly.</div>';
+    nt.style.display = 'block';
+    return;
+  }
+  nt.innerHTML = list.map(function(n){
+    var href = n.url || '#';
+    return '<a class="news-card" href="'+href+'" target="_blank" rel="noopener">'
+      +'<div class="news-card-meta">'
+        +'<span class="news-card-ticker">'+esc(n.ticker||'')+'</span>'
+        +'<span>·</span>'
+        +'<span class="news-card-time">'+rel(n.ts)+'</span>'
+        +'<span>·</span>'
+        +'<span class="news-card-source">'+esc(n.source||'')+'</span>'
+        +'<span class="news-card-sentiment '+sentCls(n.sentiment)+'">'+esc(n.sentiment||'neutral')+'</span>'
+      +'</div>'
+      +'<div class="news-card-title">'+esc(n.title||'')+'</div>'
+    +'</a>';
+  }).join('');
+})();
+
+// KPI — fill #kpiNews + #kpiTickers from runtime data (kill static literals)
+(function(){
+  var n = document.getElementById('kpiNews');
+  if(n) n.textContent = (typeof NEWS !== 'undefined' ? NEWS.length : 0);
+  var t = document.getElementById('kpiTickers');
+  if(t) t.textContent = (typeof TICKERS !== 'undefined' ? TICKERS.length : 0);
+})();
+
 
 // SECTOR CARDS — derived from SECTORS map (data.js) — single source of truth.
 const _tierForSector = {power:'1',compute:'2',semis:'2',software:'2',nonagi:'4'};
