@@ -712,5 +712,28 @@ document.getElementById('sidebarOverlay').addEventListener('click',function(){
 })();
 
 </script>
+<script>
+// NAV BADGES — dynamic from SECTORS[] / INCLUDE[] / EXCLUDE[] / TICKERS[]
+// Replaces hardcoded counts. Single source of truth = data.js.
+(function(){
+  try {
+    document.querySelectorAll('[data-sector]').forEach(function(el){
+      var sec = el.getAttribute('data-sector');
+      if (typeof SECTORS !== 'undefined' && SECTORS[sec]) {
+        el.textContent = SECTORS[sec].length;
+      }
+    });
+    document.querySelectorAll('[data-static="include"]').forEach(function(el){
+      if (typeof INCLUDE !== 'undefined') el.textContent = INCLUDE.length;
+    });
+    document.querySelectorAll('[data-static="exclude"]').forEach(function(el){
+      if (typeof EXCLUDE !== 'undefined') el.textContent = EXCLUDE.length;
+    });
+    document.querySelectorAll('[data-static="total"]').forEach(function(el){
+      if (typeof TICKERS !== 'undefined') el.textContent = TICKERS.length;
+    });
+  } catch(e) { console.error('[nav-badge]', e); }
+})();
+</script>
 </body>
 </html>

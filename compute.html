@@ -231,15 +231,15 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     <div style="padding:0 8px 12px;"><a href="index.html" style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:4px;">← Main Dashboard</a></div>
     <nav>
       <div class="nav-section">Sectors</div>
-      <div class="nav-item" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge">6</span></div>
-      <div class="nav-item active" onclick="location.href='compute.html'" class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge">2</span></div>
-      <div class="nav-item" onclick="location.href='semis.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge">2</span></div>
-      <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='power.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>電力 Power<span class="nav-badge" data-sector="power"">6</span></div>
+      <div class="nav-item active" onclick="location.href='compute.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>Compute Infra<span class="nav-badge" data-sector="compute"">2</span></div>
+      <div class="nav-item" onclick="location.href='semis.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>半導體<span class="nav-badge" data-sector="semis"">2</span></div>
+      <div class="nav-item" onclick="location.href='software.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Software<span class="nav-badge" data-sector="software"">2</span></div>
       <div class="nav-section">Defensive</div>
-      <div class="nav-item" onclick="location.href='nonagi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Non AGI<span class="nav-badge">6</span></div>
+      <div class="nav-item" onclick="location.href='nonagi.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>Non AGI<span class="nav-badge" data-sector="nonagi"">6</span></div>
       <div class="nav-section">Watchlist</div>
-      <div class="nav-item" onclick="location.href='index.html#include'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge">4</span></div>
-      <div class="nav-item" onclick="location.href='index.html#exclude'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge">2</span></div>
+      <div class="nav-item" onclick="location.href='index.html#include'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge" data-static="include"">4</span></div>
+      <div class="nav-item" onclick="location.href='index.html#exclude'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge" data-static="exclude"">2</span></div>
       <div class="nav-section">Analysis</div>
       <div class="nav-item" onclick="location.href='index.html#scoring'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Scoring</span></div>
       <div class="nav-section">Linus</div>
@@ -259,6 +259,29 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 <script>
 var tickers = ['CRWV','GDS'];
 renderSectorGrid('tickerGrid', tickers);
+</script>
+<script>
+// NAV BADGES — dynamic from SECTORS[] / INCLUDE[] / EXCLUDE[] / TICKERS[]
+// Replaces hardcoded counts. Single source of truth = data.js.
+(function(){
+  try {
+    document.querySelectorAll('[data-sector]').forEach(function(el){
+      var sec = el.getAttribute('data-sector');
+      if (typeof SECTORS !== 'undefined' && SECTORS[sec]) {
+        el.textContent = SECTORS[sec].length;
+      }
+    });
+    document.querySelectorAll('[data-static="include"]').forEach(function(el){
+      if (typeof INCLUDE !== 'undefined') el.textContent = INCLUDE.length;
+    });
+    document.querySelectorAll('[data-static="exclude"]').forEach(function(el){
+      if (typeof EXCLUDE !== 'undefined') el.textContent = EXCLUDE.length;
+    });
+    document.querySelectorAll('[data-static="total"]').forEach(function(el){
+      if (typeof TICKERS !== 'undefined') el.textContent = TICKERS.length;
+    });
+  } catch(e) { console.error('[nav-badge]', e); }
+})();
 </script>
 </body>
 </html>

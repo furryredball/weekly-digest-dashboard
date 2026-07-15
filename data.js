@@ -1,6 +1,8 @@
 // Shared data for Weekly Investing Digest
 
-// OLD inline TICKERS array (lines 2-21) removed 2026-07-13. Single source of truth = TIER1 + TIER2.
+// Legacy TICKERS IIFE (L25727) builds minimal tickerCard-shape from TIER1+TIER2.
+// index.html inline script re-synthesizes TICKERS with full schema (ca, se, ticker, ...).
+// Single source of truth = TIER1+TIER2. Do NOT add raw `const TICKERS = [...]` here — both pages load this file and would conflict.
 
 // ============================================================
 // NEWS FEED (added 2026-07-15) — injected daily by `news-tier1-daily`
@@ -192,6 +194,7 @@ var TICKERS = (function(){
       trend: ups != null ? (ups >= 0 ? '↑' : '↓') : '—',
       pct:  ups != null ? (ups >= 0 ? '+' : '') + ups.toFixed(1) + '%' : '—',
       score: score, dims: sc.dims, grade: _scGradeForScore(score),
+      ca: t.ca || '', se: t.se || '',   // bucket routing + sector key (for nav badges, bucket bars)
       pe: t.pe || '', mc: t.mc || '', upside: t.ups || '',
       news: []
     });
