@@ -212,10 +212,11 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .sidebar-overlay{display:none;}
 @media (max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.signal-list{grid-template-columns:1fr;}}
 @media (max-width:768px){
-.menu-toggle{display:flex;position:fixed;top:12px;left:12px;z-index:99;width:36px;height:36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);align-items:center;justify-content:center;color:var(--text);}
-.sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s;}
+.menu-toggle{display:flex;position:fixed;top:12px;left:12px;z-index:99;width:44px;height:44px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);align-items:center;justify-content:center;color:var(--text);-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;}
+.sidebar-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s;-webkit-tap-highlight-color:transparent;}
 .sidebar-overlay.active{opacity:1;pointer-events:auto;}
-.sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);width:260px;}
+.nav-item,.nav-item-ext,.menu-toggle,.back-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.sidebar{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);width:260px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .sidebar.open{transform:translateX(0);}
 .main{padding:56px 16px 48px;}
 .topbar-left h1{font-size:22px;}
@@ -261,7 +262,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
   </aside>
 
   <main class="main">
-    <button class="menu-toggle" id="menuToggle" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <button type="button" class="menu-toggle" id="menuToggle" aria-label="Menu" onclick="window.__mt&&window.__mt()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" pointer-events="none"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
 
     <div class="panel-view active" id="view-dashboard">
       <div class="topbar">
@@ -696,15 +697,28 @@ document.addEventListener('click',function(e){
   var btn=e.target.closest('.back-btn[data-view]');if(btn)switchView(btn.dataset.view);
 });
 
-// MOBILE MENU
-document.getElementById('menuToggle').addEventListener('click',function(){
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('active');
-});
-document.getElementById('sidebarOverlay').addEventListener('click',function(){
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('active');
-});
+// MOBILE MENU — touch-first with click fallback (iOS Safari swallows first click on positioned <button>)
+(function(){
+  function toggleMenu(){
+    var sb=document.getElementById('sidebar');
+    var ov=document.getElementById('sidebarOverlay');
+    if(!sb||!ov)return;
+    sb.classList.toggle('open');
+    ov.classList.toggle('active');
+  }
+  window.__mt=toggleMenu;
+  var btn=document.getElementById('menuToggle');
+  if(btn){
+    // Both touchstart (iOS Safari first-tap reliability) + click (desktop + fallback)
+    btn.addEventListener('touchstart',function(e){e.preventDefault();toggleMenu();},{passive:false});
+    btn.addEventListener('click',function(e){e.preventDefault();toggleMenu();});
+  }
+  var ov=document.getElementById('sidebarOverlay');
+  if(ov){
+    ov.addEventListener('touchstart',function(e){e.preventDefault();toggleMenu();},{passive:false});
+    ov.addEventListener('click',function(){toggleMenu();});
+  }
+})();
 
 // THEME TOGGLE
 (function(){
