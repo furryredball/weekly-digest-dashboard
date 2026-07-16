@@ -265,7 +265,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 
     <div class="panel-view active" id="view-dashboard">
       <div class="topbar">
-        <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle">2026-06-28 to 2026-07-04 · 17 tickers · 40 news · 5 trading days</div></div>
+        <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle" id="dashboardSubtitle">2026-06-28 to 2026-07-04 · 17 tickers · 40 news · 5 trading days</div></div>
       </div>
       <div class="section">
         <div class="linus-overview">
@@ -733,6 +733,12 @@ document.getElementById('sidebarOverlay').addEventListener('click',function(){
     document.querySelectorAll('[data-static="total"]').forEach(function(el){
       if (typeof TICKERS !== 'undefined') el.textContent = TICKERS.length;
     });
+    // Update dashboard subtitle to reflect live counts
+    var sub = document.getElementById('dashboardSubtitle');
+    if (sub && typeof TICKERS !== 'undefined' && typeof NEWS !== 'undefined') {
+      var today = new Date().toISOString().slice(0,10);
+      sub.textContent = today + ' · ' + TICKERS.length + ' tickers tracked · ' + NEWS.length + ' news items';
+    }
   } catch(e) { console.error('[nav-badge]', e); }
 })();
 </script>
