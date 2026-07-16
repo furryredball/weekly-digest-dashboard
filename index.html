@@ -703,49 +703,33 @@ document.addEventListener('click',function(e){
 
 // MOBILE MENU — guarded toggle (prevents iOS Safari double-fire that snaps sidebar open-then-immediately-closed)
 (function(){
-  // DEBUG mode: append ?debug=1 to URL → all events logged to localStorage + window.__dbg
-  // Read back with window.__dbg.dump() in desktop console, or auto-serialised beforeunload.
-  function dbgInit(){
-    var url=new URL(location.href);
-    var en=url.searchParams.get('debug')==='1'||url.searchParams.get('debug')==='menu';
-    if(!en&&!window.__menuDebug)return;
-    window.__menuDebug=en;
-    window.__dbg={events:[],errors:[],startedAt:Date.now(),ua:navigator.userAgent,vw:innerWidth+''};
-    var orig=window.addEventListener;
-    function push(t,d){window.__dbg.events.push({t:t,d:d,ts:Date.now()});}
-    window.addEventListener('error',function(e){window.__dbg.errors.push(String(e.message||e)+' @ '+(e.filename||'?')+':'+(e.lineno||'?'));});
-    // Hijack toggleMenu later — wrap existing via replacement below
-    window.__menuLogger=push;
-  }
-  dbgInit();
-
   var busy=false;
   function toggleMenu(){
-    var t0=Date.now();
-    if(window.__menuLogger)window.__menuLogger('toggleMenu:enter',{busy:busy,sidebarOpen:document.getElementById('sidebar')?document.getElementById('sidebar').classList.contains('open'):'?'});
-    if(busy){if(window.__menuLogger)window.__menuLogger('toggleMenu:busy-skip',{});return;}
+    if(busy)return;
     busy=true;
     setTimeout(function(){busy=false;},200);
     var sb=document.getElementById('sidebar');
     var ov=document.getElementById('sidebarOverlay');
     var btn=document.getElementById('menuToggle');
-    if(!sb||!ov){if(window.__menuLogger)window.__menuLogger('toggleMenu:no-elements',{sb:!!sb,ov:!!ov});return;}
+    if(!sb||!ov)return;
     var willOpen=!sb.classList.contains('open');
     sb.classList.toggle('open');
     ov.classList.toggle('active');
     if(btn)btn.setAttribute('aria-expanded',String(willOpen));
-    if(window.__menuLogger)window.__menuLogger('toggleMenu:applied',{willOpen:willOpen,sidebarOpen:sb.classList.contains('open'),overlayActive:ov.classList.contains('active'),elapsed:Date.now()-t0});
   }
-  function bindToggle(el,kind){
-    if(!el)return;
-    el.addEventListener('pointerup',function(e){if(window.__menuLogger)window.__menuLogger(kind+':pointerup',{x:e.clientX,y:e.clientY});e.preventDefault();toggleMenu();});
-    el.addEventListener('click',function(e){if(window.__menuLogger)window.__menuLogger(kind+':click',{defaultPrevented:e.defaultPrevented});e.preventDefault();toggleMenu();});
-    el.addEventListener('touchstart',function(e){if(window.__menuLogger)window.__menuLogger(kind+':touchstart',{touches:e.touches.length});});
-    el.addEventListener('touchend',function(e){if(window.__menuLogger)window.__menuLogger(kind+':touchend',{});e.preventDefault();toggleMenu();});
+  var btn=document.getElementById('menuToggle');
+  if(btn){
+    // Pointer events handle both touch and mouse uniformly. No touchstart duplicates.
+    btn.addEventListener('pointerup',function(e){e.preventDefault();toggleMenu();});
+    btn.addEventListener('click',function(e){e.preventDefault();toggleMenu();});
+    btn.addEventListener('touchend',function(e){e.preventDefault();toggleMenu();});
   }
-  bindToggle(document.getElementById('menuToggle'),'menuBtn');
-  bindToggle(document.getElementById('sidebarOverlay'),'overlay');
-
+  var ov=document.getElementById('sidebarOverlay');
+  if(ov){
+    ov.addEventListener('pointerup',function(e){e.preventDefault();toggleMenu();});
+    ov.addEventListener('click',function(){toggleMenu();});
+    ov.addEventListener('touchend',function(e){e.preventDefault();toggleMenu();});
+  }
   // Esc closes menu (desktop + mobile keyboard)
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){
@@ -753,21 +737,6 @@ document.addEventListener('click',function(e){
       if(sb&&sb.classList.contains('open'))toggleMenu();
     }
   });
-
-  // Dump helper: window.__dbg.dump() → returns JSON string. Also auto-prompts download on ?debug=1
-  window.__dbg={events:[],errors:[],startedAt:Date.now(),ua:navigator.userAgent,vw:innerWidth+'x'+innerHeight,screen:window.screen.width+'x'+window.screen.height,dpr:window.devicePixelRatio};
-  var origPush=window.__menuLogger;
-  window.__menuLogger=function(t,d){window.__dbg.events.push({t:t,d:d||{},ts:Date.now()});};
-  window.__dbg.dump=function(){return JSON.stringify(window.__dbg,null,2);};
-  if(window.__menuDebug){
-    var dumpBox=document.createElement('pre');
-    dumpBox.id='__dbgOut';
-    dumpBox.style.cssText='position:fixed;left:8px;right:8px;top:60px;max-height:40vh;overflow:auto;background:#111;color:#0f0;font:11px monospace;padding:8px;z-index:99999;border-radius:6px;white-space:pre-wrap;';
-    document.body.appendChild(dumpBox);
-    function refresh(){dumpBox.textContent=window.__dbg.dump();}
-    setInterval(refresh,500);
-    refresh();
-  }
 })();
 
 // THEME TOGGLE
