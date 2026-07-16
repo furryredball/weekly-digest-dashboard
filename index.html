@@ -481,7 +481,9 @@ function _scoreStock(t) {
   return { total: total, dims: dims };
 }
 
-const TICKERS = (function() {
+// data.js declares TICKERS via var (function(){...})(). Reassign — don't redeclare.
+// eslint-disable-next-line no-redeclare
+TICKERS = (function() {
   const out = [];
   [...TIER1, ...TIER2].forEach(function(t) {
     // Tier number (1 or 2) comes from which array the stock originated in.
@@ -511,8 +513,10 @@ const TICKERS = (function() {
   });
   return out;
 })();
-const INCLUDE = [{"ticker":"ORCL","sector":"其他","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"半導體","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"電力","upside":"+56%","note":"PPA tailwind"}];
-const EXCLUDE = [{"ticker":"CRDO","sector":"半導體","reason":"insider sells $8.3M (7d, red flag)"},{"ticker":"BE","sector":"電力","reason":"insider sells $2.5M (7d, red flag)"}];
+// INCLUDE / EXCLUDE declared in data.js — don't redeclare here (causes SyntaxError).
+// eslint-disable-next-line no-redeclare
+var INCLUDE = [{"ticker":"ORCL","sector":"其他","upside":"+88%","note":"sentiment + fundamental aligned"},{"ticker":"GDS","sector":"GPU Cloud","upside":"+61%","note":"7d pullback -5.7% (entry zone)"},{"ticker":"NVDA","sector":"半導體","upside":"+56%","note":"core holding"},{"ticker":"CEG","sector":"電力","upside":"+56%","note":"PPA tailwind"}];
+var EXCLUDE = [{"ticker":"CRDO","sector":"半導體","reason":"insider sells $8.3M (7d, red flag)"},{"ticker":"BE","sector":"電力","reason":"insider sells $2.5M (7d, red flag)"}];
 </script>
 <script>
 // BUCKET BARS — 3-bucket cut (locked 2026-07-12 per Pirry):
