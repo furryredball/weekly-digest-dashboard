@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Linus Weekly Investing Digest — Apple Bento dashboard with live data feed">
-<title>Weekly Investing Digest · Linus · Bento Draft v0.2.0</title>
+<title>Weekly Investing Digest · Linus · Bento Draft v0.3.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /* ===========================================
@@ -59,48 +59,94 @@ body {
   display: flex; min-height: 100vh; align-items: flex-start;
 }
 
-/* === Sidebar === */
+/* === Sidebar · dark navy (matches Bento tile palette) === */
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
-  background: var(--surface-2);
-  border-right: 1px solid var(--border);
-  padding: 24px 16px;
+  background: rgba(15, 24, 37, 0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 24px 14px; color: #E4E0DA;
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.10), inset -1px 0 0 rgba(255, 255, 255, 0.04);
+  transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
 }
-.sidebar-logo { display: flex; gap: 10px; align-items: center; margin-bottom: 24px; padding: 0 4px; }
+.sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-w)); opacity: 0; pointer-events: none; }
+
+.sidebar-logo { display: flex; gap: 10px; align-items: center; margin-bottom: 24px; padding: 0 6px; }
 .logo-mark {
-  width: 32px; height: 32px; border-radius: 8px;
-  background: linear-gradient(135deg, #9B8EC9, #E89B7A);
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, #E89B7A 0%, #E8A398 100%);
   display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: 700; font-size: 16px;
+  color: #0F1825; font-weight: 700; font-size: 16px;
+  box-shadow: 0 4px 12px rgba(232, 155, 122, 0.30);
 }
-.sidebar-logo > div > div:first-child { font-weight: 600; font-size: 14px; }
-.logo-sub { font-size: 11px; color: var(--text-muted); }
+.sidebar-logo > div > div:first-child { font-weight: 600; font-size: 14px; color: #E4E0DA; letter-spacing: -0.01em; }
+.logo-sub { font-size: 10px; color: #B8B4AC; margin-top: 2px; letter-spacing: 0.04em; }
 
-nav .nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); margin: 20px 0 6px 8px; font-weight: 600; }
-.nav-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border-radius: 8px; font-size: 13px;
-  color: var(--text); cursor: pointer; user-select: none;
-  transition: background 150ms;
+nav .nav-section {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+  color: #737077; margin: 22px 0 8px 10px; font-weight: 700;
 }
-.nav-item:hover { background: var(--surface-3); }
-.nav-item.active { background: var(--surface-3); color: var(--accent-2); font-weight: 600; }
-.nav-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
+nav .nav-section:first-of-type { margin-top: 8px; }
+
+.nav-item, .nav-item-ext {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px; font-size: 13px;
+  color: #E4E0DA; cursor: pointer; user-select: none;
+  transition: background 200ms, color 200ms, transform 150ms;
+  position: relative;
+}
+.nav-item:hover, .nav-item-ext:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.nav-item:active, .nav-item-ext:active { transform: scale(0.98); }
+
+.nav-item.active {
+  background: rgba(232, 155, 122, 0.10);
+  color: #FFB594;
+  font-weight: 600;
+}
+.nav-item.active::before {
+  content: '—'; position: absolute; left: -10px;
+  color: #E89B7A; font-weight: 700; font-size: 14px;
+}
+
+.nav-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.65; color: currentColor; }
+.nav-item.active svg { opacity: 1; }
+
 .nav-badge {
-  margin-left: auto; background: var(--surface-3); border-radius: var(--r-pill);
-  font-size: 10px; padding: 1px 7px; font-weight: 600; color: var(--text-muted);
+  margin-left: auto; background: rgba(255, 255, 255, 0.08); border-radius: var(--r-pill);
+  font-size: 10px; padding: 2px 8px; font-weight: 600; color: #B8B4AC;
+  font-family: ui-monospace, "SF Mono", monospace;
 }
-.nav-item-ext {
-  display: flex; align-items: center; padding: 8px 10px; border-radius: 8px;
-  font-size: 12px; color: var(--text-muted); cursor: pointer;
-}
-.nav-item-ext:hover { background: var(--surface-3); }
-.nav-item-ext > span:first-child { flex: 1; }
+.nav-item.active .nav-badge { background: rgba(232, 155, 122, 0.25); color: #FFB594; }
 
-.theme-meta { padding: 4px 8px; font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; }
-.theme-meta strong { color: var(--text); font-size: 12px; }
+.theme-meta { padding: 10px 12px; font-size: 11px; color: #B8B4AC; line-height: 1.5; margin-top: 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); }
+.theme-meta strong { color: #E89B7A; font-size: 12px; letter-spacing: -0.005em; }
+.theme-meta .small { font-size: 10px; opacity: 0.65; display: block; margin-top: 2px; }
+
+/* === Sidebar toggle pill (top-left of main) === */
+.menu-toggle {
+  position: fixed; top: 16px; left: calc(var(--sidebar-w) + 16px);
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(15, 24, 37, 0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #E89B7A; font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 200ms, transform 200ms;
+  z-index: 100;
+  font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
+  font-weight: 700;
+}
+.menu-toggle:hover { background: rgba(15, 24, 37, 1); transform: scale(1.06); }
+.menu-toggle .mt-open  { display: none; }
+.menu-toggle .mt-close { display: inline; }
+body.sidebar-collapsed .menu-toggle { left: 16px; }
+body.sidebar-collapsed .menu-toggle .mt-open  { display: inline; }
+body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
 
 /* === Main content === */
 .main { flex: 1; padding: 32px 32px 80px; max-width: 1280px; }
@@ -342,13 +388,19 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
       <span>World Signal Monitor</span>
     </div>
     <div class="nav-section">Theme</div>
-    <div class="theme-meta">Bento Draft <strong style="color:var(--t-navy);">v0.2.0</strong><br>
-      <span style="font-size:10px;">Live wired to data.js · Yahoo Finance linked</span>
+    <div class="theme-meta">Bento Draft <strong>v0.3.0</strong><br>
+      <span class="small">Dark-navy menu · live · Yahoo linked</span>
     </div>
   </nav>
 </aside>
 
 <main class="main">
+
+<!-- Sidebar toggle pill (top-left) -->
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle sidebar">
+  <span class="mt-close">«</span>
+  <span class="mt-open">☰</span>
+</button>
 
 <header class="head">
   <div>
@@ -508,6 +560,23 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 <script src="data.js?v=draftv2"></script>
 
 <script>
+// === Sidebar collapse/expand (persisted) ===
+function setSidebar(collapsed){
+  document.body.classList.toggle('sidebar-collapsed', collapsed);
+  try{localStorage.setItem('linus-bento-sidebar', collapsed ? '1' : '0');}catch(e){}
+  // Move toggle button to follow the sidebar edge
+  const btn=document.getElementById('menuToggle');
+  if(btn){btn.style.left = (collapsed ? 16 : (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-w'))||220) + 16)+'px';}
+}
+(function(){
+  let collapsed=false;
+  try{collapsed=localStorage.getItem('linus-bento-sidebar')==='1';}catch(e){}
+  setSidebar(collapsed);
+  document.getElementById('menuToggle').addEventListener('click', function(){
+    setSidebar(!document.body.classList.contains('sidebar-collapsed'));
+  });
+})();
+
 // === 5-dim scoring (mirrors linus-invest.html) ===
 function _liDimFramework(t){if(t.ca==="nonagi")return 9;if(t.se==="power")return 19;if(t.se==="compute")return 16;if(t.se==="software")return 14;if(t.se==="semis")return 12;return 10;}
 function _liDimFundamental(t){const r=t.roe||0,ri=t.roic||0;if(r>=25&&ri>=15)return 19;if(r>=15)return 16;if(r>=8)return 12;return 7;}
