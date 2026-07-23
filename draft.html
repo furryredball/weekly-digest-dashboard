@@ -3,211 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Linus Weekly Investing Digest — Apple...">
-<title>Weekly Investing Digest · Linus · Bento Draft 2026-07-23</title>
+<meta name="description" content="Linus Weekly Investing Digest — Apple Bento dashboard with live data feed">
+<title>Weekly Investing Digest · Linus · Bento Draft v0.2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /* ===========================================
-   Apple Bento Investment Dashboard
-   Palette lifted from user-supplied color image
+   Apple Bento Investment Dashboard · v0.2.0
+   - Wired to data.js (TIER1+TIER2 + INCLUDE/EXCLUDE + NEWS/OVERVIEW)
+   - Sidebar preserved (light) — kept on the left
+   - Stock cards: ticker links to Yahoo + name + price + ups + grade
    =========================================== */
 
-:root {
-  /* Apple base */
-  --bg: #0F1825;          /* deep navy bg */
-  --bg-2: #0A1422;        /* dark navy card */
-  --surface: #112233;     /* subtle surface lift */
-  --border: #1E2D40;      /* hairline */
-  --text: #E4E0DA;        /* warm white */
-  --text-2: #B8B4AC;      /* muted */
-  --text-3: #737077;      /* faint */
-  --accent: #E89B7A;      /* coral — primary action */
-
-  /* Bento tile palette (from color image) */
-  --t1-navy:    #0F2540;
-  --t2-slate:   #6E89A6;
-  --t3-coral:   #E89B7A;
-  --t4-cream:   #E8E2D5;
-  --t5-rose:    #E8A398;
-  --t6-ice:     #A6B7CC;
-
-  /* Apple radius */
-  --r-tile: 22px;
-  --r-card: 14px;
-  --r-pill: 999px;
-
-  /* Apple shadows */
-  --shadow-1: 0 1px 2px rgba(0,0,0,0.18);
-  --shadow-2: 0 4px 16px rgba(0,0,0,0.22);
-  --shadow-3: 0 12px 36px rgba(0,0,0,0.28);
-
-  /* Apple typography (SF Pro fallback to Inter) */
-  --font-sys: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", monospace;
-
-  /* Spacing scale */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-}
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 
-html { font: 100%/1.5 var(--font-sys); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-sys); }
+/* === Body + sidebar layout (light theme) === */
+:root {
+  --bg: #FBFAF7;
+  --surface: #FFFFFF;
+  --surface-2: #F6F5F1;
+  --surface-3: #EFEDE7;
+  --border: #E7E4DD;
+  --border-strong: #D6D2C7;
+  --text: #37352F;
+  --text-muted: #787774;
+  --text-faint: #B6B4AD;
+  --accent: #9B8EC9;
+  --accent-2: #3C5C8A;
+  --positive: #4D7C5E;
+  --negative: #B34747;
+  --warning: #B08D4A;
 
-/* Page container */
-.page { max-width: 1320px; margin: 0 auto; padding: var(--s-6) var(--s-5) 80px; }
+  /* Bento tile palette (user reference image) */
+  --t-navy:  #0F2540; --t-navy-txt: #E4E0DA;
+  --t-slate: #6E89A6; --t-slate-txt: #1A2530;
+  --t-coral: #E89B7A; --t-coral-txt: #3D1F0F;
+  --t-cream: #E8E2D5; --t-cream-txt: #2A2418;
+  --t-rose:  #E8A398; --t-rose-txt: #3D1A14;
+  --t-ice:   #A6B7CC; --t-ice-txt: #1E2A36;
 
-/* === Header === */
-.head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: var(--s-6); }
+  --r-tile: 18px;
+  --r-card: 12px;
+  --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-2: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-3: 0 8px 24px rgba(0,0,0,0.10);
+
+  --sidebar-w: 220px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  display: flex; min-height: 100vh; align-items: flex-start;
+}
+
+/* === Sidebar === */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--surface-2);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.sidebar-logo { display: flex; gap: 10px; align-items: center; margin-bottom: 24px; padding: 0 4px; }
+.logo-mark {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, #9B8EC9, #E89B7A);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 16px;
+}
+.sidebar-logo > div > div:first-child { font-weight: 600; font-size: 14px; }
+.logo-sub { font-size: 11px; color: var(--text-muted); }
+
+nav .nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); margin: 20px 0 6px 8px; font-weight: 600; }
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px; font-size: 13px;
+  color: var(--text); cursor: pointer; user-select: none;
+  transition: background 150ms;
+}
+.nav-item:hover { background: var(--surface-3); }
+.nav-item.active { background: var(--surface-3); color: var(--accent-2); font-weight: 600; }
+.nav-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
+.nav-badge {
+  margin-left: auto; background: var(--surface-3); border-radius: var(--r-pill);
+  font-size: 10px; padding: 1px 7px; font-weight: 600; color: var(--text-muted);
+}
+.nav-item-ext {
+  display: flex; align-items: center; padding: 8px 10px; border-radius: 8px;
+  font-size: 12px; color: var(--text-muted); cursor: pointer;
+}
+.nav-item-ext:hover { background: var(--surface-3); }
+.nav-item-ext > span:first-child { flex: 1; }
+
+.theme-meta { padding: 4px 8px; font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; }
+.theme-meta strong { color: var(--text); font-size: 12px; }
+
+/* === Main content === */
+.main { flex: 1; padding: 32px 32px 80px; max-width: 1280px; }
+
+/* Header */
+.head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
 .head h1 {
-  font-size: clamp(28px, 4vw, 44px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.05;
-  display: flex; align-items: baseline; gap: var(--s-3);
+  font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05;
+  display: flex; align-items: baseline; gap: 12px;
 }
-.head .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); position: relative; }
+.head .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); position: relative; display: inline-block; }
 .head .pulse::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: pulse 2.4s ease-in-out infinite; opacity: 0.5; }
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(2.5); opacity: 0; }
-  100% { transform: scale(1); opacity: 0; }
-}
-.head .sub { color: var(--text-2); font-size: 14px; letter-spacing: -0.005em; margin-top: var(--s-2); }
-.head .meta { color: var(--text-3); font-size: 12px; font-family: var(--font-mono); text-align: right; }
-.head .meta strong { display: block; color: var(--text-2); font-weight: 500; font-size: 13px; letter-spacing: -0.005em; margin-bottom: 2px; }
+@keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 0; } }
+.head .sub { color: var(--text-muted); font-size: 13px; margin-top: 6px; }
+.head .meta { color: var(--text-faint); font-size: 11px; font-family: ui-monospace, "SF Mono", monospace; text-align: right; }
+.head .meta strong { display: block; color: var(--text-muted); font-weight: 500; font-size: 12px; margin-bottom: 2px; }
 
-/* === Bento grid === */
-.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--s-4); }
+/* Bento grid */
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
 .tile {
   border-radius: var(--r-tile);
-  padding: var(--s-5);
+  padding: 20px;
   display: flex; flex-direction: column;
   position: relative; overflow: hidden;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  min-height: 120px;
+  min-height: 140px;
 }
 .tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
 
-/* Span patterns */
 .s-6  { grid-column: span 6; }
 .s-4  { grid-column: span 4; }
 .s-3  { grid-column: span 3; }
 .s-12 { grid-column: span 12; }
 .r-2  { grid-row: span 2; }
 
-/* Tile palette from color image */
-.t-navy   { background: var(--t1-navy); }
-.t-slate  { background: var(--t2-slate); color: #1A2530; }
-.t-coral  { background: var(--t3-coral); color: #3D1F0F; }
-.t-cream  { background: var(--t4-cream); color: #2A2418; }
-.t-rose   { background: var(--t5-rose); color: #3D1A14; }
-.t-ice    { background: var(--t6-ice); color: #1E2A36; }
-.t-glass  { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid var(--border); }
+/* Tile palette */
+.t-navy   { background: var(--t-navy);   color: var(--t-navy-txt); }
+.t-slate  { background: var(--t-slate);  color: var(--t-slate-txt); }
+.t-coral  { background: var(--t-coral);  color: var(--t-coral-txt); }
+.t-cream  { background: var(--t-cream);  color: var(--t-cream-txt); }
+.t-rose   { background: var(--t-rose);   color: var(--t-rose-txt); }
+.t-ice    { background: var(--t-ice);    color: var(--t-ice-txt); }
+.t-glass  { background: var(--surface); border: 1px solid var(--border); }
 
-/* === Tile content === */
+/* Tile content */
 .tile-eyebrow {
-  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-  font-weight: 600; opacity: 0.7; margin-bottom: var(--s-3);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 600; opacity: 0.6; margin-bottom: 8px;
 }
-.tile-title { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: var(--s-2); }
+.tile-title { font-size: 19px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 4px; }
 .tile-sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
 .tile-hero {
-  font-size: clamp(36px, 5vw, 56px); font-weight: 600; letter-spacing: -0.025em;
-  font-feature-settings: "tnum" 1; line-height: 1; margin: var(--s-3) 0 var(--s-2);
+  font-size: 44px; font-weight: 600; letter-spacing: -0.025em;
+  font-feature-settings: "tnum" 1; line-height: 1; margin: 12px 0 8px;
 }
-.tile-hero sup { font-size: 0.45em; opacity: 0.6; font-weight: 500; margin-left: 4px; vertical-align: super; }
-.tile-foot { display: flex; gap: var(--s-4); margin-top: auto; padding-top: var(--s-4); flex-wrap: wrap; }
+.tile-foot { display: flex; gap: 16px; margin-top: auto; padding-top: 12px; flex-wrap: wrap; }
 
-.kv { display: flex; flex-direction: column; gap: 2px; }
+.kv { display: flex; flex-direction: column; gap: 2px; min-width: 60px; }
 .kv-k { font-size: 10px; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-.kv-v { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; font-feature-settings: "tnum" 1; }
-.kv .delta-up    { color: var(--t-coral); }   /* coral = up on dark */
-.kv .delta-down  { color: var(--t5-rose); }
+.kv-v { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; font-feature-settings: "tnum" 1; }
+.kv-v.delta-up   { color: var(--positive); }
+.t-navy .delta-up, .t-slate .delta-up, .t-coral .delta-up, .t-cream .delta-up, .t-rose .delta-up, .t-ice .delta-up { color: inherit; opacity: 0.9; }
+.delta-down { color: var(--negative); }
 
-/* Tickers list in tile */
-.picks { display: flex; flex-direction: column; gap: var(--s-3); }
-.pick {
-  display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-3); align-items: center;
-  padding: 10px var(--s-3); border-radius: 10px;
-  transition: background 200ms ease;
-}
-.pick:hover { background: rgba(0,0,0,0.06); }
-.pick-t { font-family: var(--font-mono); font-weight: 600; font-size: 13px; letter-spacing: -0.005em; }
-.pick-n { font-size: 12px; opacity: 0.85; line-height: 1.3; }
-.pick-c { font-family: var(--font-mono); font-size: 14px; font-weight: 600; font-feature-settings: "tnum" 1; }
-
-/* Stocks grid (sector tiles) */
-.stocks { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
+/* === STOCK CARDS (linked) === */
+.stocks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
 .stock {
-  background: rgba(255,255,255,0.08); border-radius: 14px; padding: var(--s-3) var(--s-3);
+  background: rgba(255,255,255,0.16);
+  border-radius: 14px;
+  padding: 10px 12px;
   display: flex; flex-direction: column; gap: 2px;
-  transition: background 200ms;
+  text-decoration: none; color: inherit;
+  transition: background 200ms, transform 200ms;
+  position: relative;
 }
-.t-navy .stock, .t-slate .stock { background: rgba(255,255,255,0.16); }
-.t-coral .stock, .t-cream .stock, .t-rose .stock, .t-ice .stock { background: rgba(0,0,0,0.06); }
-.stock:hover { background: rgba(255,255,255,0.18); }
-.t-coral .stock:hover, .t-cream .stock:hover, .t-rose .stock:hover, .t-ice .stock:hover { background: rgba(0,0,0,0.12); }
-.stock-t { font-family: var(--font-mono); font-weight: 600; font-size: 12px; letter-spacing: -0.005em; display: flex; justify-content: space-between; }
-.stock-u { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-.stock-gr { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; font-feature-settings: "tnum" 1; margin-top: 2px; }
+.t-navy .stock, .t-slate .stock, .t-cream .stock, .t-rose .stock, .t-ice .stock, .t-coral .stock, .t-navy .stock { background: rgba(255,255,255,0.18); }
+.t-cream .stock, .t-rose .stock, .t-coral .stock, .t-ice .stock { background: rgba(0,0,0,0.06); color: inherit; }
+.stock:hover { background: rgba(255,255,255,0.26); transform: translateY(-1px); }
+.t-cream .stock:hover, .t-rose .stock:hover, .t-coral .stock:hover, .t-ice .stock:hover { background: rgba(0,0,0,0.12); }
 
-/* Scoring tile */
-.score-tile .tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--s-4); }
-.score-tile .grade { padding: 4px 10px; border-radius: var(--r-pill); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
-.gr-A    { background: var(--t4-cream); color: #2A2418; }
-.gr-B    { background: rgba(232,155,122,0.4); color: var(--t4-cream); }
-.gr-C    { background: rgba(255,255,255,0.18); color: var(--t4-cream); }
-.gr-D    { background: rgba(232,163,152,0.4); color: var(--t4-cream); }
+.stock-top { display: flex; justify-content: space-between; align-items: baseline; }
+.stock-t {
+  font-family: ui-monospace, "SF Mono", monospace; font-weight: 700; font-size: 13px;
+  letter-spacing: -0.005em; text-decoration: none; color: inherit;
+}
+a.stock-t:hover { text-decoration: underline; opacity: 0.8; }
+.stock-grade {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.28); letter-spacing: 0.05em; text-transform: uppercase;
+}
+.t-cream .stock-grade, .t-rose .stock-grade, .t-coral .stock-grade, .t-ice .stock-grade { background: rgba(0,0,0,0.18); }
+.gr-A { /* keep white pill */ }
+.stock-name {
+  font-size: 11px; opacity: 0.78; line-height: 1.25;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-decoration: none; color: inherit;
+}
+.stock-numbers { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin-top: 2px; }
+.stock-price {
+  font-family: ui-monospace, "SF Mono", monospace; font-weight: 600; font-size: 13px;
+  font-feature-settings: "tnum" 1; letter-spacing: -0.005em;
+}
+.stock-ups {
+  font-family: ui-monospace, "SF Mono", monospace; font-weight: 600; font-size: 11px;
+  font-feature-settings: "tnum" 1;
+}
+.stock-ups.up   { color: #2C7A3E; }
+.t-navy .stock-ups.up, .t-slate .stock-ups.up { color: #4ADE80; }
+.stock-ups.down { color: #A4382D; }
+.t-navy .stock-ups.down { color: #FF8585; }
 
-.score-row { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-3); align-items: center; padding: var(--s-2) 0; border-top: 1px solid rgba(255,255,255,0.08); }
+/* === Scoring tile === */
+.score-tile .tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.score-tile .grade { padding: 4px 10px; border-radius: var(--r-pill); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; background: var(--surface-3); color: var(--text); }
+
+.score-row {
+  display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center;
+  padding: 8px 0; border-top: 1px solid var(--border);
+}
 .score-row:first-of-type { border-top: none; }
-.score-t { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
-.score-d { display: flex; gap: 2px; }
-.score-d div { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); }
-.score-d div.on { background: var(--t4-cream); }
-.score-c { font-family: var(--font-mono); font-size: 12px; font-weight: 600; font-feature-settings: "tnum" 1; min-width: 32px; text-align: right; }
+.score-t { font-family: ui-monospace, "SF Mono", monospace; font-size: 13px; font-weight: 700; text-decoration: none; color: var(--text); }
+a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
+.score-n { font-size: 11px; color: var(--text-muted); }
+.score-d { display: flex; gap: 2px; min-width: 100px; }
+.score-d div { flex: 1; height: 5px; border-radius: 2px; background: var(--surface-3); }
+.score-d div.on { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.score-c { font-family: ui-monospace, "SF Mono", monospace; font-size: 13px; font-weight: 600; font-feature-settings: "tnum" 1; min-width: 60px; text-align: right; color: var(--text); }
+.score-c small { font-size: 10px; opacity: 0.6; margin-left: 4px; }
 
 /* News tile */
-.news-list { display: flex; flex-direction: column; gap: var(--s-3); }
-.news-i { padding-bottom: var(--s-3); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.news-list { display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; }
+.news-i { padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+.t-glass .news-i { border-bottom: 1px solid var(--border); }
 .news-i:last-child { border: none; }
-.news-meta { display: flex; gap: var(--s-3); font-size: 11px; opacity: 0.6; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-.news-meta b { font-weight: 600; opacity: 0.9; }
+.news-meta { display: flex; gap: 10px; font-size: 10px; opacity: 0.55; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.news-meta b { font-weight: 700; opacity: 0.95; }
 .news-body { font-size: 13px; line-height: 1.5; }
+.news-body a { color: inherit; font-weight: 700; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
+.t-glass .news-body a { border-bottom-color: var(--border-strong); }
+.news-body a:hover { opacity: 0.8; }
 
-/* Overview — Linus pick */
-.linus-voice { display: flex; gap: var(--s-3); }
+/* Linus overview */
+.linus-voice { display: flex; gap: 12px; align-items: flex-start; }
 .linus-mark {
   width: 36px; height: 36px; flex-shrink: 0;
   background: linear-gradient(135deg, #E89B7A 0%, #E8A398 100%);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   color: #0F1825; font-weight: 700; font-size: 14px;
-  box-shadow: var(--shadow-1);
 }
 .linus-bubble {
-  font-size: 14px; line-height: 1.5;
-  padding: var(--s-4) var(--s-4);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
+  font-size: 14px; line-height: 1.55;
+  padding: 14px 16px; border-radius: 14px;
+  background: var(--surface-2); border: 1px solid var(--border);
 }
-.linus-bubble em { color: var(--t3-coral); font-style: normal; font-weight: 600; }
+.linus-bubble em { color: var(--accent-2); font-style: normal; font-weight: 600; }
 
-/* Footer panel */
-.footer-rc { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--s-6); align-items: end; }
-.footer-rc .v { font-size: 13px; opacity: 0.7; }
-.footer-rc b { font-weight: 600; opacity: 0.95; }
-.footer-rc .meta-tiny { font-family: var(--font-mono); font-size: 11px; opacity: 0.5; }
+/* Sector links tile */
+.sector-links { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+.sector-link {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-radius: 10px;
+  background: rgba(255,255,255,0.16); text-decoration: none;
+  color: inherit; font-size: 13px; font-weight: 600;
+  transition: background 200ms;
+}
+.sector-link:hover { background: rgba(255,255,255,0.28); }
 
-/* Animations */
+/* Footer */
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; align-items: end; }
+.footer-grid .v { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.footer-grid b { font-weight: 600; color: var(--text); }
+.footer-grid a { color: var(--accent-2); text-decoration: none; }
+.footer-grid a:hover { text-decoration: underline; }
+.meta-tiny { font-family: ui-monospace, monospace; font-size: 11px; opacity: 0.5; color: var(--text-muted); }
+
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
-/* Mobile responsive */
-@media (max-width: 1024px) {
+/* Mobile */
+@media (max-width: 1100px) {
+  body { flex-direction: column; }
+  .sidebar { width: 100%; min-width: unset; height: auto; position: relative; padding: 12px 16px; }
+  .sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
   .grid { grid-template-columns: repeat(6, 1fr); }
   .s-6, .s-4, .s-3 { grid-column: span 6; }
   .s-12 { grid-column: span 6; }
@@ -215,94 +291,140 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-sys); 
 @media (max-width: 640px) {
   .grid { grid-template-columns: 1fr; }
   .s-6, .s-4, .s-3, .s-12 { grid-column: span 1; }
-  .stocks { grid-template-columns: 1fr; }
-  .page { padding: var(--s-4) var(--s-3) 60px; }
-}
-
-/* Apple reduce-transparency */
-@media (prefers-reduced-transparency: reduce) {
-  .t-glass { background: var(--bg-2); backdrop-filter: none; }
-  .linus-bubble { background: var(--bg-2); }
+  .stocks, .sector-links { grid-template-columns: 1fr; }
+  .main { padding: 16px 12px 60px; }
 }
 </style>
 </head>
 <body>
-<div class="page">
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">L</div>
+    <div>
+      <div>Linus Digest</div>
+      <div class="logo-sub">Weekly investing dashboard</div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-section">Sectors</div>
+    <div class="nav-item" onclick="location.href='power.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      電力 Power<span class="nav-badge" data-sector="power">—</span>
+    </div>
+    <div class="nav-item" onclick="location.href='compute.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+      Compute Infra<span class="nav-badge" data-sector="compute">—</span>
+    </div>
+    <div class="nav-item" onclick="location.href='semis.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+      半導體<span class="nav-badge" data-sector="semis">—</span>
+    </div>
+    <div class="nav-item" onclick="location.href='software.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Software<span class="nav-badge" data-sector="software">—</span>
+    </div>
+    <div class="nav-section">Defensive</div>
+    <div class="nav-item" onclick="location.href='nonagi.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Non AGI<span class="nav-badge" data-sector="nonagi">—</span>
+    </div>
+    <div class="nav-section">Add On</div>
+    <div class="nav-item-ext" onclick="location.href='linus-invest.html'">
+      <span>Linus Invest</span>
+    </div>
+    <div class="nav-item-ext" onclick="window.open('https://furryredball.github.io/signal-monitor/','_blank','noopener')">
+      <span>World Signal Monitor</span>
+    </div>
+    <div class="nav-section">Theme</div>
+    <div class="theme-meta">Bento Draft <strong style="color:var(--t-navy);">v0.2.0</strong><br>
+      <span style="font-size:10px;">Live wired to data.js · Yahoo Finance linked</span>
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
 
 <header class="head">
   <div>
     <h1>Weekly Investing Digest <span class="pulse"></span></h1>
-    <p class="sub">Linus · 2026-07-23 · Locked framework: 3-bucket · 5-dim scoring · Non-AGI terminal value</p>
+    <p class="sub">Linus · Apple Bento · 5-dim scoring · Live from <code>data.js</code> (cron-driven)</p>
   </div>
   <div class="meta">
     <strong>Updated</strong>
-    <span id="ts">--</span> HKT · 55 stocks
+    <span id="ts">—</span><br>
+    <span id="counts">— TIER1 · — TIER2</span>
   </div>
 </header>
 
-<main class="grid">
+<section class="grid">
 
-  <!-- ROW 1 -->
+  <!-- ROW 1: Hero + Tier counts -->
   <section class="tile s-6 r-2 t-navy">
     <div class="tile-eyebrow">Hero · Top of Dashboard</div>
     <div class="tile-title">Total A-Grade Plays</div>
-    <div class="tile-hero" id="hero-a-count">--</div>
-    <p class="tile-sub">Stocks scoring ≥85 across the 5-dim lens (Framework + Fund + Mom + Sent + Scar) under locked framework rules.</p>
+    <div class="tile-hero" id="hero-a-count">—</div>
+    <p class="tile-sub">Stocks scoring ≥85 across Framework + Fund + Mom + Sent + Scar (locked 5-dim framework).</p>
     <div class="tile-foot">
-      <div class="kv"><span class="kv-k">Bucket A</span><span class="kv-v" id="k-bucket-a">--</span></div>
-      <div class="kv"><span class="kv-k">Bucket B</span><span class="kv-v" id="k-bucket-b">--</span></div>
-      <div class="kv"><span class="kv-k">Bucket C</span><span class="kv-v" id="k-bucket-c">--</span></div>
-      <div class="kv"><span class="kv-k">Universe</span><span class="kv-v" id="k-universe">--</span></div>
+      <div class="kv"><span class="kv-k">Bucket A</span><span class="kv-v" id="k-bucket-a">—</span></div>
+      <div class="kv"><span class="kv-k">Bucket B</span><span class="kv-v" id="k-bucket-b">—</span></div>
+      <div class="kv"><span class="kv-k">Bucket C</span><span class="kv-v" id="k-bucket-c">—</span></div>
+      <div class="kv"><span class="kv-k">Universe</span><span class="kv-v" id="k-universe">—</span></div>
     </div>
   </section>
 
   <section class="tile s-3 r-2 t-coral">
     <div class="tile-eyebrow">Tier 1</div>
     <div class="tile-title">To Buy</div>
-    <div class="tile-hero" id="tier1-count">--</div>
-    <p class="tile-sub">High-conviction entries — pre-cleared by locked framework rules.</p>
+    <div class="tile-hero" id="tier1-count">—</div>
+    <p class="tile-sub">High-conviction entries.</p>
     <div class="tile-foot">
-      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier1-avg">--</span></div>
+      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier1-avg">—</span></div>
     </div>
   </section>
 
   <section class="tile s-3 r-2 t-ice">
     <div class="tile-eyebrow">Tier 2</div>
     <div class="tile-title">Watchlist</div>
-    <div class="tile-hero" id="tier2-count">--</div>
-    <p class="tile-sub">Monitoring / adding on pullbacks only.</p>
+    <div class="tile-hero" id="tier2-count">—</div>
+    <p class="tile-sub">Monitoring / adding on pullbacks.</p>
     <div class="tile-foot">
-      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier2-avg">--</span></div>
+      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier2-avg">—</span></div>
     </div>
   </section>
 
-  <!-- ROW 2 — Sector tiles -->
+  <!-- ROW 2: Sectors -->
   <section class="tile s-4 r-2 t-navy">
     <div class="tile-eyebrow">Power sector</div>
     <div class="tile-title">Power bottleneck</div>
-    <p class="tile-sub">Gas turbine backlog, SMR timeline, nuclear PPA tailwinds.</p>
+    <p class="tile-sub">Gas turbine backlog, nuclear PPA, SMR timeline.</p>
     <div class="stocks" id="power-stocks"></div>
   </section>
 
   <section class="tile s-4 r-2 t-slate">
     <div class="tile-eyebrow">Compute</div>
     <div class="tile-title">AI compute</div>
-    <p class="tile-sub">Neocloud, GPU rental, data-center REIT. Skip direct LLM exposure.</p>
+    <p class="tile-sub">Neocloud, GPU rental, data-center REIT. Skip direct LLM.</p>
     <div class="stocks" id="compute-stocks"></div>
   </section>
 
   <section class="tile s-4 r-2 t-ice">
     <div class="tile-eyebrow">Semis</div>
     <div class="tile-title">CoWoS spread</div>
-    <p class="tile-sub">NVDA / CRDO active. Skip MU/Hynix DRAM. TSMC observe-only.</p>
+    <p class="tile-sub">NVDA / CRDO active. Skip MU/Hynix. TSMC observe-only.</p>
     <div class="stocks" id="semis-stocks"></div>
   </section>
 
-  <!-- ROW 3 -->
+  <!-- ROW 3: Sectors continued -->
   <section class="tile s-4 r-2 t-coral">
     <div class="tile-eyebrow">Software</div>
     <div class="tile-title">Demand capture</div>
-    <p class="tile-sub">SNOW / ORCL — capture AGI demand, not bottleneck.</p>
+    <p class="tile-sub">SNOW / ORCL / GOOG — capture AGI demand, not bottleneck.</p>
     <div class="stocks" id="software-stocks"></div>
   </section>
 
@@ -316,57 +438,60 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-sys); 
   <section class="tile s-4 r-2 t-rose">
     <div class="tile-eyebrow">Sentiment</div>
     <div class="tile-title">Upside signals</div>
-    <p class="tile-sub">Analyst upside surprises, insider buy/sell imbalance.</p>
+    <p class="tile-sub">High analyst-upside % across the watchlist.</p>
     <div class="stocks" id="sentiment-stocks"></div>
   </section>
 
-  <!-- ROW 4 — Scoring tile + News -->
+  <!-- ROW 4: Scoring + News -->
   <section class="tile s-6 r-2 t-glass score-tile">
     <div class="tile-head">
       <div class="tile-eyebrow">Score</div>
-      <div class="grade gr-A">A-grade</div>
+      <div class="grade">Top 8 · 5-dim</div>
     </div>
-    <div class="tile-title">Top 8 · 5-dim breakdown</div>
+    <div class="tile-title" style="font-size:16px;margin-bottom:8px;">Top picks · breakdown</div>
     <div id="scoring-rows"></div>
   </section>
 
   <section class="tile s-6 r-2 t-navy">
-    <div class="tile-eyebrow">Live · Tier 1</div>
-    <div class="tile-title">News feed</div>
+    <div class="tile-eyebrow">Live · Tier 1 News</div>
+    <div class="tile-title" style="font-size:16px;margin-bottom:8px;">News feed</div>
     <div class="news-list" id="news-list"></div>
   </section>
 
-  <!-- ROW 5 -->
+  <!-- ROW 5: Linus overview + Sector links -->
   <section class="tile s-6 r-2 t-glass">
+    <div class="tile-eyebrow">Linus · Overview</div>
+    <div class="tile-title" style="font-size:16px;margin-bottom:8px;">本周 Pick</div>
     <div class="linus-voice">
       <div class="linus-mark">L</div>
-      <div class="linus-bubble" id="overview-text">Loading…</div>
+      <div class="linus-bubble" id="overview-text">Loading from data.js…</div>
     </div>
   </section>
 
   <section class="tile s-6 r-2 t-slate">
     <div class="tile-eyebrow">Quick filter</div>
-    <div class="tile-title">Browse by sector</div>
-    <p class="tile-sub">Open dedicated sector pages — fundamentals, scoring, news.</p>
-    <div class="tile-foot">
-      <a href="power.html"   class="kv"><span class="kv-k">→</span><span class="kv-v">Power</span></a>
-      <a href="compute.html" class="kv"><span class="kv-k">→</span><span class="kv-v">Compute</span></a>
-      <a href="semis.html"   class="kv"><span class="kv-k">→</span><span class="kv-v">Semis</span></a>
-      <a href="software.html" class="kv"><span class="kv-k">→</span><span class="kv-v">Software</span></a>
-      <a href="nonagi.html"  class="kv"><span class="kv-k">→</span><span class="kv-v">Non-AGI</span></a>
+    <div class="tile-title">Browse sectors</div>
+    <p class="tile-sub">Dedicated pages — full scoring + fundamentals + news.</p>
+    <div class="sector-links">
+      <a href="power.html" class="sector-link">電力 Power <span>→</span></a>
+      <a href="compute.html" class="sector-link">Compute Infra <span>→</span></a>
+      <a href="semis.html" class="sector-link">半導體 <span>→</span></a>
+      <a href="software.html" class="sector-link">Software <span>→</span></a>
+      <a href="nonagi.html" class="sector-link">Non AGI <span>→</span></a>
+      <a href="linus-invest.html" class="sector-link">Linus Invest <span>→</span></a>
     </div>
   </section>
 
   <!-- Footer -->
   <section class="tile s-12 t-glass">
-    <div class="footer-rc">
+    <div class="footer-grid">
       <div>
-        <div class="v"><b>Sources:</b> anysearch / Yahoo Finance / Trading Economics / Insider filings / analyst notes · daily refetch via <b>dashboard-refetch-fundamentals</b> cron.</div>
-        <div class="meta-tiny">Locked framework (2026-07-12) — 3 buckets · 5-dim scoring · HBM hard-skip · BTC miners hard-exclude</div>
+        <div class="v"><b>Sources:</b> anysearch / Yahoo Finance / Trading Economics / Insider filings — daily refetch via <b>dashboard-refetch-fundamentals</b> cron.</div>
+        <div class="meta-tiny">Locked framework (2026-07-12) · 3 buckets · 5-dim scoring · HBM hard-skip · BTC miners hard-exclude</div>
       </div>
       <div>
-        <div class="v"><b>Build:</b> <span class="meta-tiny">bento-draft v0.1.0 · 2026-07-23</span></div>
-        <div class="v" style="margin-top:8px"><b>Live:</b> <a href="https://furryredball.github.io/weekly-digest-dashboard/" style="color:var(--t3-coral);text-decoration:none">furryredball.github.io/weekly-digest-dashboard</a></div>
+        <div class="v"><b>Build:</b> <span class="meta-tiny">bento-draft v0.2.0 · 2026-07-23</span></div>
+        <div class="v" style="margin-top:8px"><b>Live:</b> <a href="https://furryredball.github.io/weekly-digest-dashboard/draft.html">draft.html</a></div>
       </div>
       <div>
         <div class="v"><b>Linus · 晨早 · 23 Jul 2026</b></div>
@@ -375,133 +500,105 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-sys); 
     </div>
   </section>
 
+</section>
+
 </main>
 
-</div>
+<!-- Live data feed (cron-driven fundamentals) -->
+<script src="data.js?v=draftv2"></script>
+
 <script>
-// Render with the data.js shape (TIER1, TIER2 arrays + dim functions inlined here for the draft)
-// ===========================================
-// Bento Investment Dashboard · Draft v0.1.0
-// (skeleton — wire to data.js in next pass)
-// ===========================================
+// === 5-dim scoring (mirrors linus-invest.html) ===
+function _liDimFramework(t){if(t.ca==="nonagi")return 9;if(t.se==="power")return 19;if(t.se==="compute")return 16;if(t.se==="software")return 14;if(t.se==="semis")return 12;return 10;}
+function _liDimFundamental(t){const r=t.roe||0,ri=t.roic||0;if(r>=25&&ri>=15)return 19;if(r>=15)return 16;if(r>=8)return 12;return 7;}
+function _liDimMomentum(t){const u=t.ups||0;if(u>=30)return 19;if(u>=10)return 16;if(u>=0)return 12;if(u>=-10)return 8;return 5;}
+function _liDimSentiment(t){const b=t.bp||0;if(b>=80)return 19;if(b>=60)return 16;if(b>=40)return 12;return 7;}
+function _liDimScarcity(t){if(t.ca==="nonagi")return 7;if(t.se==="power")return 19;if(t.se==="compute")return 14;if(t.se==="software")return 11;return 9;}
+function _liScoreStock(t){return{total:Math.min(100,_liDimFramework(t)+_liDimFundamental(t)+_liDimMomentum(t)+_liDimSentiment(t)+_liDimScarcity(t)),dims:{fw:_liDimFramework(t),fund:_liDimFundamental(t),mom:_liDimMomentum(t),sent:_liDimSentiment(t),scar:_liDimScarcity(t)}};}
+function _gradeForScore(s){if(s>=85)return"A";if(s>=75)return"B+";if(s>=65)return"B";if(s>=55)return"B-";if(s>=45)return"C+";if(s>=35)return"C";return"D";}
 
-// dim functions (5-dim scoring copy from existing scoring logic)
-function _liDimFramework(t){
-  if(t.ca==="nonagi") return 9;
-  if(t.se==="power") return 19;
-  if(t.se==="compute") return 16;
-  if(t.se==="software") return 14;
-  if(t.se==="semis") return 12;
-  return 10;
-}
-function _liDimFundamental(t){
-  const r=t.roe||0,ri=t.roic||0;
-  if(r>=25&&ri>=15) return 19;
-  if(r>=15) return 16;
-  if(r>=8) return 12;
-  return 7;
-}
-function _liDimMomentum(t){
-  const u=t.ups||0;
-  if(u>=30) return 19; if(u>=10) return 16; if(u>=0) return 12; if(u>=-10) return 8;
-  return 5;
-}
-function _liDimSentiment(t){
-  const b=t.bp||0;
-  if(b>=80) return 19; if(b>=60) return 16; if(b>=40) return 12;
-  return 7;
-}
-function _liDimScarcity(t){
-  if(t.ca==="nonagi") return 7;
-  if(t.se==="power") return 19;
-  if(t.se==="compute") return 14;
-  if(t.se==="software") return 11;
-  return 9;
-}
-function _liScoreStock(t){
-  return {total: Math.min(100, _liDimFramework(t)+_liDimFundamental(t)+_liDimMomentum(t)+_liDimSentiment(t)+_liDimScarcity(t))};
-}
-function grade(sc){
-  if(sc>=85) return "A"; if(sc>=75) return "B+"; if(sc>=65) return "B"; if(sc>=55) return "B-"; if(sc>=45) return "C+"; if(sc>=35) return "C"; return "D";
-}
-function gradeClass(g){ return "gr-"+(g[0]==="B"?"B":g); }
+// === Helpers ===
+function yahooUrl(ticker){return"https://finance.yahoo.com/quote/"+encodeURIComponent(ticker.replace(/\./g,"-"));}
+function fmtPct(n){if(typeof n!=="number")return "—";return(n>=0?"+":"")+n.toFixed(1)+"%";}
+function fmtPrice(n){if(typeof n!=="number")return "—";return"$"+n.toFixed(2);}
+function tsNow(){return new Date().toISOString().slice(0,16).replace("T"," ");}
 
-// === DEMO DATA — replaced by data.js after header wiring ===
-const TIER1 = [
-  {t:"VST", p:158.86, se:"power", ca:"agi", name:"Vistra Energy", roe:18.47, ups:42.6, bp:90.9, mg:22, bf:20, bz:21},
-  {t:"CEG", p:251.38, se:"power", ca:"agi", name:"Constellation Energy", roe:15.97, ups:52.2, bp:70, mg:21, bf:17, bz:15},
-  {t:"NVDA", p:172.05, se:"semis", ca:"agi", name:"NVIDIA", roe:104.2, ups:25.7, bp:91.4, mg:25, bf:25, bz:25},
-  {t:"VRT", p:318.86, se:"power", ca:"agi", name:"Vertiv", roe:33.82, ups:-15.3, bp:94.7, mg:22, bf:18, bz:16},
-  {t:"GOOG", p:184.50, se:"software", ca:"agi", name:"Alphabet", roe:34.1, ups:18.2, bp:88.5, mg:24, bf:22, bz:18},
-  {t:"CRDO", p:74.20, se:"semis", ca:"agi", name:"Credo Technology", roe:8.5, ups:55.4, bp:80.0, mg:21, bf:18, bz:18},
-  {t:"ORCL", p:248.30, se:"software", ca:"agi", name:"Oracle", roe:36.7, ups:88.0, bp:65.1, mg:22, bf:21, bz:18}
-];
-const TIER2 = [
-  {t:"WM", p:225.10, se:"nonagi", ca:"nonagi", name:"Waste Management", roe:30.4, ups:11.5, bp:75.0, mg:9, bf:20, bz:9},
-  {t:"RSG", p:208.40, se:"nonagi", ca:"nonagi", name:"Republic Services", roe:17.3, ups:9.8, bp:72.1, mg:9, bf:18, bz:9},
-  {t:"WCN", p:144.20, se:"nonagi", ca:"nonagi", name:"Waste Connections", roe:14.5, ups:18.4, bp:82.0, mg:9, bf:16, bz:9},
-  {t:"WCN", p:144.20, se:"nonagi", ca:"nonagi", name:"Waste Connections", roe:14.5, ups:18.4, bp:82.0, mg:9, bf:16, bz:9},
-  {t:"LLY", p:780.0, se:"nonagi", ca:"nonagi", name:"Eli Lilly", roe:78.4, ups:24.1, bp:88.6, mg:9, bf:22, bz:9},
-  {t:"NEE", p:78.20, se:"nonagi", ca:"nonagi", name:"NextEra Energy", roe:14.1, ups:8.2, bp:64.0, mg:9, bf:18, bz:9},
-  {t:"GE", p:208.90, se:"compute", ca:"agi", name:"GE Aerospace", roe:21.8, ups:18.4, bp:71.5, mg:18, bf:18, bz:14}
-];
-
-const SECTORS = {
-  power: ["VST","CEG","VRT","ETN","GEV","TLN","BE"],
-  compute: ["NVDA","CRDO","GE","GDS","CRWV"],
-  semis: ["NVDA","CRDO"],
-  software: ["GOOG","ORCL","SNOW","META","MSFT","AMZN"],
-  nonagi: ["WM","RSG","WCN","LLY","NEE","BRK","POW","TD"],
-  sentiment: ["ORCL","GDS","NVDA","CEG","CRDO"]
-};
-
-const NEWS = [
-  {sector:"power",ts:"2026-07-22 09:14",title:"Vistra +8.4% on cooling demand",body:"Grid upgrades drive Vistra to new high on ERCOT scarcity pricing projections and hyperscaler power-purchase flows."},
-  {sector:"compute",ts:"2026-07-22 09:02",title:"CoreWeave secures $2.1B facility",body:"CRWV closed new financing facility for GPU capacity buildout; revenue guidance reiterated."},
-  {sector:"semis",ts:"2026-07-22 08:50",title:"Credo AI interconnect demand",body:"AEC active cable demand from hyperscaler back-end networks reinforces CRDO CoWoS-adjacent thesis."}
-];
-
-const OVERVIEW = [
-  {sector:"power",body:"<strong>電力 Power bottleneck</strong> — gas turbine backlog 2-3 years, SMR timeline accelerating, nuclear PPA tailwinds. VST/CEG keep leading on ERCOT scarcity pricing. 近 3 日 hyperscaler power-purchase flows dominate narrative."}
-];
-
-// === Render ===
-
-function tsNow(){const d=new Date();return d.toISOString().slice(0,16).replace("T"," ");}
-
-function fmtPct(n){if(typeof n!=="number")return "—";return (n>=0?"+":"")+n.toFixed(1)+"%";}
-
-function renderStock(st){
-  const sc=_liScoreStock(st).total;
-  const g=grade(sc);
-  const cls=gradeClass(g);
-  return `<div class="stock"><div class="stock-t"><span>${st.t}</span><span class="stock-u">${g}</span></div><div class="stock-gr">${fmtPct(st.ups||0)}</div></div>`;
+// === Build TICKERS from TIER1+TIER2 (matches index.html logic) ===
+function buildTickers(){
+  const out=[];
+  [...TIER1,...TIER2].forEach(function(t){
+    const isT1=Array.isArray(TIER1)&&TIER1.indexOf(t)>=0;
+    const enriched=Object.assign({},t,{tier:isT1?1:2});
+    const s=_liScoreStock(enriched);
+    out.push({
+      ticker:enriched.t, name:enriched.name||enriched.t,
+      desc:enriched.desc||"", why:enriched.why||"",
+      price:enriched.p, ups:enriched.ups, roe:enriched.roe, bp:enriched.bp,
+      ca:enriched.ca, se:enriched.se, tier:enriched.tier,
+      score:s.total, dims:s.dims, grade:_gradeForScore(s.total)
+    });
+  });
+  return out;
 }
 
-function renderSector(name, ids){
-  const set=new Set(ids);
-  const data=[...TIER1,...TIER2].filter(x=>set.has(x.t)&&!x._dup).concat(
-    ids.filter(t=>![...TIER1,...TIER2].some(x=>x.t===t)).map(t=>({t,u:"—"}))
-  );
-  // dedupe by ticker keeping first
+// === Stock card renderer (with Yahoo Finance links) ===
+function renderStock(t){
+  const sc=Math.round(t.score||0);
+  const g=t.grade||"—";
+  const ups=t.ups;
+  const price=t.price;
+  const tickerY=yahooUrl(t.ticker);
+  const upsCls=typeof ups==="number"?(ups>=0?"up":"down"):"";
+  const upsFmt=fmtPct(ups);
+  const priceFmt=fmtPrice(price);
+  // NOTE: anchors cannot nest inside other anchors per HTML5 spec.
+  // The whole card is wrapped in one <a>; the ticker, name, price, ups are all <span>s inside.
+  return `<a class="stock" href="${tickerY}" target="_blank" rel="noopener" title="Open ${t.ticker} on Yahoo Finance">
+    <div class="stock-top">
+      <span class="stock-t">${t.ticker}</span>
+      <span class="stock-grade">${g}</span>
+    </div>
+    <span class="stock-name">${t.name}</span>
+    <div class="stock-numbers">
+      <span class="stock-price">${priceFmt}</span>
+      <span class="stock-ups ${upsCls}">${upsFmt}</span>
+    </div>
+  </a>`;
+}
+
+function pickStocksForSector(allTickers, sectorKey, wantTickerList, max=6){
+  const set=new Set(wantTickerList||[]);
+  let pool=allTickers.filter(t=>t.se===sectorKey);
+  if(!pool.length && set.size){
+    pool=allTickers.filter(t=>set.has(t.ticker));
+  }
+  // Dedupe by ticker keeping first, then sort by score desc
   const seen=new Set();
-  const uniq=data.filter(s=>!seen.has(s.t)&&(seen.add(s.t)||true));
-  const target=document.getElementById(name+"-stocks");
-  if(target) target.innerHTML=uniq.slice(0,6).map(renderStock).join("");
+  const uniq=pool.filter(t=>!seen.has(t.ticker)&&(seen.add(t.ticker)||true));
+  uniq.sort((a,b)=>b.score-a.score);
+  return uniq.slice(0,max);
 }
 
+// === Render all ===
 function renderAll(){
-  // Hero counts
+  if(typeof TIER1==="undefined"||typeof TIER2==="undefined"){
+    document.getElementById("overview-text").textContent="data.js not loaded — check network.";
+    return;
+  }
+  const TICKERS=buildTickers();
   const all=[...TIER1,...TIER2];
-  const aCount=all.filter(t=>(_liScoreStock(t).total>=85)).length;
-  const t1Avg=TIER1.length?Math.round(TIER1.reduce((a,t)=>a+_liScoreStock(t).total,0)/TIER1.length):0;
-  const t2Avg=TIER2.length?Math.round(TIER2.reduce((a,t)=>a+_liScoreStock(t).total,0)/TIER2.length):0;
+
+  // Hero counts
+  const aCount=TICKERS.filter(t=>t.score>=85).length;
   const bucket={A:0,B:0,C:0};
-  all.forEach(t=>{
+  TICKERS.forEach(t=>{
     if(t.ca==="nonagi")bucket.B++;
     else if(t.se==="software")bucket.C++;
     else bucket.A++;
   });
+  const t1Avg=TIER1.length?Math.round(TICKERS.filter(t=>t.tier===1).reduce((a,t)=>a+t.score,0)/TIER1.length):0;
+  const t2Avg=TIER2.length?Math.round(TICKERS.filter(t=>t.tier===2).reduce((a,t)=>a+t.score,0)/TIER2.length):0;
+
   document.getElementById("hero-a-count").textContent=aCount;
   document.getElementById("k-bucket-a").textContent=bucket.A;
   document.getElementById("k-bucket-b").textContent=bucket.B;
@@ -512,35 +609,65 @@ function renderAll(){
   document.getElementById("tier1-avg").textContent=String(t1Avg);
   document.getElementById("tier2-avg").textContent=String(t2Avg);
   document.getElementById("ts").textContent=tsNow();
+  document.getElementById("counts").textContent=TIER1.length+" TIER1 · "+TIER2.length+" TIER2";
+
+  // Sidebar badges
+  document.querySelectorAll(".nav-badge[data-sector]").forEach(b=>{
+    const sec=b.getAttribute("data-sector");
+    const c=TICKERS.filter(t=>t.se===sec).length;
+    b.textContent=c||"—";
+  });
 
   // Sector tiles
-  for(const [k,v] of Object.entries(SECTORS)) renderSector(k,v);
+  for(const sec of ["power","compute","semis","software","nonagi"]) {
+    const el=document.getElementById(sec+"-stocks");
+    if(el) el.innerHTML=pickStocksForSector(TICKERS,sec,null,6).map(renderStock).join("");
+  }
+  // Sentiment tile: high-upside stocks
+  const sentimentPool=[...TICKERS].filter(t=>typeof t.ups==="number"&&t.ups>0).sort((a,b)=>b.ups-a.ups).slice(0,6);
+  document.getElementById("sentiment-stocks").innerHTML=sentimentPool.map(renderStock).join("");
 
-  // Scoring — top 8 by total
-  const ranked=[...TIER1,...TIER2].filter((t,i,a)=>a.findIndex(x=>x.t===t.t)===i).sort((a,b)=>_liScoreStock(b).total-_liScoreStock(a).total).slice(0,8);
-  const rows=ranked.map(t=>{
-    const d=_liScoreStock(t);
-    const g=grade(d.total);
-    const dims=[_liDimFramework(t),_liDimFundamental(t),_liDimMomentum(t),_liDimSentiment(t),_liDimScarcity(t)];
+  // Scoring — top 8 by total (dedupe)
+  const seen2=new Set();
+  const ranked=TICKERS.filter(t=>!seen2.has(t.ticker)&&(seen2.add(t.ticker)||true)).sort((a,b)=>b.score-a.score).slice(0,8);
+  document.getElementById("scoring-rows").innerHTML=ranked.map(t=>{
+    const d=t.dims;
+    const dimsArr=[d.fw,d.fund,d.mom,d.sent,d.scar];
+    const tickerY=yahooUrl(t.ticker);
     return `<div class="score-row">
-      <div class="score-t">${t.t}</div>
-      <div class="score-d">${dims.map(v=>`<div class="${v>=15?"on":""}"></div>`).join("")}</div>
-      <div class="score-c">${d.total} · ${g}</div>
+      <a class="score-t" href="${tickerY}" target="_blank" rel="noopener">${t.ticker}</a>
+      <span class="score-n">${t.name.length>22?t.name.slice(0,21)+"…":t.name}</span>
+      <span class="score-d">${dimsArr.map(v=>`<div class="${v>=15?"on":""}"></div>`).join("")}</span>
+      <span class="score-c">${Math.round(t.score)} <small>${t.grade}</small></span>
     </div>`;
   }).join("");
-  document.getElementById("scoring-rows").innerHTML=rows;
 
   // News
-  const newsHtml=NEWS.slice(0,6).map(n=>`<div class="news-i"><div class="news-meta"><b>${n.sector.toUpperCase()}</b> · <span>${n.ts}</span></div><div class="news-body"><b>${n.title}</b> — ${n.body}</div></div>`).join("");
-  document.getElementById("news-list").innerHTML=newsHtml;
+  const newsArr=(typeof NEWS!=="undefined")?NEWS.slice(0,6):[];
+  document.getElementById("news-list").innerHTML=newsArr.map(n=>{
+    const t=new Date(n.ts).toISOString().slice(0,16).replace("T"," ");
+    const body=(n.body||"").replace(/<strong>(.*?)<\/strong>/g,'<a href="javascript:void(0)" title="highlight">$1</a>');
+    return `<div class="news-i">
+      <div class="news-meta"><b>${(n.sector||"").toUpperCase()}</b> · <span>${t}</span></div>
+      <div class="news-body">${body}</div>
+    </div>`;
+  }).join("") || "<div style='opacity:0.5;'>No news yet.</div>";
 
   // Overview
-  if(OVERVIEW.length){
-    document.getElementById("overview-text").innerHTML=OVERVIEW[0].body.replace(/<strong>/g,"<em>").replace(/<\/strong>/g,"</em>");
+  if(typeof OVERVIEW!=="undefined"&&OVERVIEW.length){
+    const o=OVERVIEW[0];
+    document.getElementById("overview-text").innerHTML=(o.body||"").replace(/<strong>/g,"<em>").replace(/<\/strong>/g,"</em>");
+  } else {
+    document.getElementById("overview-text").textContent="No overview yet.";
   }
 }
 
-document.addEventListener("DOMContentLoaded",renderAll);
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",renderAll);
+} else {
+  renderAll();
+}
 </script>
+
 </body>
 </html>
