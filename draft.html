@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Linus Weekly Investing Digest — Apple Bento dashboard with live data feed">
-<title>Weekly Investing Digest · Linus · Bento Draft v0.3.0</title>
+<title>Weekly Investing Digest · Linus · Bento Draft v0.5.0 — Emil-flavored</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /* ===========================================
@@ -50,6 +50,43 @@ html { font: 100%/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helv
   --shadow-3: 0 8px 24px rgba(0,0,0,0.10);
 
   --sidebar-w: 220px;
+
+  /* ============================================================
+     Emil Kowalski / Apple "Designing Fluid Interfaces" tokens.
+     Use these instead of inventing ad-hoc ease-in-out.
+     ============================================================ */
+  /* Easing curves (Apple fluid design system) */
+  --fluid:  cubic-bezier(0.16, 1, 0.3, 1);   /* The signature "fluid" curve — most UI motion */
+  --snap:   cubic-bezier(0.32, 0.72, 0, 1);  /* snappier, response ~0.4s feel */
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --bounce: cubic-bezier(0.34, 1.56, 0.64, 1); /* subtle overshoot, for KPI drilldown entrance */
+
+  /* Durations (Apple's haptic timing scale, ms) */
+  --d-tap:    100ms;   /* press feedback (instant) */
+  --d-fast:   200ms;   /* hover, color, opacity */
+  --d-base:   300ms;   /* panel open, drilldown */
+  --d-fluid:  400ms;   /* sidebar slide, large reposition */
+  --d-spring: 500ms;   /* spring-equivalent enter/exit */
+
+  /* Spring scale for scale-on-press (Apple's 0.97 default) */
+  --press-scale: 0.98;
+  --hover-scale: 1.02;
+
+  /* Optical typography (Apple: tracking tightens as size grows) */
+  --tracking-display: -0.025em;  /* tile titles */
+  --tracking-title:   -0.015em;  /* nav, subsections */
+  --tracking-body:    0;         /* body, near-zero */
+  --tracking-small:   0.01em;    /* small/labels, +0.01 for legibility */
+  --tracking-mono:    0;         /* SF Mono always zero */
+
+  /* Material weights (Apple: bigger surface = thicker glass + deeper shadow) */
+  --glass-tile:  rgba(255, 255, 255, 0.04);  blur(20px) saturate(180%);
+  --glass-nav:   rgba(15, 24, 37, 0.92);     blur(20px) saturate(180%);
+  --glass-pill:  rgba(255, 255, 255, 0.10);  blur(14px) saturate(140%);
+
+  /* Apple uses vibrant-text over translucency: warm cream not pure white */
+  --ink: #E4E0DA;
+  --ink-muted: #B6B4AD;
 }
 
 body {
@@ -59,17 +96,22 @@ body {
   display: flex; min-height: 100vh; align-items: flex-start;
 }
 
-/* === Sidebar · dark navy (matches Bento tile palette) === */
+/* === Sidebar · dark navy (Emil: glass + scroll-edge fade) === */
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
-  background: rgba(15, 24, 37, 0.92);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 24px 14px; color: #E4E0DA;
+  background: var(--glass-nav);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 24px 14px; color: var(--ink);  /* use Emil ink token */
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.10), inset -1px 0 0 rgba(255, 255, 255, 0.04);
-  transition: margin-left 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+  /* Apple scroll-edge: fade content where it meets the floating chrome */
+  mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  transition: margin-left var(--d-fluid) var(--fluid),
+              transform var(--d-fluid) var(--fluid);
 }
 .sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-w)); opacity: 0; pointer-events: none; }
 
@@ -154,7 +196,11 @@ body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
 /* Header */
 .head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; }
 .head h1 {
-  font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.05;
+  font-size: clamp(26px, 3.4vw, 32px); /* responsive — Apple's fluid type */
+  font-weight: 600;
+  letter-spacing: var(--tracking-display); /* -0.025em — tighten as it grows */
+  line-height: 1.05;
+  font-optical-sizing: auto;
   display: flex; align-items: baseline; gap: 12px;
 }
 .head .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); position: relative; display: inline-block; }
@@ -171,10 +217,24 @@ body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
   padding: 20px;
   display: flex; flex-direction: column;
   position: relative; overflow: hidden;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--d-fluid) var(--fluid),
+              box-shadow var(--d-fluid) var(--fluid);
   min-height: 140px;
+  /* Apple: hover brings the tile "forward" — light shadow + tiny lift */
+  box-shadow: var(--shadow-1);
 }
-.tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+.tile:hover {
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);   /* Apple: 1px lift on hover */
+}
+.tile.t-navy:hover,
+.tile.t-slate:hover,
+.tile.t-coral:hover,
+.tile.t-cream:hover,
+.tile.t-rose:hover,
+.tile.t-ice:hover,
+.tile.t-glass:hover { box-shadow: 0 16px 36px rgba(15, 24, 37, 0.20); transform: translateY(-2px); }
+/* (removed duplicate hover — Emil: one rule per state) */
 
 .s-6  { grid-column: span 6; }
 .s-4  { grid-column: span 4; }
@@ -196,7 +256,13 @@ body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
   font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
   font-weight: 600; opacity: 0.6; margin-bottom: 8px;
 }
-.tile-title { font-size: 19px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: 4px; }
+.tile-title {
+  font-size: 19px; font-weight: 600;
+  letter-spacing: var(--tracking-title); /* optical: tighten as size grows */
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-optical-sizing: auto;          /* Apple: enable variable metrics */
+}
 .tile-sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
 .tile-hero {
   font-size: 44px; font-weight: 600; letter-spacing: -0.025em;
@@ -288,8 +354,81 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 .t-glass .news-body a { border-bottom-color: var(--border-strong); }
 .news-body a:hover { opacity: 0.8; }
 
-/* Linus overview */
-.linus-voice { display: flex; gap: 12px; align-items: flex-start; }
+/* KPI card (clickable, opens drilldown) */
+.tile.kpi { cursor: pointer; }
+.tile.kpi .kpi-arrow {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 16px; font-weight: 700; opacity: 0.5;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms;
+}
+.tile.kpi.open .kpi-arrow { transform: rotate(180deg); opacity: 1; color: #E89B7A; }
+.tile.kpi:hover .kpi-arrow { opacity: 1; }
+.tile.kpi.open { box-shadow: 0 16px 40px rgba(0,0,0,0.18), var(--shadow-2); }
+
+/* Drilldown panel: full-width row below the row containing the KPI */
+/* Emil: drilldown materializes — animate blur + scale together, not just opacity. */
+.drilldown {
+  grid-column: span 12;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-tile);
+  padding: 0 24px;
+  display: block;            /* always block — presence is controlled by max-height+opacity */
+  max-height: 0; overflow: hidden; opacity: 0;
+  transform: scale(0.985);   /* grow in from the KPI origin — Apple hint */
+  transform-origin: top center;
+  transition: max-height var(--d-spring) var(--fluid),
+              opacity   var(--d-base) var(--fluid),
+              padding   var(--d-spring) var(--fluid),
+              transform var(--d-base) var(--bounce);  /* tiny overshoot on enter */
+}
+.drilldown.open {
+  display: block;
+  max-height: 4000px; opacity: 1;
+  padding: 24px;
+  transform: scale(1);       /* settle back to full size */
+}
+.drilldown-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.drilldown-head h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+.drilldown-head .close-btn {
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text-muted);
+  padding: 4px 10px; font-size: 11px; border-radius: var(--r-pill); cursor: pointer;
+  /* Emil: never "transition: all" — Apple specificates properties. */
+transition: background var(--d-fast) var(--fluid),
+            color var(--d-fast) var(--fluid);
+}
+.drilldown-head .close-btn:hover { background: var(--surface-3); color: var(--text); }
+
+/* Linus weekly takeaways strip */
+.weekly-takeaways { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.tk {
+  padding: 10px 14px; border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 13px; line-height: 1.5; color: var(--text);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.tk .tk-n {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: linear-gradient(135deg, #E89B7A, #E8A398); color: #0F1825;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px;
+}
+.tk-body strong {
+  color: var(--accent-2); font-weight: 700; background: rgba(60, 92, 138, 0.08);
+  padding: 1px 4px; border-radius: 3px;
+}
+.tk-body em {
+  color: #E89B7A; font-style: normal; font-weight: 600;
+}
+.tk-meta { font-size: 10px; opacity: 0.55; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+
+/* Linus overview voice (kept) */
+.linus-voice { display: flex; gap: 12px; align-items: flex-start; margin-top: 8px; }
 .linus-mark {
   width: 36px; height: 36px; flex-shrink: 0;
   background: linear-gradient(135deg, #E89B7A 0%, #E8A398 100%);
@@ -323,7 +462,60 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 .footer-grid a:hover { text-decoration: underline; }
 .meta-tiny { font-family: ui-monospace, monospace; font-size: 11px; opacity: 0.5; color: var(--text-muted); }
 
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+/* === Emil Kowalski / Apple: feedback on pointer-down === *
+ * Apple rule #1: respond on press, not release. Every tile gets a
+ * momentary scale-down + instant color change, reversed on release. */
+.tile:active,
+.nav-item:active,
+.score-row:active,
+.drilldown-stock:active,
+.menu-toggle:active,
+.close-btn:active,
+button:active,
+.tk:active {
+  transform: scale(0.98);
+  transition: transform 80ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tile,
+.nav-item,
+.score-row,
+.drilldown-stock,
+.menu-toggle,
+.close-btn,
+button,
+.tk {
+  transition: transform var(--d-fast) var(--fluid),
+              background-color var(--d-fast) var(--fluid),
+              box-shadow var(--d-fast) var(--fluid),
+              color var(--d-fast) var(--fluid);
+}
+
+/* Apple rule #14: reduce = crossfade, never slide/spring. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tile:active,
+  .nav-item:active,
+  .score-row:active,
+  .drilldown-stock:active,
+  .menu-toggle:active,
+  .close-btn:active,
+  button:active,
+  .tk:active { transform: none; }
+  .sidebar { transition: opacity var(--d-fast) linear; transform: none !important; }
+  .drilldown { transition: opacity var(--d-fast) linear; transform: none; }
+}
+
+/* Apple hardware-acceleration hint: animate only transform + opacity. */
+.tile,
+.nav-item,
+.drilldown-stock,
+.score-row,
+.sidebar,
+.menu-toggle { will-change: transform; }
 
 /* Mobile */
 @media (max-width: 1100px) {
@@ -343,6 +535,17 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 </style>
 </head>
 <body>
+<!-- =============================================================
+     Weekly Investing Digest · Bento Draft v0.5.0
+     Emil-flavoured — Apple's "Designing Fluid Interfaces" principles:
+     - Fluid curve: cubic-bezier(0.16, 1, 0.3, 1) for all UI motion
+     - Press feedback on pointer-down (scale(0.98) + 100ms)
+     - Optical sizing + negative tracking on display headings
+     - Material hierarchy via backdrop-filter + shadow depth
+     - Drilldown springs: bounces in from KPI origin
+     - Sidebar collapse mirrors its enter (left ↔ right)
+     - Reduced motion → crossfade only, no slides
+     ============================================================= -->
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
@@ -388,8 +591,8 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
       <span>World Signal Monitor</span>
     </div>
     <div class="nav-section">Theme</div>
-    <div class="theme-meta">Bento Draft <strong>v0.3.0</strong><br>
-      <span class="small">Dark-navy menu · live · Yahoo linked</span>
+    <div class="theme-meta">Bento Draft <strong>v0.5.0 — Emil-flavoured</strong><br>
+      <span class="small">Fluid curves · press feedback · optical type · scroll-edge fade · reduced-motion safe</span>
     </div>
   </nav>
 </aside>
@@ -416,7 +619,24 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 
 <section class="grid">
 
-  <!-- ROW 1: Hero + Tier counts -->
+  <!-- ROW 1: Linus Overview with 5+ weekly takeaways (PROMOTED to top) -->
+  <section class="tile s-12 r-2 t-glass" id="overview-tile">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+      <div>
+        <div class="tile-eyebrow">Linus · Overview</div>
+        <div class="tile-title" style="font-size:22px;margin-bottom:4px;">本周 Pick</div>
+        <p class="tile-sub" style="margin-top:2px;">5+ weekly takeaways — sector rotation, framework signals, watchlist deltas</p>
+      </div>
+      <div class="meta-tiny" id="overview-meta">—</div>
+    </div>
+    <div class="linus-voice">
+      <div class="linus-mark">L</div>
+      <div class="linus-bubble" id="overview-lead" style="flex:1;">Loading from data.js…</div>
+    </div>
+    <div class="weekly-takeaways" id="weekly-takeaways" style="margin-top:14px;"></div>
+  </section>
+
+  <!-- ROW 2: Hero + Tier counts (clickable drilldowns) -->
   <section class="tile s-6 r-2 t-navy">
     <div class="tile-eyebrow">Hero · Top of Dashboard</div>
     <div class="tile-title">Total A-Grade Plays</div>
@@ -430,25 +650,88 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
     </div>
   </section>
 
-  <section class="tile s-3 r-2 t-coral">
+  <section class="tile s-3 r-2 t-coral kpi" id="tier1-kpi" data-target="tier1-drill" role="button" tabindex="0">
+    <span class="kpi-arrow">▾</span>
     <div class="tile-eyebrow">Tier 1</div>
     <div class="tile-title">To Buy</div>
     <div class="tile-hero" id="tier1-count">—</div>
-    <p class="tile-sub">High-conviction entries.</p>
+    <p class="tile-sub">High-conviction entries. Click to see all.</p>
     <div class="tile-foot">
       <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier1-avg">—</span></div>
     </div>
   </section>
 
-  <section class="tile s-3 r-2 t-ice">
+  <!-- Tier 1 drilldown row (full-width, slides below KPI) -->
+  <section class="drilldown" id="tier1-drill">
+    <div class="drilldown-head">
+      <h3>Tier 1 — To Buy <span class="meta-tiny" id="tier1-drill-meta">—</span></h3>
+      <button class="close-btn" data-close="tier1-drill">▲ Close</button>
+    </div>
+    <div class="stocks-grid" id="tier1-list"></div>
+  </section>
+
+  <section class="tile s-3 r-2 t-ice kpi" id="tier2-kpi" data-target="tier2-drill" role="button" tabindex="0">
+    <span class="kpi-arrow">▾</span>
     <div class="tile-eyebrow">Tier 2</div>
     <div class="tile-title">Watchlist</div>
     <div class="tile-hero" id="tier2-count">—</div>
-    <p class="tile-sub">Monitoring / adding on pullbacks.</p>
+    <p class="tile-sub">Monitoring / adding on pullbacks. Click to see all.</p>
     <div class="tile-foot">
       <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier2-avg">—</span></div>
     </div>
   </section>
+
+  <!-- Tier 2 drilldown row -->
+  <section class="drilldown" id="tier2-drill">
+    <div class="drilldown-head">
+      <h3>Tier 2 — Watchlist <span class="meta-tiny" id="tier2-drill-meta">—</span></h3>
+      <button class="close-btn" data-close="tier2-drill">▲ Close</button>
+    </div>
+    <div class="stocks-grid" id="tier2-list"></div>
+  </section>
+
+  <style>
+  /* Multi-column drilldown list (stock cards stacked, 4-col grid for breathing room) */
+  .stocks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .drilldown-stock {
+    display: grid; grid-template-columns: 1fr; gap: 8px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px;
+    /* Emil: never "transition: all" — Apple specificates properties. */
+transition: background var(--d-fast) var(--fluid),
+            color var(--d-fast) var(--fluid);
+  }
+  .drilldown-stock:hover { background: var(--surface-3); transform: translateY(-1px); }
+  .drilldown-stock .row1 { display: flex; justify-content: space-between; align-items: baseline; }
+  .drilldown-stock .ticker {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 16px; font-weight: 700;
+    text-decoration: none; color: var(--text); letter-spacing: -0.01em;
+  }
+  a.ticker:hover { text-decoration: underline; color: var(--accent-2); }
+  .drilldown-stock .grade {
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+    background: var(--surface-3); color: var(--text); letter-spacing: 0.04em;
+  }
+  .gr-A { background: #4D7C5E; color: white; }
+  .gr-Bplus { background: #6B8E76; color: white; }
+  .gr-B { background: #9B8EC9; color: white; }
+  .gr-Bminus { background: #B8B4AC; color: white; }
+  .gr-Cplus { background: #B08D4A; color: white; }
+  .gr-C { background: #A4886F; color: white; }
+  .gr-D { background: #B34747; color: white; }
+  .drilldown-stock .name {
+    font-size: 12px; color: var(--text-muted); line-height: 1.35; margin-top: -2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .drilldown-stock .nums { display: flex; gap: 12px; padding-top: 6px; border-top: 1px solid var(--border); }
+  .drilldown-stock .num { display: flex; flex-direction: column; gap: 1px; }
+  .drilldown-stock .num-k { font-size: 9px; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.06em; }
+  .drilldown-stock .num-v { font-size: 13px; font-weight: 600; font-feature-settings: "tnum" 1; }
+  .drilldown-stock .num-v.up { color: #2C7A3E; }
+  .drilldown-stock .num-v.down { color: #A4382D; }
+  @media (max-width: 900px) { .stocks-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .stocks-grid { grid-template-columns: 1fr; } }
+  </style>
 
   <!-- ROW 2: Sectors -->
   <section class="tile s-4 r-2 t-navy">
@@ -511,14 +794,7 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
   </section>
 
   <!-- ROW 5: Linus overview + Sector links -->
-  <section class="tile s-6 r-2 t-glass">
-    <div class="tile-eyebrow">Linus · Overview</div>
-    <div class="tile-title" style="font-size:16px;margin-bottom:8px;">本周 Pick</div>
-    <div class="linus-voice">
-      <div class="linus-mark">L</div>
-      <div class="linus-bubble" id="overview-text">Loading from data.js…</div>
-    </div>
-  </section>
+  <!-- (OLD Overview tile removed in v0.4.0 — promoted to top of dashboard) -->
 
   <section class="tile s-6 r-2 t-slate">
     <div class="tile-eyebrow">Quick filter</div>
@@ -561,12 +837,20 @@ a.score-t:hover { text-decoration: underline; color: var(--accent-2); }
 
 <script>
 // === Sidebar collapse/expand (persisted) ===
+// === Emil/Apple: sidebar collapse with mirrored easing (spatial consistency) ===
 function setSidebar(collapsed){
   document.body.classList.toggle('sidebar-collapsed', collapsed);
   try{localStorage.setItem('linus-bento-sidebar', collapsed ? '1' : '0');}catch(e){}
-  // Move toggle button to follow the sidebar edge
   const btn=document.getElementById('menuToggle');
-  if(btn){btn.style.left = (collapsed ? 16 : (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-w'))||220) + 16)+'px';}
+  if(btn){
+    const sidebarW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-w'))||220;
+    btn.style.left = (collapsed ? 16 : (sidebarW + 16)) + 'px';
+    // Mirror the icon state (close vs open glyph) — Apple: reversible transitions
+    const closeGlyph = btn.querySelector('.mt-close');
+    const openGlyph = btn.querySelector('.mt-open');
+    if (closeGlyph) closeGlyph.style.opacity = collapsed ? 0 : 1;
+    if (openGlyph) openGlyph.style.opacity = collapsed ? 1 : 0;
+  }
 }
 (function(){
   let collapsed=false;
@@ -651,7 +935,7 @@ function pickStocksForSector(allTickers, sectorKey, wantTickerList, max=6){
 // === Render all ===
 function renderAll(){
   if(typeof TIER1==="undefined"||typeof TIER2==="undefined"){
-    document.getElementById("overview-text").textContent="data.js not loaded — check network.";
+    document.getElementById("overview-lead").textContent="data.js not loaded — check network.";
     return;
   }
   const TICKERS=buildTickers();
@@ -722,13 +1006,89 @@ function renderAll(){
     </div>`;
   }).join("") || "<div style='opacity:0.5;'>No news yet.</div>";
 
-  // Overview
+  // Overview — lead (most recent) + 5+ takeaways (second-newest → eldest)
   if(typeof OVERVIEW!=="undefined"&&OVERVIEW.length){
-    const o=OVERVIEW[0];
-    document.getElementById("overview-text").innerHTML=(o.body||"").replace(/<strong>/g,"<em>").replace(/<\/strong>/g,"</em>");
+    const lead = OVERVIEW[0];
+    document.getElementById("overview-lead").innerHTML = (lead.body||"").replace(/<strong>/g,"<em>").replace(/<\/strong>/g,"</em>");
+    const ts = new Date(lead.ts).toISOString().slice(0,16).replace("T"," ");
+    document.getElementById("overview-meta").textContent = ts + " · " + (lead.sector||"weekly");
+
+    // 5+ weekly takeaways (slice 1..6 of OVERVIEW, oldest first)
+    const tk = (OVERVIEW.slice(1,7));
+    if (tk.length) {
+      document.getElementById("weekly-takeaways").innerHTML = tk.map(function(o, i){
+        const tts = new Date(o.ts).toISOString().slice(0,10);
+        const body = (o.body||"").replace(/<strong>/g,"<strong>").replace(/<\/strong>/g,"</strong>");
+        return `<div class="tk">
+          <div class="tk-n">${i+1}</div>
+          <div style="flex:1;min-width:0;">
+            <div class="tk-meta">${(o.sector||"weekly")} · ${tts}</div>
+            <div class="tk-body">${body}</div>
+          </div>
+        </div>`;
+      }).join("");
+    } else {
+      document.getElementById("weekly-takeaways").innerHTML = '<div class="tk"><div class="tk-n">5</div><div class="tk-body">No additional weekly takeaways yet — only the lead voice bubble above.</div></div>';
+    }
   } else {
-    document.getElementById("overview-text").textContent="No overview yet.";
+    document.getElementById("overview-lead").textContent = "No overview yet.";
+    document.getElementById("weekly-takeaways").innerHTML = "";
   }
+
+  // Tier 1 + Tier 2 drilldown lists (in addition to the KPI heroes above)
+  function renderDrill(stocks, listId, metaId){
+    const sorted = [...stocks].sort((a,b)=>b.score-a.score);
+    document.getElementById(listId).innerHTML = sorted.map(function(t){
+      const url = yahooUrl(t.ticker);
+      const upsCls = typeof t.ups==="number"?(t.ups>=0?"up":"down"):"";
+      const grCls = "gr-" + String(t.grade||"D").replace("+","plus");
+      return `<div class="drilldown-stock">
+        <div class="row1">
+          <a class="ticker" href="${url}" target="_blank" rel="noopener">${t.ticker}</a>
+          <span class="grade ${grCls}">${t.grade||"—"}</span>
+        </div>
+        <div class="name">${t.name}</div>
+        <div class="nums">
+          <div class="num"><span class="num-k">Price</span><span class="num-v">${fmtPrice(t.price)}</span></div>
+          <div class="num"><span class="num-k">Upside</span><span class="num-v ${upsCls}">${fmtPct(t.ups)}</span></div>
+          <div class="num"><span class="num-k">Score</span><span class="num-v">${Math.round(t.score)}</span></div>
+        </div>
+      </div>`;
+    }).join("");
+    document.getElementById(metaId).textContent = sorted.length + " stocks · avg grade " + (sorted.length?Math.round(sorted.reduce((a,t)=>a+t.score,0)/sorted.length):0);
+  }
+  renderDrill(TICKERS.filter(t=>t.tier===1), "tier1-list", "tier1-drill-meta");
+  renderDrill(TICKERS.filter(t=>t.tier===2), "tier2-list", "tier2-drill-meta");
+
+  // Wire up drilldown toggles
+  document.querySelectorAll(".tile.kpi").forEach(function(kpi){
+    kpi.addEventListener("click", function(e){
+      const targetId = kpi.getAttribute("data-target");
+      const target = document.getElementById(targetId);
+      if(!target) return;
+      const isOpen = target.classList.contains("open");
+      // Close all drilldowns first (only one open at a time)
+      document.querySelectorAll(".drilldown.open").forEach(d=>d.classList.remove("open"));
+      document.querySelectorAll(".tile.kpi.open").forEach(t=>t.classList.remove("open"));
+      if(!isOpen){
+        target.classList.add("open");
+        kpi.classList.add("open");
+        // Smooth scroll to drilldown
+        setTimeout(()=>target.scrollIntoView({behavior:"smooth", block:"nearest"}), 100);
+      }
+    });
+    kpi.addEventListener("keydown", function(e){
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();kpi.click();}
+    });
+  });
+  document.querySelectorAll(".close-btn").forEach(function(btn){
+    btn.addEventListener("click", function(e){
+      e.stopPropagation();
+      const id = btn.getAttribute("data-close");
+      document.getElementById(id).classList.remove("open");
+      document.querySelectorAll(".tile.kpi").forEach(t=>t.classList.remove("open"));
+    });
+  });
 }
 
 if(document.readyState==="loading"){
