@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Linus Weekly Investing Digest — Apple...">
+<title>Weekly Investing Digest · Linus · Bento Draft 2026-07-23</title>
+<style>
+/* ===========================================
+   Apple Bento Investment Dashboard
+   Palette lifted from user-supplied color image
+   =========================================== */
+
+:root {
+  /* Apple base */
+  --bg: #0F1825;          /* deep navy bg */
+  --bg-2: #0A1422;        /* dark navy card */
+  --surface: #112233;     /* subtle surface lift */
+  --border: #1E2D40;      /* hairline */
+  --text: #E4E0DA;        /* warm white */
+  --text-2: #B8B4AC;      /* muted */
+  --text-3: #737077;      /* faint */
+  --accent: #E89B7A;      /* coral — primary action */
+
+  /* Bento tile palette (from color image) */
+  --t1-navy:    #0F2540;
+  --t2-slate:   #6E89A6;
+  --t3-coral:   #E89B7A;
+  --t4-cream:   #E8E2D5;
+  --t5-rose:    #E8A398;
+  --t6-ice:     #A6B7CC;
+
+  /* Apple radius */
+  --r-tile: 22px;
+  --r-card: 14px;
+  --r-pill: 999px;
+
+  /* Apple shadows */
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.18);
+  --shadow-2: 0 4px 16px rgba(0,0,0,0.22);
+  --shadow-3: 0 12px 36px rgba(0,0,0,0.28);
+
+  /* Apple typography (SF Pro fallback to Inter) */
+  --font-sys: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", monospace;
+
+  /* Spacing scale */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font: 100%/1.5 var(--font-sys); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-sys); }
+
+/* Page container */
+.page { max-width: 1320px; margin: 0 auto; padding: var(--s-6) var(--s-5) 80px; }
+
+/* === Header === */
+.head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: var(--s-6); }
+.head h1 {
+  font-size: clamp(28px, 4vw, 44px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.05;
+  display: flex; align-items: baseline; gap: var(--s-3);
+}
+.head .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); position: relative; }
+.head .pulse::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent); animation: pulse 2.4s ease-in-out infinite; opacity: 0.5; }
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(2.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 0; }
+}
+.head .sub { color: var(--text-2); font-size: 14px; letter-spacing: -0.005em; margin-top: var(--s-2); }
+.head .meta { color: var(--text-3); font-size: 12px; font-family: var(--font-mono); text-align: right; }
+.head .meta strong { display: block; color: var(--text-2); font-weight: 500; font-size: 13px; letter-spacing: -0.005em; margin-bottom: 2px; }
+
+/* === Bento grid === */
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--s-4); }
+.tile {
+  border-radius: var(--r-tile);
+  padding: var(--s-5);
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 120px;
+}
+.tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-3); }
+
+/* Span patterns */
+.s-6  { grid-column: span 6; }
+.s-4  { grid-column: span 4; }
+.s-3  { grid-column: span 3; }
+.s-12 { grid-column: span 12; }
+.r-2  { grid-row: span 2; }
+
+/* Tile palette from color image */
+.t-navy   { background: var(--t1-navy); }
+.t-slate  { background: var(--t2-slate); color: #1A2530; }
+.t-coral  { background: var(--t3-coral); color: #3D1F0F; }
+.t-cream  { background: var(--t4-cream); color: #2A2418; }
+.t-rose   { background: var(--t5-rose); color: #3D1A14; }
+.t-ice    { background: var(--t6-ice); color: #1E2A36; }
+.t-glass  { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid var(--border); }
+
+/* === Tile content === */
+.tile-eyebrow {
+  font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+  font-weight: 600; opacity: 0.7; margin-bottom: var(--s-3);
+}
+.tile-title { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.15; margin-bottom: var(--s-2); }
+.tile-sub { font-size: 13px; opacity: 0.7; line-height: 1.45; }
+.tile-hero {
+  font-size: clamp(36px, 5vw, 56px); font-weight: 600; letter-spacing: -0.025em;
+  font-feature-settings: "tnum" 1; line-height: 1; margin: var(--s-3) 0 var(--s-2);
+}
+.tile-hero sup { font-size: 0.45em; opacity: 0.6; font-weight: 500; margin-left: 4px; vertical-align: super; }
+.tile-foot { display: flex; gap: var(--s-4); margin-top: auto; padding-top: var(--s-4); flex-wrap: wrap; }
+
+.kv { display: flex; flex-direction: column; gap: 2px; }
+.kv-k { font-size: 10px; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.kv-v { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; font-feature-settings: "tnum" 1; }
+.kv .delta-up    { color: var(--t-coral); }   /* coral = up on dark */
+.kv .delta-down  { color: var(--t5-rose); }
+
+/* Tickers list in tile */
+.picks { display: flex; flex-direction: column; gap: var(--s-3); }
+.pick {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-3); align-items: center;
+  padding: 10px var(--s-3); border-radius: 10px;
+  transition: background 200ms ease;
+}
+.pick:hover { background: rgba(0,0,0,0.06); }
+.pick-t { font-family: var(--font-mono); font-weight: 600; font-size: 13px; letter-spacing: -0.005em; }
+.pick-n { font-size: 12px; opacity: 0.85; line-height: 1.3; }
+.pick-c { font-family: var(--font-mono); font-size: 14px; font-weight: 600; font-feature-settings: "tnum" 1; }
+
+/* Stocks grid (sector tiles) */
+.stocks { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-3); margin-top: var(--s-3); }
+.stock {
+  background: rgba(255,255,255,0.08); border-radius: 14px; padding: var(--s-3) var(--s-3);
+  display: flex; flex-direction: column; gap: 2px;
+  transition: background 200ms;
+}
+.t-navy .stock, .t-slate .stock { background: rgba(255,255,255,0.16); }
+.t-coral .stock, .t-cream .stock, .t-rose .stock, .t-ice .stock { background: rgba(0,0,0,0.06); }
+.stock:hover { background: rgba(255,255,255,0.18); }
+.t-coral .stock:hover, .t-cream .stock:hover, .t-rose .stock:hover, .t-ice .stock:hover { background: rgba(0,0,0,0.12); }
+.stock-t { font-family: var(--font-mono); font-weight: 600; font-size: 12px; letter-spacing: -0.005em; display: flex; justify-content: space-between; }
+.stock-u { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.stock-gr { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; font-feature-settings: "tnum" 1; margin-top: 2px; }
+
+/* Scoring tile */
+.score-tile .tile-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--s-4); }
+.score-tile .grade { padding: 4px 10px; border-radius: var(--r-pill); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.gr-A    { background: var(--t4-cream); color: #2A2418; }
+.gr-B    { background: rgba(232,155,122,0.4); color: var(--t4-cream); }
+.gr-C    { background: rgba(255,255,255,0.18); color: var(--t4-cream); }
+.gr-D    { background: rgba(232,163,152,0.4); color: var(--t4-cream); }
+
+.score-row { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-3); align-items: center; padding: var(--s-2) 0; border-top: 1px solid rgba(255,255,255,0.08); }
+.score-row:first-of-type { border-top: none; }
+.score-t { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+.score-d { display: flex; gap: 2px; }
+.score-d div { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); }
+.score-d div.on { background: var(--t4-cream); }
+.score-c { font-family: var(--font-mono); font-size: 12px; font-weight: 600; font-feature-settings: "tnum" 1; min-width: 32px; text-align: right; }
+
+/* News tile */
+.news-list { display: flex; flex-direction: column; gap: var(--s-3); }
+.news-i { padding-bottom: var(--s-3); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.news-i:last-child { border: none; }
+.news-meta { display: flex; gap: var(--s-3); font-size: 11px; opacity: 0.6; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.news-meta b { font-weight: 600; opacity: 0.9; }
+.news-body { font-size: 13px; line-height: 1.5; }
+
+/* Overview — Linus pick */
+.linus-voice { display: flex; gap: var(--s-3); }
+.linus-mark {
+  width: 36px; height: 36px; flex-shrink: 0;
+  background: linear-gradient(135deg, #E89B7A 0%, #E8A398 100%);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #0F1825; font-weight: 700; font-size: 14px;
+  box-shadow: var(--shadow-1);
+}
+.linus-bubble {
+  font-size: 14px; line-height: 1.5;
+  padding: var(--s-4) var(--s-4);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+}
+.linus-bubble em { color: var(--t3-coral); font-style: normal; font-weight: 600; }
+
+/* Footer panel */
+.footer-rc { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--s-6); align-items: end; }
+.footer-rc .v { font-size: 13px; opacity: 0.7; }
+.footer-rc b { font-weight: 600; opacity: 0.95; }
+.footer-rc .meta-tiny { font-family: var(--font-mono); font-size: 11px; opacity: 0.5; }
+
+/* Animations */
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(6, 1fr); }
+  .s-6, .s-4, .s-3 { grid-column: span 6; }
+  .s-12 { grid-column: span 6; }
+}
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .s-6, .s-4, .s-3, .s-12 { grid-column: span 1; }
+  .stocks { grid-template-columns: 1fr; }
+  .page { padding: var(--s-4) var(--s-3) 60px; }
+}
+
+/* Apple reduce-transparency */
+@media (prefers-reduced-transparency: reduce) {
+  .t-glass { background: var(--bg-2); backdrop-filter: none; }
+  .linus-bubble { background: var(--bg-2); }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="head">
+  <div>
+    <h1>Weekly Investing Digest <span class="pulse"></span></h1>
+    <p class="sub">Linus · 2026-07-23 · Locked framework: 3-bucket · 5-dim scoring · Non-AGI terminal value</p>
+  </div>
+  <div class="meta">
+    <strong>Updated</strong>
+    <span id="ts">--</span> HKT · 55 stocks
+  </div>
+</header>
+
+<main class="grid">
+
+  <!-- ROW 1 -->
+  <section class="tile s-6 r-2 t-navy">
+    <div class="tile-eyebrow">Hero · Top of Dashboard</div>
+    <div class="tile-title">Total A-Grade Plays</div>
+    <div class="tile-hero" id="hero-a-count">--</div>
+    <p class="tile-sub">Stocks scoring ≥85 across the 5-dim lens (Framework + Fund + Mom + Sent + Scar) under locked framework rules.</p>
+    <div class="tile-foot">
+      <div class="kv"><span class="kv-k">Bucket A</span><span class="kv-v" id="k-bucket-a">--</span></div>
+      <div class="kv"><span class="kv-k">Bucket B</span><span class="kv-v" id="k-bucket-b">--</span></div>
+      <div class="kv"><span class="kv-k">Bucket C</span><span class="kv-v" id="k-bucket-c">--</span></div>
+      <div class="kv"><span class="kv-k">Universe</span><span class="kv-v" id="k-universe">--</span></div>
+    </div>
+  </section>
+
+  <section class="tile s-3 r-2 t-coral">
+    <div class="tile-eyebrow">Tier 1</div>
+    <div class="tile-title">To Buy</div>
+    <div class="tile-hero" id="tier1-count">--</div>
+    <p class="tile-sub">High-conviction entries — pre-cleared by locked framework rules.</p>
+    <div class="tile-foot">
+      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier1-avg">--</span></div>
+    </div>
+  </section>
+
+  <section class="tile s-3 r-2 t-ice">
+    <div class="tile-eyebrow">Tier 2</div>
+    <div class="tile-title">Watchlist</div>
+    <div class="tile-hero" id="tier2-count">--</div>
+    <p class="tile-sub">Monitoring / adding on pullbacks only.</p>
+    <div class="tile-foot">
+      <div class="kv"><span class="kv-k">Avg grade</span><span class="kv-v" id="tier2-avg">--</span></div>
+    </div>
+  </section>
+
+  <!-- ROW 2 — Sector tiles -->
+  <section class="tile s-4 r-2 t-navy">
+    <div class="tile-eyebrow">Power sector</div>
+    <div class="tile-title">Power bottleneck</div>
+    <p class="tile-sub">Gas turbine backlog, SMR timeline, nuclear PPA tailwinds.</p>
+    <div class="stocks" id="power-stocks"></div>
+  </section>
+
+  <section class="tile s-4 r-2 t-slate">
+    <div class="tile-eyebrow">Compute</div>
+    <div class="tile-title">AI compute</div>
+    <p class="tile-sub">Neocloud, GPU rental, data-center REIT. Skip direct LLM exposure.</p>
+    <div class="stocks" id="compute-stocks"></div>
+  </section>
+
+  <section class="tile s-4 r-2 t-ice">
+    <div class="tile-eyebrow">Semis</div>
+    <div class="tile-title">CoWoS spread</div>
+    <p class="tile-sub">NVDA / CRDO active. Skip MU/Hynix DRAM. TSMC observe-only.</p>
+    <div class="stocks" id="semis-stocks"></div>
+  </section>
+
+  <!-- ROW 3 -->
+  <section class="tile s-4 r-2 t-coral">
+    <div class="tile-eyebrow">Software</div>
+    <div class="tile-title">Demand capture</div>
+    <p class="tile-sub">SNOW / ORCL — capture AGI demand, not bottleneck.</p>
+    <div class="stocks" id="software-stocks"></div>
+  </section>
+
+  <section class="tile s-4 r-2 t-cream">
+    <div class="tile-eyebrow">Non-AGI</div>
+    <div class="tile-title">Defensive</div>
+    <p class="tile-sub">WM / RSG / WCN — terminal value doesn't depend on AGI.</p>
+    <div class="stocks" id="nonagi-stocks"></div>
+  </section>
+
+  <section class="tile s-4 r-2 t-rose">
+    <div class="tile-eyebrow">Sentiment</div>
+    <div class="tile-title">Upside signals</div>
+    <p class="tile-sub">Analyst upside surprises, insider buy/sell imbalance.</p>
+    <div class="stocks" id="sentiment-stocks"></div>
+  </section>
+
+  <!-- ROW 4 — Scoring tile + News -->
+  <section class="tile s-6 r-2 t-glass score-tile">
+    <div class="tile-head">
+      <div class="tile-eyebrow">Score</div>
+      <div class="grade gr-A">A-grade</div>
+    </div>
+    <div class="tile-title">Top 8 · 5-dim breakdown</div>
+    <div id="scoring-rows"></div>
+  </section>
+
+  <section class="tile s-6 r-2 t-navy">
+    <div class="tile-eyebrow">Live · Tier 1</div>
+    <div class="tile-title">News feed</div>
+    <div class="news-list" id="news-list"></div>
+  </section>
+
+  <!-- ROW 5 -->
+  <section class="tile s-6 r-2 t-glass">
+    <div class="linus-voice">
+      <div class="linus-mark">L</div>
+      <div class="linus-bubble" id="overview-text">Loading…</div>
+    </div>
+  </section>
+
+  <section class="tile s-6 r-2 t-slate">
+    <div class="tile-eyebrow">Quick filter</div>
+    <div class="tile-title">Browse by sector</div>
+    <p class="tile-sub">Open dedicated sector pages — fundamentals, scoring, news.</p>
+    <div class="tile-foot">
+      <a href="power.html"   class="kv"><span class="kv-k">→</span><span class="kv-v">Power</span></a>
+      <a href="compute.html" class="kv"><span class="kv-k">→</span><span class="kv-v">Compute</span></a>
+      <a href="semis.html"   class="kv"><span class="kv-k">→</span><span class="kv-v">Semis</span></a>
+      <a href="software.html" class="kv"><span class="kv-k">→</span><span class="kv-v">Software</span></a>
+      <a href="nonagi.html"  class="kv"><span class="kv-k">→</span><span class="kv-v">Non-AGI</span></a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="tile s-12 t-glass">
+    <div class="footer-rc">
+      <div>
+        <div class="v"><b>Sources:</b> anysearch / Yahoo Finance / Trading Economics / Insider filings / analyst notes · daily refetch via <b>dashboard-refetch-fundamentals</b> cron.</div>
+        <div class="meta-tiny">Locked framework (2026-07-12) — 3 buckets · 5-dim scoring · HBM hard-skip · BTC miners hard-exclude</div>
+      </div>
+      <div>
+        <div class="v"><b>Build:</b> <span class="meta-tiny">bento-draft v0.1.0 · 2026-07-23</span></div>
+        <div class="v" style="margin-top:8px"><b>Live:</b> <a href="https://furryredball.github.io/weekly-digest-dashboard/" style="color:var(--t3-coral);text-decoration:none">furryredball.github.io/weekly-digest-dashboard</a></div>
+      </div>
+      <div>
+        <div class="v"><b>Linus · 晨早 · 23 Jul 2026</b></div>
+        <div class="meta-tiny">Great Pumpkin mode — waiting for the right setup 🎃</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+</div>
+<script>
+// Render with the data.js shape (TIER1, TIER2 arrays + dim functions inlined here for the draft)
+// ===========================================
+// Bento Investment Dashboard · Draft v0.1.0
+// (skeleton — wire to data.js in next pass)
+// ===========================================
+
+// dim functions (5-dim scoring copy from existing scoring logic)
+function _liDimFramework(t){
+  if(t.ca==="nonagi") return 9;
+  if(t.se==="power") return 19;
+  if(t.se==="compute") return 16;
+  if(t.se==="software") return 14;
+  if(t.se==="semis") return 12;
+  return 10;
+}
+function _liDimFundamental(t){
+  const r=t.roe||0,ri=t.roic||0;
+  if(r>=25&&ri>=15) return 19;
+  if(r>=15) return 16;
+  if(r>=8) return 12;
+  return 7;
+}
+function _liDimMomentum(t){
+  const u=t.ups||0;
+  if(u>=30) return 19; if(u>=10) return 16; if(u>=0) return 12; if(u>=-10) return 8;
+  return 5;
+}
+function _liDimSentiment(t){
+  const b=t.bp||0;
+  if(b>=80) return 19; if(b>=60) return 16; if(b>=40) return 12;
+  return 7;
+}
+function _liDimScarcity(t){
+  if(t.ca==="nonagi") return 7;
+  if(t.se==="power") return 19;
+  if(t.se==="compute") return 14;
+  if(t.se==="software") return 11;
+  return 9;
+}
+function _liScoreStock(t){
+  return {total: Math.min(100, _liDimFramework(t)+_liDimFundamental(t)+_liDimMomentum(t)+_liDimSentiment(t)+_liDimScarcity(t))};
+}
+function grade(sc){
+  if(sc>=85) return "A"; if(sc>=75) return "B+"; if(sc>=65) return "B"; if(sc>=55) return "B-"; if(sc>=45) return "C+"; if(sc>=35) return "C"; return "D";
+}
+function gradeClass(g){ return "gr-"+(g[0]==="B"?"B":g); }
+
+// === DEMO DATA — replaced by data.js after header wiring ===
+const TIER1 = [
+  {t:"VST", p:158.86, se:"power", ca:"agi", name:"Vistra Energy", roe:18.47, ups:42.6, bp:90.9, mg:22, bf:20, bz:21},
+  {t:"CEG", p:251.38, se:"power", ca:"agi", name:"Constellation Energy", roe:15.97, ups:52.2, bp:70, mg:21, bf:17, bz:15},
+  {t:"NVDA", p:172.05, se:"semis", ca:"agi", name:"NVIDIA", roe:104.2, ups:25.7, bp:91.4, mg:25, bf:25, bz:25},
+  {t:"VRT", p:318.86, se:"power", ca:"agi", name:"Vertiv", roe:33.82, ups:-15.3, bp:94.7, mg:22, bf:18, bz:16},
+  {t:"GOOG", p:184.50, se:"software", ca:"agi", name:"Alphabet", roe:34.1, ups:18.2, bp:88.5, mg:24, bf:22, bz:18},
+  {t:"CRDO", p:74.20, se:"semis", ca:"agi", name:"Credo Technology", roe:8.5, ups:55.4, bp:80.0, mg:21, bf:18, bz:18},
+  {t:"ORCL", p:248.30, se:"software", ca:"agi", name:"Oracle", roe:36.7, ups:88.0, bp:65.1, mg:22, bf:21, bz:18}
+];
+const TIER2 = [
+  {t:"WM", p:225.10, se:"nonagi", ca:"nonagi", name:"Waste Management", roe:30.4, ups:11.5, bp:75.0, mg:9, bf:20, bz:9},
+  {t:"RSG", p:208.40, se:"nonagi", ca:"nonagi", name:"Republic Services", roe:17.3, ups:9.8, bp:72.1, mg:9, bf:18, bz:9},
+  {t:"WCN", p:144.20, se:"nonagi", ca:"nonagi", name:"Waste Connections", roe:14.5, ups:18.4, bp:82.0, mg:9, bf:16, bz:9},
+  {t:"WCN", p:144.20, se:"nonagi", ca:"nonagi", name:"Waste Connections", roe:14.5, ups:18.4, bp:82.0, mg:9, bf:16, bz:9},
+  {t:"LLY", p:780.0, se:"nonagi", ca:"nonagi", name:"Eli Lilly", roe:78.4, ups:24.1, bp:88.6, mg:9, bf:22, bz:9},
+  {t:"NEE", p:78.20, se:"nonagi", ca:"nonagi", name:"NextEra Energy", roe:14.1, ups:8.2, bp:64.0, mg:9, bf:18, bz:9},
+  {t:"GE", p:208.90, se:"compute", ca:"agi", name:"GE Aerospace", roe:21.8, ups:18.4, bp:71.5, mg:18, bf:18, bz:14}
+];
+
+const SECTORS = {
+  power: ["VST","CEG","VRT","ETN","GEV","TLN","BE"],
+  compute: ["NVDA","CRDO","GE","GDS","CRWV"],
+  semis: ["NVDA","CRDO"],
+  software: ["GOOG","ORCL","SNOW","META","MSFT","AMZN"],
+  nonagi: ["WM","RSG","WCN","LLY","NEE","BRK","POW","TD"],
+  sentiment: ["ORCL","GDS","NVDA","CEG","CRDO"]
+};
+
+const NEWS = [
+  {sector:"power",ts:"2026-07-22 09:14",title:"Vistra +8.4% on cooling demand",body:"Grid upgrades drive Vistra to new high on ERCOT scarcity pricing projections and hyperscaler power-purchase flows."},
+  {sector:"compute",ts:"2026-07-22 09:02",title:"CoreWeave secures $2.1B facility",body:"CRWV closed new financing facility for GPU capacity buildout; revenue guidance reiterated."},
+  {sector:"semis",ts:"2026-07-22 08:50",title:"Credo AI interconnect demand",body:"AEC active cable demand from hyperscaler back-end networks reinforces CRDO CoWoS-adjacent thesis."}
+];
+
+const OVERVIEW = [
+  {sector:"power",body:"<strong>電力 Power bottleneck</strong> — gas turbine backlog 2-3 years, SMR timeline accelerating, nuclear PPA tailwinds. VST/CEG keep leading on ERCOT scarcity pricing. 近 3 日 hyperscaler power-purchase flows dominate narrative."}
+];
+
+// === Render ===
+
+function tsNow(){const d=new Date();return d.toISOString().slice(0,16).replace("T"," ");}
+
+function fmtPct(n){if(typeof n!=="number")return "—";return (n>=0?"+":"")+n.toFixed(1)+"%";}
+
+function renderStock(st){
+  const sc=_liScoreStock(st).total;
+  const g=grade(sc);
+  const cls=gradeClass(g);
+  return `<div class="stock"><div class="stock-t"><span>${st.t}</span><span class="stock-u">${g}</span></div><div class="stock-gr">${fmtPct(st.ups||0)}</div></div>`;
+}
+
+function renderSector(name, ids){
+  const set=new Set(ids);
+  const data=[...TIER1,...TIER2].filter(x=>set.has(x.t)&&!x._dup).concat(
+    ids.filter(t=>![...TIER1,...TIER2].some(x=>x.t===t)).map(t=>({t,u:"—"}))
+  );
+  // dedupe by ticker keeping first
+  const seen=new Set();
+  const uniq=data.filter(s=>!seen.has(s.t)&&(seen.add(s.t)||true));
+  const target=document.getElementById(name+"-stocks");
+  if(target) target.innerHTML=uniq.slice(0,6).map(renderStock).join("");
+}
+
+function renderAll(){
+  // Hero counts
+  const all=[...TIER1,...TIER2];
+  const aCount=all.filter(t=>(_liScoreStock(t).total>=85)).length;
+  const t1Avg=TIER1.length?Math.round(TIER1.reduce((a,t)=>a+_liScoreStock(t).total,0)/TIER1.length):0;
+  const t2Avg=TIER2.length?Math.round(TIER2.reduce((a,t)=>a+_liScoreStock(t).total,0)/TIER2.length):0;
+  const bucket={A:0,B:0,C:0};
+  all.forEach(t=>{
+    if(t.ca==="nonagi")bucket.B++;
+    else if(t.se==="software")bucket.C++;
+    else bucket.A++;
+  });
+  document.getElementById("hero-a-count").textContent=aCount;
+  document.getElementById("k-bucket-a").textContent=bucket.A;
+  document.getElementById("k-bucket-b").textContent=bucket.B;
+  document.getElementById("k-bucket-c").textContent=bucket.C;
+  document.getElementById("k-universe").textContent=all.length;
+  document.getElementById("tier1-count").textContent=TIER1.length;
+  document.getElementById("tier2-count").textContent=TIER2.length;
+  document.getElementById("tier1-avg").textContent=String(t1Avg);
+  document.getElementById("tier2-avg").textContent=String(t2Avg);
+  document.getElementById("ts").textContent=tsNow();
+
+  // Sector tiles
+  for(const [k,v] of Object.entries(SECTORS)) renderSector(k,v);
+
+  // Scoring — top 8 by total
+  const ranked=[...TIER1,...TIER2].filter((t,i,a)=>a.findIndex(x=>x.t===t.t)===i).sort((a,b)=>_liScoreStock(b).total-_liScoreStock(a).total).slice(0,8);
+  const rows=ranked.map(t=>{
+    const d=_liScoreStock(t);
+    const g=grade(d.total);
+    const dims=[_liDimFramework(t),_liDimFundamental(t),_liDimMomentum(t),_liDimSentiment(t),_liDimScarcity(t)];
+    return `<div class="score-row">
+      <div class="score-t">${t.t}</div>
+      <div class="score-d">${dims.map(v=>`<div class="${v>=15?"on":""}"></div>`).join("")}</div>
+      <div class="score-c">${d.total} · ${g}</div>
+    </div>`;
+  }).join("");
+  document.getElementById("scoring-rows").innerHTML=rows;
+
+  // News
+  const newsHtml=NEWS.slice(0,6).map(n=>`<div class="news-i"><div class="news-meta"><b>${n.sector.toUpperCase()}</b> · <span>${n.ts}</span></div><div class="news-body"><b>${n.title}</b> — ${n.body}</div></div>`).join("");
+  document.getElementById("news-list").innerHTML=newsHtml;
+
+  // Overview
+  if(OVERVIEW.length){
+    document.getElementById("overview-text").innerHTML=OVERVIEW[0].body.replace(/<strong>/g,"<em>").replace(/<\/strong>/g,"</em>");
+  }
+}
+
+document.addEventListener("DOMContentLoaded",renderAll);
+</script>
+</body>
+</html>
