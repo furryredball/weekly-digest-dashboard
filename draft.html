@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Linus Weekly Investing Digest — Apple Bento dashboard with live data feed">
-<title>Weekly Investing Digest · Linus · Bento Draft v0.5.0 — Emil-flavored</title>
+<title>Weekly Investing Digest · Linus · Bento Draft v0.6.0 — Emil-flavoured</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /* ===========================================
@@ -169,23 +169,32 @@ nav .nav-section:first-of-type { margin-top: 8px; }
 .theme-meta .small { font-size: 10px; opacity: 0.65; display: block; margin-top: 2px; }
 
 /* === Sidebar toggle pill (top-left of main) === */
+/* v0.6.0: bigger, labelled toggle so collapsing is obvious (Pirry: "the menu should be collapsible") */
 .menu-toggle {
-  position: fixed; top: 16px; left: calc(var(--sidebar-w) + 16px);
-  width: 36px; height: 36px; border-radius: 10px;
+  position: fixed; top: 12px; left: calc(var(--sidebar-w) + 12px);
+  height: 36px; padding: 0 14px 0 12px;
+  border-radius: 10px;
   background: rgba(15, 24, 37, 0.92);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: #E89B7A; font-size: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 200ms, transform 200ms;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; color: #E89B7A;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  transition: left var(--d-fluid) var(--fluid),
+              background var(--d-fast) var(--fluid),
+              transform var(--d-fast) var(--fluid);
   z-index: 100;
   font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
-  font-weight: 700;
+  font-weight: 600; font-size: 12.5px; letter-spacing: 0.01em;
+  white-space: nowrap;
 }
-.menu-toggle:hover { background: rgba(15, 24, 37, 1); transform: scale(1.06); }
-.menu-toggle .mt-open  { display: none; }
-.menu-toggle .mt-close { display: inline; }
+body.sidebar-collapsed .menu-toggle { left: 12px; }
+.menu-toggle:hover  { background: rgba(15, 24, 37, 0.98); transform: translateY(-1px); }
+.menu-toggle:active { transform: scale(0.97); transition: transform 80ms ease-out; }
+.mt-glyph { font-size: 16px; line-height: 1; transition: transform var(--d-fluid) var(--fluid); }
+.mt-label { opacity: 0.8; font-weight: 500; }
+body.sidebar-collapsed .mt-close { display: none; }
+body:not(.sidebar-collapsed) .mt-open { display: none; }
 body.sidebar-collapsed .menu-toggle { left: 16px; }
 body.sidebar-collapsed .menu-toggle .mt-open  { display: inline; }
 body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
@@ -234,7 +243,15 @@ body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
 .tile.t-rose:hover,
 .tile.t-ice:hover,
 .tile.t-glass:hover { box-shadow: 0 16px 36px rgba(15, 24, 37, 0.20); transform: translateY(-2px); }
-/* (removed duplicate hover — Emil: one rule per state) */
+
+/* Emil rule #6: gate hover motion on fine pointer (touch fires false hovers) */
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover,
+  .drilldown-stock:hover,
+  .score-row:hover {
+    transform: translateY(-1px);
+  }
+}
 
 .s-6  { grid-column: span 6; }
 .s-4  { grid-column: span 4; }
@@ -410,7 +427,22 @@ transition: background var(--d-fast) var(--fluid),
   background: var(--surface-2);
   border: 1px solid var(--border);
   font-size: 13px; line-height: 1.5; color: var(--text);
-  display: flex; gap: 12px; align-items: flex-start;
+  display: flex; gap: 12px;
+  /* Emil rule #7: stagger on list mount — 50ms per child, max 6 */
+  animation: tkIn var(--d-fluid) var(--fluid) backwards;
+}
+.tk:nth-child(1){animation-delay:0ms}
+.tk:nth-child(2){animation-delay:50ms}
+.tk:nth-child(3){animation-delay:100ms}
+.tk:nth-child(4){animation-delay:150ms}
+.tk:nth-child(5){animation-delay:200ms}
+.tk:nth-child(6){animation-delay:250ms}
+@keyframes tkIn{
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tk { animation: none; }
 }
 .tk .tk-n {
   flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
@@ -591,8 +623,8 @@ button,
       <span>World Signal Monitor</span>
     </div>
     <div class="nav-section">Theme</div>
-    <div class="theme-meta">Bento Draft <strong>v0.5.0 — Emil-flavoured</strong><br>
-      <span class="small">Fluid curves · press feedback · optical type · scroll-edge fade · reduced-motion safe</span>
+    <div class="theme-meta">Bento Draft <strong>v0.6.0 — Emil-flavoured</strong><br>
+      <span class="small">Live Yahoo prices · tier drilldowns · list stagger · hover-gated · reduced-motion safe</span>
     </div>
   </nav>
 </aside>
@@ -600,9 +632,11 @@ button,
 <main class="main">
 
 <!-- Sidebar toggle pill (top-left) -->
-<button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle sidebar">
-  <span class="mt-close">«</span>
-  <span class="mt-open">☰</span>
+<button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle sidebar" title="Toggle sidebar">
+  <span class="mt-glyph mt-close">«</span>
+  <span class="mt-label mt-close">Hide Menu</span>
+  <span class="mt-glyph mt-open">☰</span>
+  <span class="mt-label mt-open">Menu</span>
 </button>
 
 <header class="head">
@@ -1057,8 +1091,9 @@ function renderAll(){
     }).join("");
     document.getElementById(metaId).textContent = sorted.length + " stocks · avg grade " + (sorted.length?Math.round(sorted.reduce((a,t)=>a+t.score,0)/sorted.length):0);
   }
-  renderDrill(TICKERS.filter(t=>t.tier===1), "tier1-list", "tier1-drill-meta");
-  renderDrill(TICKERS.filter(t=>t.tier===2), "tier2-list", "tier2-drill-meta");
+/* FIX v0.6.0: tier field is a display string ("本週 Tier 1 (Power)"), not number. */
+  renderDrill(TICKERS.filter(t=>t.tier.indexOf("Tier 1")>=0), "tier1-list", "tier1-drill-meta");
+  renderDrill(TICKERS.filter(t=>t.tier.indexOf("Tier 2")>=0), "tier2-list", "tier2-drill-meta");
 
   // Wire up drilldown toggles
   document.querySelectorAll(".tile.kpi").forEach(function(kpi){
