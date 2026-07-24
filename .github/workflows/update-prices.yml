@@ -2,11 +2,12 @@ name: Update Stock Prices
 
 on:
   schedule:
-    # Every 30 minutes during market hours (9:30 AM - 4:00 PM ET = 13:30 - 20:00 UTC)
-    # Plus one run at market close (20:30 UTC) and one at open (13:30 UTC)
-    - cron: '*/30 13-20 * * 1-5'  # Mon-Fri, 13:00-20:30 UTC
-    - cron: '30 20 * * 1-5'       # Market close
-    - cron: '30 13 * * 1-5'       # Market open
+    # Hourly during market hours (9:30 AM - 4:00 PM ET = 13:30 - 20:00 UTC)
+    # 48 tickers × 1 req each = 48 req/run. 250/day limit = ~5 runs/day max.
+    # So: hourly during 6-hour market window = 7 runs/day = 336 requests. Still over.
+    # Adjust: every 2 hours during market hours = 4 runs/day = 192 requests. Safe.
+    - cron: '0 13,15,17,19 * * 1-5'  # 13:00, 15:00, 17:00, 19:00 UTC (market hours)
+    - cron: '30 20 * * 1-5'          # Market close snapshot
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
