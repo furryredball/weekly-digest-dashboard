@@ -152,7 +152,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
         ⚠️ <strong>Full Mode (2026-07-13)</strong> — 15 of 48 Tier 1 picks live. Three-bucket cut (locked 2026-07-12, "Anti-AGI" sector renamed "Non-AGI" 2026-07-13): <strong>Bucket A</strong> (10 AGI bottleneck picks-and-shovels) + <strong>Bucket B</strong> (3 defensive non-AGI) + <strong>Bucket C</strong> (2 demand-side beneficiaries). 33 TIER2 watchlist entries populated (7 miscategorized removed in fix(scope) commit). Tier 1 cards use real M/B/Bz scores from CSV; Tier 2 cards use proxy heuristic pending per-stock pitches. See FRAMEWORK_THREE_BUCKETS.md for canonical taxonomy.
       </div>
       <div class="topbar">
-        <div class="topbar-left"><h1>Tier 1 — Linus 推薦</h1><div class="subtitle">Top 15 by 3-lens quality score · 10 AGI bottleneck + 3 defensive + 2 demand-side · Updated 2026-07-13</div></div>
+        <div class="topbar-left"><h1>Tier 1 — Linus 推薦</h1><div class="subtitle">Top 15 by 3-lens quality score · 10 AGI bottleneck + 3 defensive + 2 demand-side · Updated 2026-07-13</div><div id="priceTimestamp" style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);margin-top:2px;opacity:0.6;">Prices: loading...</div></div>
       </div>
       <div class="kpi-grid" id="kpiTier1"></div>
       <div class="section-header"><span class="section-title">All Tier 1 Picks</span><span class="section-meta" id="tier1Summary"></span></div>
@@ -215,12 +215,99 @@ function grade(sc){if(sc>=85)return 'A';if(sc>=75)return 'B+';if(sc>=65)return '
 function gradeClass(sc){return sc>=80?'grade-A':sc>=75?'grade-B':'grade-C';}
 function fm(n,d){return n!=null?(n<0?'':n.toFixed(d||1)):'—';}
 function fc(n,d){var c=n>0?'metric-up':n<0?'metric-down':'';return '<span class="'+c+'">'+(n>0?'+':'')+fm(n,d)+'%</span>';}
-(function(){var grid=document.getElementById('tier1Grid');var html='';TIER1.forEach(function(s,i){var tag=s.ca==='agi'?'tag-agi':'tag-nonagi';var ups=s.ups!=null?fc(s.ups):'—';var total=_liTotal(s);var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);html+='<div class="card '+tag+'">';html+='<div class="card-head"><span class="card-symbol">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+s.t+'</span><span class="card-price">$'+(s.p!=null?fm(s.p,2):'—')+'</span></div>';html+='<div class="card-name">'+(s.name||'')+'</div>';html+='<div class="card-desc">'+(s.desc||'')+'</div>';html+='<div class="card-why"><strong>Why:</strong> '+(s.why||'')+'</div>';html+='<div class="card-metrics">';html+='<span class="metric-label">ROE</span><span class="metric-val">'+fm(s.roe)+'%</span>';html+='<span class="metric-label">Upside</span><span class="metric-val">'+ups+'</span>';html+='<span class="metric-label">ROIC</span><span class="metric-val">'+fm(s.roic)+'%</span>';html+='<span class="metric-label">Buy %</span><span class="metric-val">'+fm(s.bp)+'%</span>';html+='<span class="metric-label">EV/EBITDA</span><span class="metric-val">'+fm(s.ev,1)+'×</span>';html+='<span class="metric-label">MCap</span><span class="metric-val">'+(s.mc?fm(s.mc,1)+'B':'—')+'</span>';html+='</div>';html+='<div class="card-score-bar"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div>';
-html+='<div class="card-score"><span class="score-text">Fw '+d.fw+' · Fund '+d.fund+' · Mom '+d.mom+' · Sent '+d.sent+' · Scar '+d.scar+'</span><span class="score-num">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span></div>';
-html+='<div class="card-sector">'+s.se+'</div></div>';});grid.innerHTML=html;
-var avgScore=(TIER1.reduce(function(a,s){return a+_liTotal(s)},0)/TIER1.length).toFixed(1);var agiCount=TIER1.filter(function(s){return s.ca==='agi'}).length;var nonagiCount=TIER1.length-agiCount;var avgUps=(TIER1.reduce(function(a,s){return a+(s.ups||0)},0)/TIER1.length).toFixed(1);var avgRoe=(TIER1.reduce(function(a,s){return a+(s.roe||0)},0)/TIER1.length).toFixed(1);
-document.getElementById('kpiTier1').innerHTML='<div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">'+avgScore+'</div><div class="kpi-meta">out of 100</div></div><div class="kpi-card"><div class="kpi-label">Composition</div><div class="kpi-value">'+agiCount+' 🔌 + '+nonagiCount+' 🛡️</div><div class="kpi-meta">AGI / Non-AGI</div></div><div class="kpi-card"><div class="kpi-label">Avg Upside</div><div class="kpi-value">'+avgUps+'%</div><div class="kpi-meta">analyst consensus</div></div><div class="kpi-card"><div class="kpi-label">Avg ROE</div><div class="kpi-value">'+avgRoe+'%</div><div class="kpi-meta">profitability</div></div>';document.getElementById('tier1Summary').textContent=TIER1.length+' picks · sorted by score';})();
-(function(){var grid=document.getElementById('tier2Grid');var html='';TIER2.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;document.getElementById('tier2Summary').textContent=TIER2.length+' tickers · framework-compatible';})();
-(function(){var all=TIER1.concat(TIER2);all.sort(function(a,b){return _liTotal(b)-_liTotal(a)});var grid=document.getElementById('allGrid');var html='';all.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;})();
+
+// ============ FMP LIVE PRICE REFRESH (Option B) ============
+// Fetches live prices from FMP, caches in localStorage for 15 min.
+// Falls back to data.js prices if fetch fails or cache is stale.
+var FMP_KEY = 'mUtIyTLKVFH2QXJqTiMHSBik97nzgU8c';
+var FMP_CACHE_KEY = 'fmp-prices-cache';
+var FMP_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
+function getCachedPrices() {
+  try {
+    var raw = localStorage.getItem(FMP_CACHE_KEY);
+    if (!raw) return null;
+    var data = JSON.parse(raw);
+    if (Date.now() - data.ts > FMP_CACHE_TTL) return null;
+    return data.prices;
+  } catch(e) { return null; }
+}
+
+function setCachedPrices(prices) {
+  try {
+    localStorage.setItem(FMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), prices: prices }));
+  } catch(e) {}
+}
+
+async function fetchLivePrices() {
+  var cached = getCachedPrices();
+  if (cached) return cached;
+  var tickers = [];
+  TIER1.forEach(function(t){ tickers.push(t.t); });
+  TIER2.forEach(function(t){ tickers.push(t.t); });
+  var results = {};
+  for (var i = 0; i < tickers.length; i++) {
+    var sym = tickers[i];
+    try {
+      var res = await fetch('https://financialmodelingprep.com/stable/profile?symbol=' + sym + '&apikey=' + FMP_KEY);
+      if (!res.ok) continue;
+      var data = await res.json();
+      if (data && data[0] && data[0].price != null) {
+        results[sym] = { price: data[0].price, changePct: data[0].changePercentage || 0 };
+      }
+    } catch(e) {}
+  }
+  if (Object.keys(results).length > 0) setCachedPrices(results);
+  return results;
+}
+
+function applyPricesToTiers(priceMap) {
+  if (!priceMap) return;
+  TIER1.forEach(function(t){ if (priceMap[t.t]) { t.p = priceMap[t.t].price; t._live = true; } });
+  TIER2.forEach(function(t){ if (priceMap[t.t]) { t.p = priceMap[t.t].price; t._live = true; } });
+}
+
+function renderAllGrids() {
+  renderTier1();
+  renderTier2();
+  renderAll();
+}
+
+function updatePriceTimestamp(source) {
+  var el = document.getElementById('priceTimestamp');
+  if (!el) return;
+  var now = new Date();
+  el.textContent = 'Prices: ' + source + ' · ' + now.toLocaleTimeString('en-HK', { timeZone: 'Asia/Hong_Kong', hour: '2-digit', minute: '2-digit' }) + ' HKT';
+  el.style.opacity = '1';
+}
+
+async function initLivePrices() {
+  updatePriceTimestamp('loading...');
+  var prices = await fetchLivePrices();
+  if (Object.keys(prices).length > 0) {
+    applyPricesToTiers(prices);
+    updatePriceTimestamp('FMP live');
+  } else {
+    updatePriceTimestamp('data.js (offline)');
+  }
+  renderAllGrids();
+}
+
+// Initial render with data.js prices, then upgrade to live
+initLivePrices();
+setInterval(initLivePrices, FMP_CACHE_TTL);
+function renderTier1() {
+  var grid=document.getElementById('tier1Grid');var html='';TIER1.forEach(function(s,i){var tag=s.ca==='agi'?'tag-agi':'tag-nonagi';var ups=s.ups!=null?fc(s.ups):'—';var total=_liTotal(s);var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);html+='<div class="card '+tag+'">';html+='<div class="card-head"><span class="card-symbol">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+s.t+'</span><span class="card-price">$'+(s.p!=null?fm(s.p,2):'—')+'</span></div>';html+='<div class="card-name">'+(s.name||'')+'</div>';html+='<div class="card-desc">'+(s.desc||'')+'</div>';html+='<div class="card-why"><strong>Why:</strong> '+(s.why||'')+'</div>';html+='<div class="card-metrics">';html+='<span class="metric-label">ROE</span><span class="metric-val">'+fm(s.roe)+'%</span>';html+='<span class="metric-label">Upside</span><span class="metric-val">'+ups+'</span>';html+='<span class="metric-label">ROIC</span><span class="metric-val">'+fm(s.roic)+'%</span>';html+='<span class="metric-label">Buy %</span><span class="metric-val">'+fm(s.bp)+'%</span>';html+='<span class="metric-label">EV/EBITDA</span><span class="metric-val">'+fm(s.ev,1)+'×</span>';html+='<span class="metric-label">MCap</span><span class="metric-val">'+(s.mc?fm(s.mc,1)+'B':'—')+'</span>';html+='</div>';html+='<div class="card-score-bar"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div>';
+  html+='<div class="card-score"><span class="score-text">Fw '+d.fw+' · Fund '+d.fund+' · Mom '+d.mom+' · Sent '+d.sent+' · Scar '+d.scar+'</span><span class="score-num">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span></div>';
+  html+='<div class="card-sector">'+s.se+'</div></div>';});grid.innerHTML=html;
+  var avgScore=(TIER1.reduce(function(a,s){return a+_liTotal(s)},0)/TIER1.length).toFixed(1);var agiCount=TIER1.filter(function(s){return s.ca==='agi'}).length;var nonagiCount=TIER1.length-agiCount;var avgUps=(TIER1.reduce(function(a,s){return a+(s.ups||0)},0)/TIER1.length).toFixed(1);var avgRoe=(TIER1.reduce(function(a,s){return a+(s.roe||0)},0)/TIER1.length).toFixed(1);
+  document.getElementById('kpiTier1').innerHTML='<div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">'+avgScore+'</div><div class="kpi-meta">out of 100</div></div><div class="kpi-card"><div class="kpi-label">Composition</div><div class="kpi-value">'+agiCount+' 🔌 + '+nonagiCount+' 🛡️</div><div class="kpi-meta">AGI / Non-AGI</div></div><div class="kpi-card"><div class="kpi-label">Avg Upside</div><div class="kpi-value">'+avgUps+'%</div><div class="kpi-meta">analyst consensus</div></div><div class="kpi-card"><div class="kpi-label">Avg ROE</div><div class="kpi-value">'+avgRoe+'%</div><div class="kpi-meta">profitability</div></div>';document.getElementById('tier1Summary').textContent=TIER1.length+' picks · sorted by score';
+}
+function renderTier2() {
+  var grid=document.getElementById('tier2Grid');var html='';TIER2.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;document.getElementById('tier2Summary').textContent=TIER2.length+' tickers · framework-compatible';
+}
+function renderAll() {
+  var all=TIER1.concat(TIER2);all.sort(function(a,b){return _liTotal(b)-_liTotal(a)});var grid=document.getElementById('allGrid');var html='';all.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;
+}
 function switchView(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});var v=document.getElementById('view-'+id);if(v)v.classList.add('active');var n=document.querySelector('[data-view="'+id+'"]');if(n)n.classList.add('active');}
 document.querySelectorAll(
