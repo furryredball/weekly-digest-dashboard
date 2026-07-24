@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Linus Weekly Investing Digest — Apple Bento dashboard with live data feed">
-<title>Weekly Investing Digest · Linus · Bento Draft v0.6.0 — Emil-flavoured</title>
+<title>Weekly Investing Digest · Linus · Bento Draft v0.6.1 — Emil-flavoured</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /* ===========================================
@@ -183,21 +183,28 @@ nav .nav-section:first-of-type { margin-top: 8px; }
   transition: left var(--d-fluid) var(--fluid),
               background var(--d-fast) var(--fluid),
               transform var(--d-fast) var(--fluid);
-  z-index: 100;
+  z-index: 9999;                          /* always above tiles */
   font-family: -apple-system, "SF Pro Display", system-ui, sans-serif;
   font-weight: 600; font-size: 12.5px; letter-spacing: 0.01em;
   white-space: nowrap;
+  user-select: none; -webkit-tap-highlight-color: transparent;
 }
 body.sidebar-collapsed .menu-toggle { left: 12px; }
 .menu-toggle:hover  { background: rgba(15, 24, 37, 0.98); transform: translateY(-1px); }
 .menu-toggle:active { transform: scale(0.97); transition: transform 80ms ease-out; }
 .mt-glyph { font-size: 16px; line-height: 1; transition: transform var(--d-fluid) var(--fluid); }
-.mt-label { opacity: 0.8; font-weight: 500; }
+.mt-label { opacity: 0.85; font-weight: 500; }
 body.sidebar-collapsed .mt-close { display: none; }
 body:not(.sidebar-collapsed) .mt-open { display: none; }
-body.sidebar-collapsed .menu-toggle { left: 16px; }
-body.sidebar-collapsed .menu-toggle .mt-open  { display: inline; }
-body.sidebar-collapsed .menu-toggle .mt-close { display: none; }
+
+/* Mobile: bigger touch target, anchor top-left */
+@media (max-width: 640px) {
+  .menu-toggle {
+    top: 12px; left: 12px;        /* always top-left; even when sidebar visible */
+    height: 40px; padding: 0 14px; font-size: 13px;
+  }
+  body.sidebar-collapsed .menu-toggle { left: 12px; }
+}
 
 /* === Main content === */
 .main { flex: 1; padding: 32px 32px 80px; max-width: 1280px; }
@@ -559,10 +566,16 @@ button,
   .s-12 { grid-column: span 6; }
 }
 @media (max-width: 640px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; gap: 12px; }
   .s-6, .s-4, .s-3, .s-12 { grid-column: span 1; }
   .stocks, .sector-links { grid-template-columns: 1fr; }
   .main { padding: 16px 12px 60px; }
+  /* mobile: drop grid-row spans so tiles don't get vertically stuck */
+  .r-2, .r-3, .r-4 { grid-row: auto; }
+  /* mobile news: simplified ticker rows */
+  .news-i { padding: 10px 12px; }
+  .news-body { font-size: 13px; }
+  .head h1 { font-size: 22px; }
 }
 </style>
 </head>
@@ -623,8 +636,8 @@ button,
       <span>World Signal Monitor</span>
     </div>
     <div class="nav-section">Theme</div>
-    <div class="theme-meta">Bento Draft <strong>v0.6.0 — Emil-flavoured</strong><br>
-      <span class="small">Live Yahoo prices · tier drilldowns · list stagger · hover-gated · reduced-motion safe</span>
+    <div class="theme-meta">Bento Draft <strong>v0.6.1 — Emil-flavoured</strong><br>
+      <span class="small">Live prices · mobile-safe · news fixed · auto-collapse on mobile</span>
     </div>
   </nav>
 </aside>
@@ -870,6 +883,11 @@ transition: background var(--d-fast) var(--fluid),
 <script src="data.js?v=draftv2"></script>
 
 <script>
+// === Helpers ===
+function escapeHtml(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 // === Sidebar collapse/expand (persisted) ===
 // === Emil/Apple: sidebar collapse with mirrored easing (spatial consistency) ===
 function setSidebar(collapsed){
@@ -887,8 +905,16 @@ function setSidebar(collapsed){
   }
 }
 (function(){
-  let collapsed=false;
-  try{collapsed=localStorage.getItem('linus-bento-sidebar')==='1';}catch(e){}
+  // Default: COLLAPSED on mobile (≤900px) so first-paint shows menu button only
+  // Default: OPEN on desktop so menu is the wayfinding
+  // Persist user override via localStorage.
+  const isMobile = window.matchMedia('(max-width: 900px)').matches;
+  let collapsed = isMobile;
+  try{
+    const stored = localStorage.getItem('linus-bento-sidebar');
+    if(stored === '1') collapsed = true;
+    else if(stored === '0') collapsed = false;
+  }catch(e){}
   setSidebar(collapsed);
   document.getElementById('menuToggle').addEventListener('click', function(){
     setSidebar(!document.body.classList.contains('sidebar-collapsed'));
@@ -1033,12 +1059,18 @@ function renderAll(){
   const newsArr=(typeof NEWS!=="undefined")?NEWS.slice(0,6):[];
   document.getElementById("news-list").innerHTML=newsArr.map(n=>{
     const t=new Date(n.ts).toISOString().slice(0,16).replace("T"," ");
-    const body=(n.body||"").replace(/<strong>(.*?)<\/strong>/g,'<a href="javascript:void(0)" title="highlight">$1</a>');
+    let sector = SECTOR_NAMES[n.sector] || '';
+    if(!sector && n.ticker && typeof SECTORS === 'object'){
+      const key = Object.keys(SECTORS).find(function(k){return SECTORS[k] && SECTORS[k].includes ? SECTORS[k].includes(n.ticker) : false;});
+      if(key) sector = SECTOR_NAMES[key] || key;
+    }
+    const sentimentIcon = n.sentiment === 'bullish' ? '↑' : n.sentiment === 'bearish' ? '↓' : '—';
+    const title = (n.title || n.body || '');
     return `<div class="news-i">
-      <div class="news-meta"><b>${(n.sector||"").toUpperCase()}</b> · <span>${t}</span></div>
-      <div class="news-body">${body}</div>
+      <div class="news-meta"><b>${escapeHtml(n.ticker || '')}</b>${sector ? ' · ' + escapeHtml(sector) : ''} · <span>${t}</span> · <span class="sentiment sentiment-${n.sentiment || 'neutral'}">${sentimentIcon}</span></div>
+      <div class="news-body"><a href="${escapeHtml(n.url || 'javascript:void(0)')}" target="_blank" rel="noopener">${escapeHtml(title)}</a></div>
     </div>`;
-  }).join("") || "<div style='opacity:0.5;'>No news yet.</div>";
+  }).join("") || "<div style='opacity:0.5;padding:12px;'>No news yet.</div>";
 
   // Overview — lead (most recent) + 5+ takeaways (second-newest → eldest)
   if(typeof OVERVIEW!=="undefined"&&OVERVIEW.length){
