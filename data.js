@@ -98,7 +98,7 @@ var _sectorByTicker = {};
 Object.keys(SECTORS).forEach(function(k){
   SECTORS[k].forEach(function(t){ _sectorByTicker[t] = SECTOR_NAMES[k] || k; });
 });
-const TIER1 = [
+var TIER1 = [
   { t:"VST", p:168.98, se:"power", ca:"agi", name:"Vistra Energy", desc:"Texas-based integrated utility with the lowest-cost nuclear and gas fleet in the most load-growth-rich region of the US.", why:"Geographic moat in ERCOT/PJM scarcity-priced markets", roe:18.47, roic:3.3, bp:90.9, ev:14.17, ups:42.6, mg:22, bf:20, bz:21 },
   { t:"CEG", p:275.6, se:"power", ca:"agi", name:"Constellation Energy", desc:"Largest US nuclear power operator with 33GW of irreplaceable assets.", why:"Hyperscaler PPA tailwind + Three Mile Island restart validates nuclear pricing power", roe:15.97, roic:4, bp:70, ev:23.13, ups:52.2, mg:21, bf:17, bz:15 },
   { t:"VRT", p:304.04, se:"power", ca:"agi", name:"Vertiv", desc:"Dominant global supplier of thermal management and power distribution for data centers.", why:"Liquid cooling bottleneck as GPU density rises above 100kW per rack", roe:33.82, roic:18.55, bp:94.7, ev:29.73, ups:-15.3, mg:22, bf:18, bz:16 },
@@ -116,7 +116,7 @@ const TIER1 = [
   { t:"SNOW", p:265.13, se:"software", ca:"demand", name:"Snowflake", desc:"Cloud data platform for warehousing/analytics/AI across multi-cloud.", why:"Switching cost moat in enterprise data + multi-cloud architecture", bp:80.8, ups:3.4, mg:13, bf:17, bz:15 },
   { t:"ORCL", p:120.04, se:"software", ca:"demand", name:"Oracle", desc:"Enterprise software + cloud infrastructure OCI with database moat pivoting to AI.", why:"OCI multi-cloud strategy extends database moat to AI workloads", roe:40.2, roic:7.99, bp:65.1, ev:26.11, ups:109.1, mg:16, bf:17, bz:15 }
 ];
-const TIER2 = [
+var TIER2 = [
   { t:"TLN", p:379.27, se:"power", ca:"agi", name:"Talen Energy", desc:"Independent power producer owning 1.2GW Susquehanna nuclear plant with 300MW Nautilus AI campus.", why:"Susquehanna site most valuable industrial real estate in PJM", roic:0.16, bp:100, ev:45.31, ups:21.3, mg:19, bf:16, bz:12 },
   { t:"GE", p:349, se:"power", ca:"agi", name:"General Electric", desc:"Aerospace power systems and grid equipment benefiting from AI infrastructure capex.", why:"GE Vernova spinoff parent grid equipment exposure with smaller scale than GEV/Eaton", roe:46.6, roic:8.12, bp:68.6, ev:27.92, ups:99.9, mg:18, bf:15, bz:15 },
   { t:"EQIX", p:1033.55, se:"compute", ca:"agi", name:"Equinix", desc:"Global data center REIT with 260+ IBX colocation facilities across 30+ metros.", why:"Colocation scale leader but stock at premium quality but expensive", roe:9.54, roic:4.36, bp:75, ev:23.57, ups:0.7, mg:15, bf:12, bz:15 },
