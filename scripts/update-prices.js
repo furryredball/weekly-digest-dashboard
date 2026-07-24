@@ -42,12 +42,31 @@ function extractTickers(src) {
   return Array.from(tickers);
 }
 
-// Fetch quotes from FMP (batch endpoint supports comma-separated symbols)
+// Fetch quotes from FMP stable/profile endpoint (batch: one symbol per call)
+// Note: FMP stable/profile returns array with one object per symbol
 async function fetchQuotes(tickers) {
-  const url = `https://financialmodelingprep.com/api/v3/quote/${tickers.join(',')}?apikey=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`FMP API error: ${res.status} ${res.statusText}`);
-  return res.json();
+  const results = [];
+  for (const ticker of tickers) {
+    try {
+      const url = `https://financialmodelingprep.com/stable/profile?symbol=${ticker}&apikey=${API_KEY}`;
+      const res = await fetch(url);
+      if (!res.ok) {
+        console.warn(`  ${ticker}: HTTP ${res.status}`);
+        continue;
+      }
+      const data = await res.json();
+      if (Array.isArray(data) && data[0] && data[0].price != null) {
+        results.push({
+          symbol: data[0].symbol,
+          price: data[0].price,
+          changesPercentage: data[0].changePercentage || 0,
+        });
+      }
+    } catch (e) {
+      console.warn(`  ${ticker}: ${e.message}`);
+    }
+  }
+  return results;
 }
 
 // Update price in TIER array body text
