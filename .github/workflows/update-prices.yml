@@ -1,0 +1,41 @@
+name: Update Stock Prices
+
+on:
+  schedule:
+    # Every 30 minutes during market hours (9:30 AM - 4:00 PM ET = 13:30 - 20:00 UTC)
+    # Plus one run at market close (20:30 UTC) and one at open (13:30 UTC)
+    - cron: '*/30 13-20 * * 1-5'  # Mon-Fri, 13:00-20:30 UTC
+    - cron: '30 20 * * 1-5'       # Market close
+    - cron: '30 13 * * 1-5'       # Market open
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch stock prices and update data.js
+        env:
+          FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+        run: |
+          node scripts/update-prices.js
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data.js
+          git diff --staged --quiet || git commit -m "chore(prices): auto-update $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
