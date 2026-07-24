@@ -26,14 +26,15 @@ if (!API_KEY) {
 }
 
 // Extract ticker symbols from TIER1 and TIER2
+// Accept var|let|const — data.js currently declares with `var`.
 function extractTickers(src) {
-  const tier1Match = src.match(/const TIER1 = \[([\s\S]*?)\];/);
-  const tier2Match = src.match(/const TIER2 = \[([\s\S]*?)\];/);
+  const tier1Match = src.match(/(?:const|let|var)\s+TIER1\s*=\s*\[([\s\S]*?)\];/);
+  const tier2Match = src.match(/(?:const|let|var)\s+TIER2\s*=\s*\[([\s\S]*?)\];/);
   const tickers = new Set();
   [tier1Match, tier2Match].forEach(m => {
     if (!m) return;
     const body = m[1];
-    const re = /\{ t:"([A-Z]+)"/g;
+    const re = /\{\s*t:"([A-Z.]+)"/g;
     let match;
     while ((match = re.exec(body)) !== null) {
       tickers.add(match[1]);
@@ -95,17 +96,22 @@ async function main() {
   console.log(`Fetched ${quotes.length} quotes from FMP.`);
 
   // Split into TIER1 and TIER2 sections, update each, reassemble
-  const tier1Match = src.match(/(const TIER1 = \[)([\s\S]*?)(\];)/);
-  const tier2Match = src.match(/(const TIER2 = \[)([\s\S]*?)(\];)/);
+  // Match var|let|const so renames don't silently break the updater again.
+  const tier1Match = src.match(/((?:const|let|var)\s+TIER1\s*=\s*\[)([\s\S]*?)(\];)/);
+  const tier2Match = src.match(/((?:const|let|var)\s+TIER2\s*=\s*\[)([\s\S]*?)(\];)/);
 
   let newSrc = src;
   if (tier1Match) {
     const newBody = updateTierBody(tier1Match[2], quotes);
     newSrc = newSrc.replace(tier1Match[0], tier1Match[1] + newBody + tier1Match[3]);
+  } else {
+    console.warn('TIER1 block not found — data.js declaration may have changed shape');
   }
   if (tier2Match) {
     const newBody = updateTierBody(tier2Match[2], quotes);
     newSrc = newSrc.replace(tier2Match[0], tier2Match[1] + newBody + tier2Match[3]);
+  } else {
+    console.warn('TIER2 block not found — data.js declaration may have changed shape');
   }
 
   if (newSrc !== src) {

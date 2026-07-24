@@ -140,19 +140,19 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     <div class="sidebar-logo">🐶 Linus Invest</div>
     <div class="sidebar-back" onclick="location.href='./'">← Main Dashboard</div>
     <div class="nav-section">STOCKS</div>
-    <div class="nav-item active" data-view="tier1">⭐ Tier 1 — Recommended<span class="nav-badge" id="badge-tier1">15</span></div>
-    <div class="nav-item" data-view="tier2">📋 Tier 2 — Watchlist<span class="nav-badge">40</span></div>
-    <div class="nav-item" data-view="all">📊 All 55 Sorted</div>
+    <div class="nav-item active" data-view="tier1">⭐ Tier 1 — Recommended<span class="nav-badge" id="badge-tier1">16</span></div>
+    <div class="nav-item" data-view="tier2">📋 Tier 2 — Watchlist<span class="nav-badge" id="badge-tier2">32</span></div>
+    <div class="nav-item" data-view="all">📊 All 48 Sorted</div>
     <div class="nav-section">INFO</div>
     <div class="nav-item" data-view="methodology">⚙️ Methodology</div>
   </aside>
   <main class="main">
     <div class="panel active" id="view-tier1">
       <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);border-radius:8px;padding:12px 16px;margin-bottom:18px;color:#f59e0b;font-size:13px;line-height:1.5;">
-        ⚠️ <strong>Full Mode (2026-07-13)</strong> — 15 of 48 Tier 1 picks live. Three-bucket cut (locked 2026-07-12, "Anti-AGI" sector renamed "Non-AGI" 2026-07-13): <strong>Bucket A</strong> (10 AGI bottleneck picks-and-shovels) + <strong>Bucket B</strong> (3 defensive non-AGI) + <strong>Bucket C</strong> (2 demand-side beneficiaries). 33 TIER2 watchlist entries populated (7 miscategorized removed in fix(scope) commit). Tier 1 cards use real M/B/Bz scores from CSV; Tier 2 cards use proxy heuristic pending per-stock pitches. See FRAMEWORK_THREE_BUCKETS.md for canonical taxonomy.
+        ⚠️ <strong>Full Mode</strong> — 16 Tier 1 + 32 Tier 2 = 48 tickers. Three-bucket cut: <strong>Bucket A</strong> AGI bottleneck · <strong>Bucket B</strong> defensive non-AGI · <strong>Bucket C</strong> demand-side. Prices live in <code>data.js</code> and refresh via GitHub Actions (FMP server-side). No client API key.
       </div>
       <div class="topbar">
-        <div class="topbar-left"><h1>Tier 1 — Linus 推薦</h1><div class="subtitle">Top 15 by 3-lens quality score · 10 AGI bottleneck + 3 defensive + 2 demand-side · Updated 2026-07-13</div><div id="priceTimestamp" style="font-size:11px;color:var(--color-text-faint);font-family:var(--font-mono);margin-top:2px;opacity:0.6;">Prices: loading...</div></div>
+        <div class="topbar-left"><h1>Tier 1 — Linus 推薦</h1><div class="subtitle">Top 16 by 5-dimension quality score · curated fundamentals · prices from data.js</div><div id="priceTimestamp" style="font-size:11px;color:var(--text-faint);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin-top:2px;">Prices: data.js (Actions-updated)</div></div>
       </div>
       <div class="kpi-grid" id="kpiTier1"></div>
       <div class="section-header"><span class="section-title">All Tier 1 Picks</span><span class="section-meta" id="tier1Summary"></span></div>
@@ -160,47 +160,49 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
     <div class="panel" id="view-tier2">
       <div class="topbar">
-        <div class="topbar-left"><h1>Tier 2 — Watchlist</h1><div class="subtitle">33 framework-compatible picks · Cat 1 picks-and-shovels + Cat 3 civilization trends · Updated 2026-07-16</div></div>
+        <div class="topbar-left"><h1>Tier 2 — Watchlist</h1><div class="subtitle">32 framework-compatible picks · curated watchlist · prices from data.js</div></div>
       </div>
       <div class="section-header"><span class="section-title">Sorted by Score</span><span class="section-meta" id="tier2Summary"></span></div>
       <div class="row-grid" id="tier2Grid"></div>
     </div>
     <div class="panel" id="view-all">
       <div class="topbar">
-        <div class="topbar-left"><h1>All 55 Stocks</h1><div class="subtitle">Combined Tier 1 + Tier 2 sorted by score</div></div>
+        <div class="topbar-left"><h1>All 48 Stocks</h1><div class="subtitle">Combined Tier 1 + Tier 2 sorted by score</div></div>
       </div>
       <div class="row-grid" id="allGrid"></div>
     </div>
     <div class="panel" id="view-methodology">
-      <div class="topbar"><div class="topbar-left"><h1>Scoring Methodology</h1><div class="subtitle">3-lens framework: Munger (inversion) + Buffett (moat) + Bezos (flywheel)</div></div></div>
-      <div class="meth-section">
-        <h2>4 Scoring Dimensions (100 pts)</h2>
-        <table class="meth-table">
-          <tr><th>Dimension</th><th>Points</th><th>What It Measures</th></tr>
-          <tr><td>Munger Inversion</td><td>25</td><td>Financial health: ROE profitability, NetDebt/EBITDA fortress, FCF yield sustainability</td></tr>
-          <tr><td>Buffett Moat</td><td>25</td><td>Quality: ROIC moat width, EV/EBITDA reasonableness, analyst buy consensus, large-cap premium</td></tr>
-          <tr><td>Bezos Flywheel</td><td>20</td><td>Compounding momentum: analyst upside %, price vs 50-day MA, recent % change</td></tr>
-          <tr><td>Framework Fit</td><td>30</td><td>AGI picks-and-shovels (30) vs Non-AGI quality compounder (15). Equalized to 25 in Tier selection.</td></tr>
-        </table>
-      </div>
-      <div class="meth-section">
-        <h2>Grade Scale</h2>
-        <table class="meth-table">
-          <tr><th>Score</th><th>Grade</th><th>Meaning</th></tr>
-          <tr><td>80+</td><td>A</td><td>Exceptional — top conviction</td></tr>
-          <tr><td>75–79</td><td>B</td><td>Strong — above-average moat</td></tr>
-          <tr><td>70–74</td><td>C</td><td>Moderate — framework-compatible</td></tr>
-          <tr><td>&lt;70</td><td>—</td><td>Tier 2 only — directional fit</td></tr>
-        </table>
-      </div>
-      <div class="meth-section">
-        <h2>Data Sources</h2>
-        <p>Real-time quotes + analyst consensus via financialmodelingprep.com. As of 2026-07-11.</p>
-      </div>
+      <div class="topbar"><div class="topbar-left"><h1>Scoring Methodology</h1><div class="subtitle">5-dimension scoring: Framework · Fundamental · Momentum · Sentiment · Scarcity</div></div></div>
+            <div class="meth-section">
+              <h2>5 Scoring Dimensions (100 pts)</h2>
+              <table class="meth-table">
+                <tr><th>Dimension</th><th>Points</th><th>What It Measures</th></tr>
+                <tr><td>Framework Fit</td><td>20</td><td>AGI bottleneck / demand-side / non-AGI defensive alignment</td></tr>
+                <tr><td>Fundamental Quality</td><td>20</td><td>ROE / ROIC profitability and capital efficiency</td></tr>
+                <tr><td>Momentum</td><td>20</td><td>Analyst upside / forward growth pressure</td></tr>
+                <tr><td>Sentiment & Flow</td><td>20</td><td>Buy-side consensus / ownership tone</td></tr>
+                <tr><td>Bottleneck Scarcity</td><td>20</td><td>Hard-to-replace picks-and-shovels scarcity</td></tr>
+              </table>
+            </div>
+            <div class="meth-section">
+              <h2>Grade Scale</h2>
+              <table class="meth-table">
+                <tr><th>Score</th><th>Grade</th><th>Meaning</th></tr>
+                <tr><td>80+</td><td>A</td><td>Exceptional — top conviction</td></tr>
+                <tr><td>75–79</td><td>B+</td><td>Strong — above-average moat</td></tr>
+                <tr><td>65–74</td><td>B</td><td>Solid framework fit</td></tr>
+                <tr><td>55–64</td><td>B-</td><td>Moderate — watchlist quality</td></tr>
+                <tr><td><55</td><td>C or below</td><td>Directional only</td></tr>
+              </table>
+            </div>
+            <div class="meth-section">
+              <h2>Data Sources</h2>
+              <p>Curated ticker metadata in <code>data.js</code>. Prices refreshed server-side by GitHub Actions via Financial Modeling Prep (API key never ships to the browser).</p>
+            </div>
     </div>
   </main>
 </div>
-<script src="data.js?v=20260724a"></script>
+<script src="data.js?v=20260724c"></script>
 <script>
 (function(){document.documentElement.setAttribute('data-theme','light');})();
 // 5-DIMENSION SCORING (Aschenbrenner Situational Awareness) — used by linus-invest.html
@@ -210,104 +212,31 @@ function _liDimMomentum(t){const u=t.ups;if(u==null)return 9;if(u>=50)return 19;
 function _liDimSentiment(t){const bp=t.bp;if(bp==null)return 9;if(bp>=85)return 19;if(bp>=70)return 16;if(bp>=55)return 13;if(bp>=40)return 10;if(bp>=25)return 8;return 5;}
 function _liDimScarcity(t){if(t.ca==='nonagi')return 8;if(t.ca==='agi'){if(t.tier===1&&(t.se==='power'||t.se==='semis'))return 18;if(t.tier===1&&t.se==='compute')return 14;return 11;}if(t.ca==='demand')return 10;return 6;}
 function _liScoreStock(t){const d={fw:_liDimFramework(t),fund:_liDimFundamental(t),mom:_liDimMomentum(t),sent:_liDimSentiment(t),scar:_liDimScarcity(t)};return{total:d.fw+d.fund+d.mom+d.sent+d.scar,dims:d};}
-function _liTotal(t){var e=Object.assign({},t,{tier:Array.isArray(TIER1)&&TIER1.indexOf(t)>=0?1:2});return _liScoreStock(e).total;}
+function _liTotal(t){var tierNum=(typeof TIER1!=='undefined'&&Array.isArray(TIER1)&&TIER1.indexOf(t)>=0)?1:2;var e=Object.assign({},t,{tier:t.tier!=null?t.tier:tierNum});return _liScoreStock(e).total;}
 function grade(sc){if(sc>=85)return 'A';if(sc>=75)return 'B+';if(sc>=65)return 'B';if(sc>=55)return 'B-';if(sc>=45)return 'C+';if(sc>=35)return 'C';return 'D/F';}
 function gradeClass(sc){return sc>=80?'grade-A':sc>=75?'grade-B':'grade-C';}
-function fm(n,d){return n!=null?(n<0?'':n.toFixed(d||1)):'—';}
+function fm(n,d){return n!=null&&n===n?Number(n).toFixed(d!=null?d:1):'—';}
 function fc(n,d){var c=n>0?'metric-up':n<0?'metric-down':'';return '<span class="'+c+'">'+(n>0?'+':'')+fm(n,d)+'%</span>';}
-
-// ============ FMP LIVE PRICE REFRESH (Option B) ============
-// Fetches live prices from FMP, caches in localStorage for 15 min.
-// Falls back to data.js prices if fetch fails or cache is stale.
-var FMP_KEY = 'mUtIyTLKVFH2QXJqTiMHSBik97nzgU8c';
-var FMP_CACHE_KEY = 'fmp-prices-cache';
-var FMP_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
-
-function getCachedPrices() {
-  try {
-    var raw = localStorage.getItem(FMP_CACHE_KEY);
-    if (!raw) return null;
-    var data = JSON.parse(raw);
-    if (Date.now() - data.ts > FMP_CACHE_TTL) return null;
-    return data.prices;
-  } catch(e) { return null; }
-}
-
-function setCachedPrices(prices) {
-  try {
-    localStorage.setItem(FMP_CACHE_KEY, JSON.stringify({ ts: Date.now(), prices: prices }));
-  } catch(e) {}
-}
-
-async function fetchLivePrices() {
-  var cached = getCachedPrices();
-  if (cached) return cached;
-  var tickers = [];
-  TIER1.forEach(function(t){ tickers.push(t.t); });
-  TIER2.forEach(function(t){ tickers.push(t.t); });
-  var results = {};
-  for (var i = 0; i < tickers.length; i++) {
-    var sym = tickers[i];
-    try {
-      var res = await fetch('https://financialmodelingprep.com/stable/profile?symbol=' + sym + '&apikey=' + FMP_KEY);
-      if (!res.ok) continue;
-      var data = await res.json();
-      if (data && data[0] && data[0].price != null) {
-        results[sym] = { price: data[0].price, changePct: data[0].changePercentage || 0 };
-      }
-    } catch(e) {}
+function pack(s){var tierNum=(typeof TIER1!=='undefined'&&Array.isArray(TIER1)&&TIER1.indexOf(s)>=0)?1:2;return Object.assign({},s,{tier:s.tier!=null?s.tier:tierNum});}
+// No client-side FMP calls. Prices come only from data.js / GitHub Actions.
+(function(){
+  if(typeof TIER1==='undefined'||typeof TIER2==='undefined'){
+    console.error('[linus-invest] TIER1/TIER2 missing — data.js failed to load');
+    return;
   }
-  if (Object.keys(results).length > 0) setCachedPrices(results);
-  return results;
-}
-
-function applyPricesToTiers(priceMap) {
-  if (!priceMap) return;
-  TIER1.forEach(function(t){ if (priceMap[t.t]) { t.p = priceMap[t.t].price; t._live = true; } });
-  TIER2.forEach(function(t){ if (priceMap[t.t]) { t.p = priceMap[t.t].price; t._live = true; } });
-}
-
-function renderAllGrids() {
-  renderTier1();
-  renderTier2();
-  renderAll();
-}
-
-function updatePriceTimestamp(source) {
-  var el = document.getElementById('priceTimestamp');
-  if (!el) return;
-  var now = new Date();
-  el.textContent = 'Prices: ' + source + ' · ' + now.toLocaleTimeString('en-HK', { timeZone: 'Asia/Hong_Kong', hour: '2-digit', minute: '2-digit' }) + ' HKT';
-  el.style.opacity = '1';
-}
-
-async function initLivePrices() {
-  updatePriceTimestamp('loading...');
-  var prices = await fetchLivePrices();
-  if (Object.keys(prices).length > 0) {
-    applyPricesToTiers(prices);
-    updatePriceTimestamp('FMP live');
-  } else {
-    updatePriceTimestamp('data.js (offline)');
-  }
-  renderAllGrids();
-}
-
-// Initial render with data.js prices, then upgrade to live
-initLivePrices();
-setInterval(initLivePrices, FMP_CACHE_TTL);
-function renderTier1() {
-  var grid=document.getElementById('tier1Grid');var html='';TIER1.forEach(function(s,i){var tag=s.ca==='agi'?'tag-agi':'tag-nonagi';var ups=s.ups!=null?fc(s.ups):'—';var total=_liTotal(s);var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);html+='<div class="card '+tag+'">';html+='<div class="card-head"><span class="card-symbol">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+s.t+'</span><span class="card-price">$'+(s.p!=null?fm(s.p,2):'—')+'</span></div>';html+='<div class="card-name">'+(s.name||'')+'</div>';html+='<div class="card-desc">'+(s.desc||'')+'</div>';html+='<div class="card-why"><strong>Why:</strong> '+(s.why||'')+'</div>';html+='<div class="card-metrics">';html+='<span class="metric-label">ROE</span><span class="metric-val">'+fm(s.roe)+'%</span>';html+='<span class="metric-label">Upside</span><span class="metric-val">'+ups+'</span>';html+='<span class="metric-label">ROIC</span><span class="metric-val">'+fm(s.roic)+'%</span>';html+='<span class="metric-label">Buy %</span><span class="metric-val">'+fm(s.bp)+'%</span>';html+='<span class="metric-label">EV/EBITDA</span><span class="metric-val">'+fm(s.ev,1)+'×</span>';html+='<span class="metric-label">MCap</span><span class="metric-val">'+(s.mc?fm(s.mc,1)+'B':'—')+'</span>';html+='</div>';html+='<div class="card-score-bar"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div>';
-  html+='<div class="card-score"><span class="score-text">Fw '+d.fw+' · Fund '+d.fund+' · Mom '+d.mom+' · Sent '+d.sent+' · Scar '+d.scar+'</span><span class="score-num">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span></div>';
-  html+='<div class="card-sector">'+s.se+'</div></div>';});grid.innerHTML=html;
-  var avgScore=(TIER1.reduce(function(a,s){return a+_liTotal(s)},0)/TIER1.length).toFixed(1);var agiCount=TIER1.filter(function(s){return s.ca==='agi'}).length;var nonagiCount=TIER1.length-agiCount;var avgUps=(TIER1.reduce(function(a,s){return a+(s.ups||0)},0)/TIER1.length).toFixed(1);var avgRoe=(TIER1.reduce(function(a,s){return a+(s.roe||0)},0)/TIER1.length).toFixed(1);
-  document.getElementById('kpiTier1').innerHTML='<div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">'+avgScore+'</div><div class="kpi-meta">out of 100</div></div><div class="kpi-card"><div class="kpi-label">Composition</div><div class="kpi-value">'+agiCount+' 🔌 + '+nonagiCount+' 🛡️</div><div class="kpi-meta">AGI / Non-AGI</div></div><div class="kpi-card"><div class="kpi-label">Avg Upside</div><div class="kpi-value">'+avgUps+'%</div><div class="kpi-meta">analyst consensus</div></div><div class="kpi-card"><div class="kpi-label">Avg ROE</div><div class="kpi-value">'+avgRoe+'%</div><div class="kpi-meta">profitability</div></div>';document.getElementById('tier1Summary').textContent=TIER1.length+' picks · sorted by score';
-}
-function renderTier2() {
-  var grid=document.getElementById('tier2Grid');var html='';TIER2.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;document.getElementById('tier2Summary').textContent=TIER2.length+' tickers · framework-compatible';
-}
-function renderAll() {
-  var all=TIER1.concat(TIER2);all.sort(function(a,b){return _liTotal(b)-_liTotal(a)});var grid=document.getElementById('allGrid');var html='';all.forEach(function(s,i){var total=_liTotal(s);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(Object.assign({},s,{tier:Array.isArray(TIER1)&&TIER1.indexOf(s)>=0?1:2}));var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;
-}
+  var b1=document.getElementById('badge-tier1'); if(b1) b1.textContent=TIER1.length;
+  var b2=document.getElementById('badge-tier2'); if(b2) b2.textContent=TIER2.length;
+  var ts=document.getElementById('priceTimestamp'); if(ts) ts.textContent='Prices: data.js (Actions-updated) · '+TIER1.length+'+'+TIER2.length+' tickers';
+})();
+(function(){var grid=document.getElementById('tier1Grid');if(!grid||typeof TIER1==='undefined')return;var html='';TIER1.forEach(function(s,i){var tag=s.ca==='agi'?'tag-agi':'tag-nonagi';var ups=s.ups!=null?fc(s.ups):'—';var packed=pack(s);var total=_liTotal(packed);var sc=_liScoreStock(packed);var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);html+='<div class="card '+tag+'">';html+='<div class="card-head"><span class="card-symbol">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+s.t+'</span><span class="card-price">$'+(s.p!=null?fm(s.p,2):'—')+'</span></div>';html+='<div class="card-name">'+(s.name||'')+'</div>';html+='<div class="card-desc">'+(s.desc||'')+'</div>';html+='<div class="card-why"><strong>Why:</strong> '+(s.why||'')+'</div>';html+='<div class="card-metrics">';html+='<span class="metric-label">ROE</span><span class="metric-val">'+fm(s.roe)+'%</span>';html+='<span class="metric-label">Upside</span><span class="metric-val">'+ups+'</span>';html+='<span class="metric-label">ROIC</span><span class="metric-val">'+fm(s.roic)+'%</span>';html+='<span class="metric-label">Buy %</span><span class="metric-val">'+fm(s.bp)+'%</span>';html+='<span class="metric-label">EV/EBITDA</span><span class="metric-val">'+fm(s.ev,1)+'×</span>';html+='<span class="metric-label">MCap</span><span class="metric-val">'+(s.mc?fm(s.mc,1)+'B':'—')+'</span>';html+='</div>';html+='<div class="card-score-bar"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div>';
+html+='<div class="card-score"><span class="score-text">Fw '+d.fw+' · Fund '+d.fund+' · Mom '+d.mom+' · Sent '+d.sent+' · Scar '+d.scar+'</span><span class="score-num">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span></div>';
+html+='<div class="card-sector">'+s.se+'</div></div>';});grid.innerHTML=html;
+var avgScore=(TIER1.reduce(function(a,s){return a+_liTotal(pack(s))},0)/TIER1.length).toFixed(1);var agiCount=TIER1.filter(function(s){return s.ca==='agi'}).length;var nonagiCount=TIER1.length-agiCount;var avgUps=(TIER1.reduce(function(a,s){return a+(s.ups||0)},0)/TIER1.length).toFixed(1);var avgRoe=(TIER1.reduce(function(a,s){return a+(s.roe||0)},0)/TIER1.length).toFixed(1);
+document.getElementById('kpiTier1').innerHTML='<div class="kpi-card"><div class="kpi-label">Avg Score</div><div class="kpi-value">'+avgScore+'</div><div class="kpi-meta">out of 100</div></div><div class="kpi-card"><div class="kpi-label">Composition</div><div class="kpi-value">'+agiCount+' 🔌 + '+nonagiCount+' 🛡️</div><div class="kpi-meta">AGI / Non-AGI</div></div><div class="kpi-card"><div class="kpi-label">Avg Upside</div><div class="kpi-value">'+avgUps+'%</div><div class="kpi-meta">analyst consensus</div></div><div class="kpi-card"><div class="kpi-label">Avg ROE</div><div class="kpi-value">'+avgRoe+'%</div><div class="kpi-meta">profitability</div></div>';document.getElementById('tier1Summary').textContent=TIER1.length+' picks · sorted by score';})();
+(function(){var grid=document.getElementById('tier2Grid');if(!grid||typeof TIER2==='undefined')return;var html='';TIER2.forEach(function(s,i){var packed=pack(s);var total=_liTotal(packed);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(packed);var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;document.getElementById('tier2Summary').textContent=TIER2.length+' tickers · framework-compatible';})();
+(function(){if(typeof TIER1==='undefined'||typeof TIER2==='undefined')return;var all=TIER1.concat(TIER2);all.sort(function(a,b){return _liTotal(pack(b))-_liTotal(pack(a))});var grid=document.getElementById('allGrid');if(!grid)return;var html='';all.forEach(function(s,i){var packed=pack(s);var total=_liTotal(packed);var ups=s.ups!=null?fc(s.ups):'—';var sc=_liScoreStock(packed);var d=sc.dims;var fwW=(d.fw/total*100).toFixed(0),fundW=(d.fund/total*100).toFixed(0),momW=(d.mom/total*100).toFixed(0),sentW=(d.sent/total*100).toFixed(0),scarW=(d.scar/total*100).toFixed(0);var yahooUrl='https://finance.yahoo.com/quote/'+encodeURIComponent(s.t.replace(/\./g,'-'));html+='<div class="row">';html+='<span class="row-rank">'+(i+1)+'</span>';html+='<span class="row-ticker"><span class="row-sector">'+(s.ca==='agi'?'🔌 ':'🛡️ ')+'</span><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+s.t+'</a></span>';html+='<span class="row-name"><a href="'+yahooUrl+'" target="_blank" rel="noopener">'+(s.name||s.t)+' →</a><div class="row-score-bar" style="margin-top:4px;"><div class="score-seg-framework" style="width:'+fwW+'%"></div><div class="score-seg-fundamental" style="width:'+fundW+'%"></div><div class="score-seg-momentum" style="width:'+momW+'%"></div><div class="score-seg-sentiment" style="width:'+sentW+'%"></div><div class="score-seg-scarcity" style="width:'+scarW+'%"></div></div><div class="row-score-meta"><span>Fw'+d.fw+' Fu'+d.fund+' M'+d.mom+' S'+d.sent+' Sc'+d.scar+'</span><span>'+total+'</span></div></span>';html+='<span class="row-sector">'+s.se+'</span>';html+='<span class="row-price">$'+fm(s.p,2)+'</span>';html+='<span class="row-score">'+total+' <span class="grade-pill '+gradeClass(total)+'">'+grade(total)+'</span></span>';html+='</div>';});grid.innerHTML=html;})();
 function switchView(id){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});var v=document.getElementById('view-'+id);if(v)v.classList.add('active');var n=document.querySelector('[data-view="'+id+'"]');if(n)n.classList.add('active');}
-document.querySelectorAll(
+document.querySelectorAll('.nav-item').forEach(function(i){i.addEventListener('click',function(){switchView(i.dataset.view)})});
+</script>
+</body>
+</html>
