@@ -565,12 +565,14 @@ button,
   .head > div:first-child { min-width: 0; }
   .head h1 { font-size: 22px; white-space: nowrap; }
   .head .sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* Mobile is a widget strip: six readable cards across the viewport, horizontally scrollable. */
-  .grid { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: stretch; gap: 12px; width: max-content; min-width: 100%; overflow-x: auto; overflow-y: visible; scroll-snap-type: x proximity; padding: 0 13px 12px 0; }
-  .grid > .tile, .grid > .drilldown { flex: 0 0 132px; width: 132px; min-width: 132px; height: 284px; min-height: 284px; grid-column: auto; grid-row: auto; scroll-snap-align: start; border-radius: 22px; padding: 16px; overflow: hidden; }
-  .grid > .tile.s-12, .grid > .tile.s-6, .grid > .tile.s-4, .grid > .tile.s-3 { grid-column: auto; }
-  .grid > .tile:nth-child(1), .grid > .tile:nth-child(2) { flex-basis: 132px; width: 132px; }
-  .grid > .tile:nth-child(n+7) { margin-top: 300px; }
+  /* Each mobile row is its own horizontal widget rail. Never put the whole dashboard in one flex row. */
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; width: 100%; overflow: visible; }
+  .grid > .tile, .grid > .drilldown { width: auto; min-width: 0; height: 284px; min-height: 284px; grid-column: span 1; grid-row: auto; border-radius: 22px; padding: 16px; overflow: hidden; }
+  /* Full-width widgets start a new row; paired widgets share a row. */
+  .grid > .tile.s-12 { grid-column: 1 / -1; }
+  .grid > .tile.s-6, .grid > .tile.s-4, .grid > .tile.s-3 { grid-column: span 1; }
+  .grid > .tile:nth-child(1), .grid > .tile:nth-child(2) { grid-column: span 1; }
+  .grid > .tile:nth-child(n+7) { margin-top: 0; }
   .tile-title, .tile h2 { overflow-wrap: normal; word-break: normal; }
   .tile-sub { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; }
   .stocks, .sector-links, .stocks-grid { grid-template-columns: 1fr; }
