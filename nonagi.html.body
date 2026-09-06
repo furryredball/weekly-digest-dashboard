@@ -1,0 +1,24 @@
+      <div class="nav-item" onclick="location.href='index.html#include'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Include<span class="nav-badge">4</span></div>
+      <div class="nav-item" onclick="location.href='index.html#exclude'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Exclude<span class="nav-badge">2</span></div>
+      <div class="nav-section">Analysis</div>
+      <div class="nav-item" onclick="location.href='index.html#scoring'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Scoring</span></div>
+      <div class="nav-section">Linus</div>
+      <div class="nav-item-ext" onclick="location.href='linus-invest.html'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg><span>Linus Invest</span><span class="nav-badge">55</span></div>
+      <div class="nav-section">Theme</div>
+      <div style="padding:4px 8px;font-size:12px;color:var(--text-muted);line-height:1.5;">本週 bottleneck：<br><strong style="color:var(--text);">Power — 5 hits</strong><br><span style="font-size:11px;">(BE, CEG, ETN, VST)</span></div>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left"><h1>Non AGI</h1><div class="subtitle">Defensive waste + defensive plays · 5 tickers</div></div>
+      <div class="topbar-right"><button class="icon-btn" onclick="location.href='index.html'" title="Back to Dashboard"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button></div>
+    </div>
+    <div class="ticker-grid" id="tickerGrid"></div>
+  </main>
+</div>
+<script>
+var tickers = ['RSG','WM','WCN'];
+renderSectorGrid('tickerGrid', tickers);
+</script>
+</body>
+</html>
