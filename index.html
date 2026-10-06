@@ -277,6 +277,49 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .sector-card:nth-child(5) { animation-delay: 200ms; }
 .sector-card:nth-child(6) { animation-delay: 250ms; }
 
+.data-status-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  padding: 10px 18px;
+  margin: 12px 0 18px 0;
+  background: #FAFAF7;
+  border: 1px solid #E8E6E1;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #4A4A48;
+  letter-spacing: -0.005em;
+}
+.data-status-stale {
+  padding: 10px 18px;
+  margin: 12px 0 18px 0;
+  background: #FBEAE7;
+  border: 1px solid #A4382D;
+  border-radius: 12px;
+  color: #A4382D;
+  font-size: 12px;
+}
+.dsb-group { display: inline-flex; align-items: center; gap: 6px; }
+.dsb-label { color: #8E8E8B; font-weight: 500; }
+.dsb-val { color: #1A1A1A; font-weight: 600; font-variant-numeric: tabular-nums; }
+.dsb-val em { color: #8E8E8B; font-style: normal; font-weight: 400; margin-left: 4px; font-size: 11px; }
+.dsb-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dsb-fresh  { background: #2C7A3E; }
+.dsb-aging  { background: #9B7821; }
+.dsb-stale  { background: #A4382D; }
+.dsb-pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; margin-right: 4px; }
+.dsb-pill-t1   { background: #EAF2EB; color: #2C7A3E; }
+.dsb-pill-t2   { background: #FDF3E3; color: #9B7821; }
+.dsb-pill-miss { background: #FBEAE7; color: #A4382D; }
+.dsb-pill-uni  { background: #F4F4F2; color: #4A4A48; }
+.dsb-source { color: #3C5C8A; text-decoration: none; border-bottom: 1px dotted #3C5C8A; }
+.dsb-source:hover { background: #EAF0FB; }
+@media (max-width: 720px) {
+  .data-status-bar { padding: 8px 12px; gap: 8px 12px; font-size: 11px; }
+  .dsb-pill { font-size: 10px; padding: 1px 6px; }
+}
+
 </style>
 </head>
 <body>
@@ -324,6 +367,75 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
       <div class="topbar">
         <div class="topbar-left"><h1>Weekly Digest</h1><div class="subtitle" id="dashboardSubtitle">2026-06-28 to 2026-07-04 · 17 tickers · 40 news · 5 trading days</div></div>
       </div>
+
+<!-- DATA TRUST STATUS BAR (added 2026-10-05) — reads DATA_META from data.js -->
+      <div id="dataStatusBar" class="data-status-bar"></div>
+      <script>
+(function(){
+  if (typeof DATA_META === "undefined") {
+    document.getElementById("dataStatusBar").innerHTML =
+      "<div class='data-status-stale'>⚠ DATA_META not loaded — check data.js</div>";
+    return;
+  }
+  var m = DATA_META;
+  var now = new Date(m.computed_at);
+  var age_days = (Date.now() - now.getTime()) / 86400000;
+  var freshness = age_days < 2 ? "fresh" : (age_days < 7 ? "aging" : "stale");
+  var priceAgo = m.prices_as_of ? ((Date.now() - new Date(m.prices_as_of).getTime()) / 3600000).toFixed(0) + "h ago" : "—";
+  var fundAgo  = m.fundamentals_as_of ? ((Date.now() - new Date(m.fundamentals_as_of).getTime()) / 86400000).toFixed(0) + "d ago" : "—";
+  var cov = m.coverage || {};
+  var sources = m.sources || {};
+  var html = "";
+  html += "<div class='dsb-group dsb-meta'>";
+  html += "  <span class='dsb-dot dsb-"+freshness+"' title='Computed "+age_days.toFixed(1)+"d ago'></span>";
+  html += "  <span class='dsb-label'>Reporting</span>";
+  html += "  <span class='dsb-val'>"+(m.reporting_period? m.reporting_period.start : "—")+" → "+(m.reporting_period? m.reporting_period.end : "—")+"</span>";
+  html += "</div>";
+  html += "<div class='dsb-group'>";
+  html += "  <span class='dsb-label'>Prices</span>";
+  html += "  <span class='dsb-val'>"+(m.prices_as_of||"—")+" <em>"+priceAgo+"</em></span>";
+  html += "</div>";
+  html += "<div class='dsb-group'>";
+  html += "  <span class='dsb-label'>Fundamentals</span>";
+  html += "  <span class='dsb-val'>"+(m.fundamentals_as_of||"—")+" <em>"+fundAgo+"</em></span>";
+  html += "</div>";
+  if (cov.universe) {
+    html += "<div class='dsb-group dsb-cov'>";
+    html += "  <span class='dsb-label'>Coverage</span>";
+    html += "  <span class='dsb-val'>";
+    html += "    <span class='dsb-pill dsb-pill-t1'>T1: "+(cov.in_tier1||0)+"</span>";
+    html += "    <span class='dsb-pill dsb-pill-t2'>T2: "+(cov.in_tier2||0)+"</span>";
+    if (cov.missing_data) html += "    <span class='dsb-pill dsb-pill-miss'>Missing: "+cov.missing_data+"</span>";
+    html += "    <span class='dsb-pill dsb-pill-uni'>Universe: "+(cov.universe||0)+"</span>";
+    html += "  </span>";
+    html += "</div>";
+  }
+  if (sources.price || sources.fundamentals || sources.news) {
+    html += "<div class='dsb-group dsb-src'>";
+    html += "  <span class='dsb-label'>Sources</span>";
+    html += "  <span class='dsb-val'>";
+    if (sources.price)        html += "<a class='dsb-source' href='"+sources.price.url+"' target='_blank' rel='noopener'>"+sources.price.name+"</a> · ";
+    if (sources.fundamentals) html += "<a class='dsb-source' href='"+sources.fundamentals.url+"' target='_blank' rel='noopener'>"+sources.fundamentals.name+"</a> · ";
+    if (sources.news)         html += "<a class='dsb-source' href='"+sources.news.url+"' target='_blank' rel='noopener'>"+sources.news.name+"</a>";
+    html += "  </span>";
+    html += "</div>";
+  }
+  document.getElementById("dataStatusBar").innerHTML = html;
+  // === Patch: keep KPI Scored / Scoring-Coverage in sync with DATA_META.coverage ===
+  var scoredEl = document.getElementById("kpiScored");
+  if (scoredEl && cov.universe) {
+    scoredEl.textContent = (cov.universe - (cov.missing_data || 0)) + "/" + cov.universe;
+  }
+  var scEl = document.getElementById("kpiScoringCoverage");
+  if (scEl && cov.universe) {
+    var pct = Math.round(((cov.universe - (cov.missing_data || 0)) / cov.universe) * 100);
+    scEl.textContent = pct + "%";
+    scEl.className = "kpi-delta " + (pct >= 95 ? "delta-up" : (pct >= 80 ? "delta-neutral" : "delta-down"));
+  }
+})();
+      </script>
+
+      
       <div class="section">
         <div class="linus-overview">
         <div class="linus-overview-header" id="linusOverviewHeader">Linus's Overview · <span id="linusOverviewDate">Jul 10, 2026</span></div>
@@ -344,7 +456,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
         <div class="kpi-card featured"><div class="kpi-label">本週主題</div><div class="kpi-value" style="font-size:20px;">Power</div><div class="kpi-meta" id="kpiFeaturedTheme">7 hits · 主導 bottleneck</div></div>
         <div class="kpi-card"><div class="kpi-label">Tickers tracked</div><div class="kpi-value" id="kpiTickers">55</div><div class="kpi-meta"><span class="kpi-delta delta-up">+38</span> vs legacy 17</div></div>
         <div class="kpi-card"><div class="kpi-label">News ingested</div><div class="kpi-value" id="kpiNews">—</div><div class="kpi-meta"><span class="kpi-delta delta-up">from anysearch</span> news API</div></div>
-        <div class="kpi-card"><div class="kpi-label">Scored</div><div class="kpi-value" id="kpiScored">55/55</div><div class="kpi-meta"><span class="kpi-delta delta-up">100%</span> conviction coverage</div></div>
+        <div class="kpi-card"><div class="kpi-label">Scored</div><div class="kpi-value" id="kpiScored">55/55</div><div class="kpi-meta"><span class="kpi-delta delta-neutral" id="kpiScoringCoverage">—</span> <span style="color:var(--text-muted);">scoring coverage</span> <span style="color:var(--text-muted);font-size:10px;">(not a probability)</span></div></div>
       </div>
       <div class="section">
         <div class="section-header"><div class="section-title">Bottleneck distribution</div><div class="section-meta" id="kpiBottleneckCount">55 stocks mapped</div></div>
