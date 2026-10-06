@@ -14,7 +14,7 @@
 // 3-day rolling cap enforced by cron trim logic.
 // ============================================================
 // DATA_META — auto-managed by dashboard_data_writer.update_data_meta()
-const DATA_META = {
+var DATA_META = {
   "reporting_period": {
     "start": "2026-09-29",
     "end": "2026-10-06"
