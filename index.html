@@ -373,7 +373,9 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 <!-- DATA TRUST STATUS BAR (added 2026-10-05) — reads DATA_META from data.js -->
       <div id="dataStatusBar" class="data-status-bar"></div>
       <script>
-(function(){
+// Deferred: data.js is loaded near the end of <body>, so reading DATA_META here
+// before it exists made this banner show "DATA_META not loaded" on a healthy page.
+document.addEventListener("DOMContentLoaded", function(){
   if (typeof DATA_META === "undefined") {
     document.getElementById("dataStatusBar").innerHTML =
       "<div class='data-status-stale'>⚠ DATA_META not loaded — check data.js</div>";
@@ -423,18 +425,32 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     html += "</div>";
   }
   document.getElementById("dataStatusBar").innerHTML = html;
+  // The meta counter and the scoring path use different definitions; show the real one.
+  var _missPill = document.querySelector("#dataStatusBar .dsb-pill-miss");
+  if (_missPill) {
+    var _unscored = (typeof TICKERS !== "undefined")
+      ? TICKERS.filter(function(t){ return t.score == null; }).length
+      : (cov.missing_data || 0);
+    _missPill.textContent = "Unscored: " + _unscored;
+  }
   // === Patch: keep KPI Scored / Scoring-Coverage in sync with DATA_META.coverage ===
+  // Count what is ACTUALLY scored, not DATA_META's missing_data counter — the two
+  // use different definitions (meta says 9, the scoring path excludes 12).
+  var _tk = (typeof TICKERS !== "undefined") ? TICKERS : null;
+  var _scored = _tk ? _tk.filter(function(t){ return t.score != null; }).length : null;
+  var _total  = _tk ? _tk.length : (cov.universe || 0);
+  var _miss   = _tk ? (_total - _scored) : (cov.missing_data || 0);
   var scoredEl = document.getElementById("kpiScored");
-  if (scoredEl && cov.universe) {
-    scoredEl.textContent = (cov.universe - (cov.missing_data || 0)) + "/" + cov.universe;
+  if (scoredEl && _total) {
+    scoredEl.textContent = (_scored != null ? _scored : (_total - _miss)) + "/" + _total;
   }
   var scEl = document.getElementById("kpiScoringCoverage");
-  if (scEl && cov.universe) {
-    var pct = Math.round(((cov.universe - (cov.missing_data || 0)) / cov.universe) * 100);
+  if (scEl && _total) {
+    var pct = Math.round(((_total - _miss) / _total) * 100);
     scEl.textContent = pct + "%";
     scEl.className = "kpi-delta " + (pct >= 95 ? "delta-up" : (pct >= 80 ? "delta-neutral" : "delta-down"));
   }
-})();
+});
       </script>
 
       
