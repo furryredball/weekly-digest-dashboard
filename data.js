@@ -88,8 +88,8 @@ function _fmtBig(v){
   return v.toFixed(0);
 }
 function tickerCard(t){
-  var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
-  var tl=(t.tier.match(/Tier\s*\d+/i)||['','TIER 4'])[0].toUpperCase();
+  var tc=(t.conviction_tier==1?'tier-1':t.conviction_tier==2?'tier-2':t.conviction_tier==3?'tier-3':t.conviction_tier==4?'tier-4':'tier-unrated');
+  var tl=(String(t.tier||'Unrated').match(/Tier\s*\d+|Unrated/i)||['','UNRATED'])[0].toUpperCase();
   var priceClass=t.trend==='↑'?'ticker-price-up':'ticker-price-down';
   var gradeClass='grade-'+(t.grade==='B+'?'B-plus':String(t.grade).replace('+','-plus'));
   var p=parseFloat(t.price);
@@ -100,7 +100,7 @@ function tickerCard(t){
   var up=t.upside!=null&&t.upside!==''?'<span class="ticker-fund"><span class="ticker-fund-label">Upside</span><span class="'+(t.upside>=0?'up-pos':'up-neg')+'">'+(t.upside>=0?'+':'')+_fmtN(t.upside,1)+'%</span></span>':'';
   return '<div class="ticker-card" data-ticker="'+_esc(t.ticker)+'">'
     +'<div class="ticker-head"><div class="ticker-symbol"><a href="'+_yahooUrl(t.ticker)+'" target="_blank" rel="noopener">'+_esc(t.ticker)+'</a></div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div>'
-    +'<div class="ticker-price-row"><span class="ticker-price '+priceClass+'">'+priceStr+'</span><span class="'+priceClass+'">'+t.trend+' '+_esc(t.pct||'—')+'</span><span class="ticker-score '+gradeClass+'">'+_esc(t.score)+' '+_esc(t.grade||'')+'</span></div>'
+    +'<div class="ticker-price-row"><span class="ticker-price '+priceClass+'">'+priceStr+'</span><span class="'+priceClass+'">'+t.trend+' '+_esc(t.pct||'—')+'</span><span class="ticker-score '+gradeClass+'">'+(t.score==null?'insufficient data':_esc(t.score)+' '+_esc(t.grade||''))+'</span></div>'
     +(pe||mc||up?'<div class="ticker-fund-row">'+pe+mc+up+'</div>':'')
     +'<div class="ticker-name">'+_esc(t.name)+'</div>'
     +(t.desc?'<div class="ticker-desc">'+_esc(t.desc)+'</div>':'')
@@ -189,23 +189,39 @@ var TIER2 = [
 // ============================================================
 
 // ============================================================
-// 5-DIMENSION SCORING + LEGACY TICKERS BUILDER
-// (Moved from power.html on 2026-07-15 — fixes empty-sector bug
-//  on nonagi/compute/semis/software sub-pages by making the scoring
-//  helpers + TICKERS available to every page that loads data.js)
+// CONVICTION REGISTRY — approved conviction tiers ONLY.
+// Populated exclusively by an approved proposal (see workspace/universe/universe.json).
+// Empty = unrated. The UI must say "Unrated"; sector is never a conviction proxy.
+// ============================================================
+var CONVICTION = {};
+
 // ============================================================
 // 5-DIMENSION SCORING (Aschenbrenner Situational Awareness)
-function _scGradeForScore(s){if(s>=85)return 'A';if(s>=75)return 'B+';if(s>=65)return 'B';if(s>=55)return 'B-';if(s>=45)return 'C+';if(s>=35)return 'C';return 'D/F';}
+// DATA-TRUST CONTRACT (locked 2026-11-15):
+//   1. A dimension with no verified input returns null. Never a default number.
+//   2. A stock scores only when ALL FIVE dimensions have inputs; otherwise
+//      total = null, grade = null, and it is excluded from the ranking.
+//   3. Valid component scores are still reported, so partial evidence is visible
+//      without being dressed up as a total.
+//   4. Real ceiling is 95 (19+20+19+19+18). Thresholds are unchanged; the page
+//      copy states the real maximum. Rescaling to 100 is an approval-only change.
+// ============================================================
+function _scGradeForScore(s){if(s==null)return null;if(s>=85)return 'A';if(s>=75)return 'B+';if(s>=65)return 'B';if(s>=55)return 'B-';if(s>=45)return 'C+';if(s>=35)return 'C';return 'D/F';}
 function _scDimFramework(t){if(t.ca==='nonagi')return 9;if(t.ca==='agi'){if(t.tier===1&&(t.se==='power'||t.se==='semis'))return 19;if(t.tier===1&&t.se==='compute')return 16;return 12;}if(t.ca==='demand')return t.tier===1?14:10;return 8;}
-function _scDimFundamental(t){const roe=t.roe,roic=t.roic;if(roe==null&&roic==null)return 9;if(roic!=null&&roic<0)return 5;let base;if(roe==null){if(roic>=20)base=17;else if(roic>=10)base=14;else if(roic>=5)base=11;else base=8;}else{if(roe>=25)base=18;else if(roe>=20)base=16;else if(roe>=15)base=14;else if(roe>=10)base=12;else if(roe>=5)base=9;else base=6;if(roic!=null){if(roic>=15)base+=2;else if(roic<3&&roe>10)base-=2;}}return Math.max(4,Math.min(20,base));}
-function _scDimMomentum(t){const u=t.ups;if(u==null)return 9;if(u>=50)return 19;if(u>=30)return 17;if(u>=15)return 14;if(u>=5)return 12;if(u>=0)return 10;if(u>=-10)return 7;if(u>=-25)return 5;return 3;}
-function _scDimSentiment(t){const bp=t.bp;if(bp==null)return 9;if(bp>=85)return 19;if(bp>=70)return 16;if(bp>=55)return 13;if(bp>=40)return 10;if(bp>=25)return 8;return 5;}
+function _scDimFundamental(t){const roe=t.roe,roic=t.roic;if(roe==null&&roic==null)return null;if(roic!=null&&roic<0)return 5;let base;if(roe==null){if(roic>=20)base=17;else if(roic>=10)base=14;else if(roic>=5)base=11;else base=8;}else{if(roe>=25)base=18;else if(roe>=20)base=16;else if(roe>=15)base=14;else if(roe>=10)base=12;else if(roe>=5)base=9;else base=6;if(roic!=null){if(roic>=15)base+=2;else if(roic<3&&roe>10)base-=2;}}return Math.max(4,Math.min(20,base));}
+function _scDimMomentum(t){const u=t.ups;if(u==null)return null;if(u>=50)return 19;if(u>=30)return 17;if(u>=15)return 14;if(u>=5)return 12;if(u>=0)return 10;if(u>=-10)return 7;if(u>=-25)return 5;return 3;}
+function _scDimSentiment(t){const bp=t.bp;if(bp==null)return null;if(bp>=85)return 19;if(bp>=70)return 16;if(bp>=55)return 13;if(bp>=40)return 10;if(bp>=25)return 8;return 5;}
 function _scDimScarcity(t){if(t.ca==='nonagi')return 8;if(t.ca==='agi'){if(t.tier===1&&(t.se==='power'||t.se==='semis'))return 18;if(t.tier===1&&t.se==='compute')return 14;return 11;}if(t.ca==='demand')return 10;return 6;}
-function _scScoreStock(t){const d={fw:_scDimFramework(t),fund:_scDimFundamental(t),mom:_scDimMomentum(t),sent:_scDimSentiment(t),scar:_scDimScarcity(t)};return{total:d.fw+d.fund+d.mom+d.sent+d.scar,dims:d};}
+function _scScoreStock(t){
+  const d={framework:_scDimFramework(t),fundamental:_scDimFundamental(t),momentum:_scDimMomentum(t),sentiment:_scDimSentiment(t),scarcity:_scDimScarcity(t)};
+  const missing=Object.keys(d).filter(function(k){return d[k]==null;});
+  const complete=missing.length===0;
+  const total=complete?(d.framework+d.fundamental+d.momentum+d.sentiment+d.scarcity):null;
+  return {total:total,dims:d,missing:missing,complete:complete,grade:_scGradeForScore(total)};
+}
 
-// Build minimal legacy-shape TICKERS map for this sector from TIER1+TIER2 (data.js).
-// Sector pages need tickerCard() shape (ticker, tier_emoji, tier, price, score, grade, news[]).
-function _scTierLabel(se){return ({power:'Tier 1',compute:'Tier 2',semis:'Tier 2',software:'Tier 2',nonagi:'Tier 4'})[se] || 'Tier 2';}
+// Build legacy-shape TICKERS from TIER1+TIER2.
+function _scTierLabel(t){const c=CONVICTION[t.t];return (c==null)?'Unrated':('Tier '+c);}
 function _scTierEmoji(se){return ({power:'🔋',compute:'🟠',semis:'🟡',software:'🟡',nonagi:'🟢'})[se] || '🟡';}
 
 var TICKERS = (function(){
@@ -214,18 +230,18 @@ var TICKERS = (function(){
     var isIn1=Array.isArray(TIER1)&&TIER1.indexOf(t)>=0;
     var enriched=Object.assign({},t,{tier:isIn1?1:2});
     var sc=_scScoreStock(enriched);
-    var score=sc.total;
     var ups=t.ups;
-    var ups = t.ups;
     out.push({
       ticker: t.t, name: t.name || t.t, desc: t.desc || '', why: t.why || '',
-      tier: '本週 ' + _scTierLabel(t.se) + ' (' + (SECTOR_NAMES[t.se] || t.se) + ')',
+      tier: _scTierLabel(t),
       tier_emoji: _scTierEmoji(t.se),
+      conviction_tier: CONVICTION[t.t] != null ? CONVICTION[t.t] : null,
       price: t.p,
       trend: ups != null ? (ups >= 0 ? '↑' : '↓') : '—',
       pct:  ups != null ? (ups >= 0 ? '+' : '') + ups.toFixed(1) + '%' : '—',
-      score: score, dims: sc.dims, grade: _scGradeForScore(score),
-      ca: t.ca || '', se: t.se || '',   // bucket routing + sector key (for nav badges, bucket bars)
+      score: sc.total, dims: sc.dims, grade: sc.grade,
+      score_complete: sc.complete, missing: sc.missing,
+      ca: t.ca || '', se: t.se || '',
       pe: t.pe || '', mc: t.mc || '', upside: t.ups || '',
       news: []
     });

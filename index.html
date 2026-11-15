@@ -22,7 +22,7 @@
 --error:#b34747;--error-light:#f5e7e7;
 --purple:#8b7dbe;--purple-light:#f0edf8;
 --teal:#4a7d8b;--teal-light:#e8eff1;
---tier1:#37352f;--tier2:#787774;--tier3:#b08d4a;--tier4:#8b7dbe;
+--tier1:#37352f;--tier2:#787774;--tier3:#b08d4a;--tier4:#8b7dbe;--tierunrated:#b8b4a8;
 --radius-sm:4px;--radius-md:6px;--radius-lg:8px;
 --shadow:0 1px 2px rgba(0,0,0,0.04);
 
@@ -168,6 +168,8 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 .detail-price{font-size:24px;font-weight:600;}
 .detail-trend{font-size:14px;color:var(--text-muted);}
 .detail-score-badge{font-size:12px;padding:4px 10px;border-radius:12px;font-weight:600;}
+.tier-unrated{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border-strong);}
+.grade-NA{background:var(--surface-3);color:var(--text-muted);border:1px solid var(--border-strong);}
 .grade-A{background:#1b5e20;color:#fff;}
 .grade-B-plus{background:#2e7d32;color:#fff;}
 .grade-B{background:#f9a825;color:#000;}
@@ -485,7 +487,7 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
     </div>
   </main>
 </div>
-<script src="data.js?v=20261115b"></script>
+<script src="data.js?v=20261115c"></script>
 <script>
 // ============================================================
 // Synthesize legacy TICKERS array from TIER1+TIER2 for backward
@@ -500,29 +502,18 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 //   TIER1.ca → TICKERS.ca
 // news array, trend, pct, score, grade are not in TIER1+TIER2 — derive from score=mg+bf+bz
 // ============================================================
-function _tierLabel(se) {
-  const map = {power:'Tier 1', compute:'Tier 2', semis:'Tier 2', software:'Tier 2', nonagi:'Tier 4'};
-  return map[se] || 'Tier 2';
-}
-function _tierEmoji(se) {
-  const map = {power:'🔋', compute:'🟠', semis:'🟡', software:'🟡', nonagi:'🟢'};
-  return map[se] || '🟡';
-}
-function _gradeForScore(s) {
-  if (s >= 85) return 'A';
-  if (s >= 75) return 'B+';
-  if (s >= 65) return 'B';
-  if (s >= 55) return 'B-';
-  if (s >= 45) return 'C+';
-  if (s >= 35) return 'C';
-  return 'D/F';
-}
+// ── Canonical scoring + tier labelling live in data.js. Do not re-implement here.
+// Sector is NOT a conviction proxy: the badge reads the approved CONVICTION map.
+function _tierLabel(t) { return _scTierLabel(t); }
+function _tierEmoji(se) { return _scTierEmoji(se); }
+function _gradeForScore(x) { return _scGradeForScore(x); }
+function _scoreStock(t) { return _scScoreStock(t); }
 
 // ============================================================
 // 5-DIMENSION SCORING — Leopold Aschenbrenner Situational Awareness
 // ============================================================
 //
-// Each stock = 5 dimensions × 20 pts = 100 pts max.
+// Each stock = 5 dimensions, real ceiling 95 pts (19/20/19/19/18). A missing input scores nothing.
 //
 // Dim 1: FRAMEWORK FIT (max 20) — picks-and-shovels / bottleneck alignment
 //   - Hard cap 10 for non-AGI (ca==='nonagi') per Pirry 2026-07-13.
@@ -547,110 +538,8 @@ function _gradeForScore(s) {
 // grade. No flat +25 inflation: every dimension varies by ticker.
 // ============================================================
 
-function _dimFramework(t) {
-  // Hard cap non-AGI at 10
-  if (t.ca === 'nonagi') {
-    return 9; // defensive waste/services — terminal value, no AGI beta
-  }
-  // AGI categories
-  if (t.ca === 'agi') {
-    // Tier-1 directly in bottleneck sectors (power + semis) score highest
-    if (t.tier === 1 && (t.se === 'power' || t.se === 'semis')) return 19;
-    if (t.tier === 1 && t.se === 'compute') return 16; // GPU cloud / DC REIT
-    // Tier-2 AGI watchlist
-    return 12;
-  }
-  // Demand-side beneficiary (ca='demand')
-  if (t.ca === 'demand') {
-    return t.tier === 1 ? 14 : 10;
-  }
-  return 8;
-}
+// 5-dimension scoring implementation: _scScoreStock() in data.js (single source).
 
-function _dimFundamental(t) {
-  // ROE/ROIC driven. Pre-revenue tickers (negative or missing ROIC) get low.
-  const roe = t.roe;
-  const roic = t.roic;
-  if (roe == null && roic == null) {
-    // No fundamentals available — penalty, but don't zero
-    return 9;
-  }
-  // Negative ROIC = pre-profit / speculative
-  if (roic != null && roic < 0) return 5;
-  // Map ROE tier; ROIC adjusts
-  let base;
-  if (roe == null) {
-    // Have roic only
-    if (roic >= 20) base = 17;
-    else if (roic >= 10) base = 14;
-    else if (roic >= 5) base = 11;
-    else base = 8;
-  } else {
-    if (roe >= 25) base = 18;
-    else if (roe >= 20) base = 16;
-    else if (roe >= 15) base = 14;
-    else if (roe >= 10) base = 12;
-    else if (roe >= 5) base = 9;
-    else base = 6;
-    // ROIC bonus/penalty within ±2
-    if (roic != null) {
-      if (roic >= 15) base += 2;
-      else if (roic < 3 && roe > 10) base -= 2;
-    }
-  }
-  return Math.max(4, Math.min(20, base));
-}
-
-function _dimMomentum(t) {
-  const ups = t.ups;
-  if (ups == null) return 9; // missing data
-  if (ups >= 50) return 19;
-  if (ups >= 30) return 17;
-  if (ups >= 15) return 14;
-  if (ups >= 5) return 12;
-  if (ups >= 0) return 10;
-  if (ups >= -10) return 7;
-  if (ups >= -25) return 5;
-  return 3;
-}
-
-function _dimSentiment(t) {
-  const bp = t.bp;
-  if (bp == null) return 9; // missing
-  if (bp >= 85) return 19;
-  if (bp >= 70) return 16;
-  if (bp >= 55) return 13;
-  if (bp >= 40) return 10;
-  if (bp >= 25) return 8;
-  return 5;
-}
-
-function _dimScarcity(t) {
-  // Non-AGI hard cap 10
-  if (t.ca === 'nonagi') return 8;
-  if (t.ca === 'agi') {
-    if (t.tier === 1 && (t.se === 'power' || t.se === 'semis')) return 18;
-    if (t.tier === 1 && t.se === 'compute') return 14;
-    return 11;
-  }
-  if (t.ca === 'demand') return 10;
-  return 6;
-}
-
-function _scoreStock(t) {
-  const dims = {
-    framework: _dimFramework(t),
-    fundamental: _dimFundamental(t),
-    momentum: _dimMomentum(t),
-    sentiment: _dimSentiment(t),
-    scarcity: _dimScarcity(t)
-  };
-  const total = dims.framework + dims.fundamental + dims.momentum + dims.sentiment + dims.scarcity;
-  return { total: total, dims: dims };
-}
-
-// data.js declares TICKERS via var (function(){...})(). Reassign — don't redeclare.
-// eslint-disable-next-line no-redeclare
 TICKERS = (function() {
   const out = [];
   [...TIER1, ...TIER2].forEach(function(t) {
@@ -666,14 +555,17 @@ TICKERS = (function() {
       name: enriched.name || enriched.t,
       desc: enriched.desc || '',
       why: enriched.why || '',
-      tier: '本週 ' + _tierLabel(enriched.se) + ' (' + (SECTOR_NAMES[enriched.se] || enriched.se) + ')',
+      tier: _tierLabel(enriched),
       tier_emoji: _tierEmoji(enriched.se),
       price: enriched.p,
       trend: '↑',
       pct: '+0.00%',
       score: s.total,
       dims: s.dims,
-      grade: _gradeForScore(s.total),
+      grade: s.grade,
+      score_complete: s.complete,
+      missing: s.missing,
+      conviction_tier: (typeof CONVICTION !== 'undefined' && CONVICTION[enriched.t] != null) ? CONVICTION[enriched.t] : null,
       ca: enriched.ca,
       se: enriched.se,
       news: []
@@ -767,12 +659,13 @@ document.getElementById('bucketBars').innerHTML=buckets.map(b=>'<div class="buck
 
 
 // SECTOR CARDS — derived from SECTORS map (data.js) — single source of truth.
-const _tierForSector = {power:'1',compute:'2',semis:'2',software:'2',nonagi:'4'};
-const _tierNameForSector = {power:'TIER 1-3',compute:'TIER 2-3',semis:'OBSERVE',software:'TIER 2',nonagi:'TIER 4'};
+// Sector cards show the bucket mix of their members — a sector is not a conviction tier.
+const _bucketLetter = {agi:'A',nonagi:'B',demand:'C'};
+function _bucketMixForSector(list){var c={};TICKERS.forEach(function(t){if(list.indexOf(t.ticker)>=0){c[t.ca]=(c[t.ca]||0)+1;}});return Object.keys(c).sort().map(function(k){return (_bucketLetter[k]||k)+' '+c[k];}).join(' · ');}
 const _pageForSector = {power:'power.html',compute:'compute.html',semis:'semis.html',software:'software.html',nonagi:'nonagi.html'};
 const _labelForSector = {power:'電力 Power',compute:'Compute Infra',semis:'半導體 Semi',software:'Software',nonagi:'Non AGI'};
 const sectorData = Object.keys(SECTORS).map(function(k){
-  return {name: _labelForSector[k] || k, tickers: SECTORS[k], tier: _tierForSector[k] || '2', tierName: _tierNameForSector[k] || 'TIER 2', page: _pageForSector[k] || ''};
+  return {name: _labelForSector[k] || k, tickers: SECTORS[k], tier: '0', tierName: _bucketMixForSector(SECTORS[k]), page: _pageForSector[k] || ''};
 });
 document.getElementById('sectorGrid').innerHTML=sectorData.map(function(s){return '<div class="sector-card"'+(s.page?' onclick="location.href='+String.fromCharCode(39)+s.page+String.fromCharCode(39)+'"':'')+'><div class="sector-card-head"><div class="sector-name">'+s.name+'</div><span class="sector-tier-badge tier-'+s.tier+'">'+s.tierName+'</span></div><div class="sector-tickers">'+s.tickers.map(function(t){return '<span class="ticker-chip">'+t+'</span>'}).join('')+'</div><div class="sector-meta"><span>'+s.tickers.length+' tickers</span><span>'+(s.page?'→ drilldown':'觀望')+'</span></div></div>'}).join('');
 
@@ -784,11 +677,11 @@ document.getElementById('excludeFull').innerHTML='<div class="signal-col" style=
 
 // TICKER CARD
 function tickerCard(t){
-  var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
-  var tl=t.tier.match(/Tier\s*\d+/i)?.[0]?.toUpperCase() || 'TIER 4';
+  var tc=(t.conviction_tier==1?'tier-1':t.conviction_tier==2?'tier-2':t.conviction_tier==3?'tier-3':t.conviction_tier==4?'tier-4':'tier-unrated');
+  var tl=(t.tier||'Unrated').toUpperCase();
   var priceClass=t.trend==='↑'?'ticker-price-up':'ticker-price-down';
-  var gradeClass='grade-'+(t.grade==='B+'?'B-plus':t.grade.replace('+','-plus'));
-  return '<div class="ticker-card" data-ticker="'+t.ticker+'"><div class="ticker-head"><div class="ticker-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="ticker-price-row"><span class="ticker-price '+priceClass+'">$'+t.price.toFixed(t.price<1?4:2)+'</span><span class="'+priceClass+'">'+t.trend+' '+t.pct+'</span><span class="ticker-score '+gradeClass+'">'+t.score+' '+t.grade+'</span></div><div class="ticker-name">'+t.name+'</div><div class="ticker-desc">'+t.desc+'</div><div class="ticker-why">💡 '+t.why+'</div><div class="ticker-news-count">'+t.news.length+' news items</div><div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+(t.news[0]?t.news[0].title.slice(0,100)+'...':'No news')+'</div></div>';
+  var gradeClass='grade-'+(t.grade==null?'NA':(t.grade==='B+'?'B-plus':t.grade.replace('+','-plus')));
+  return '<div class="ticker-card" data-ticker="'+t.ticker+'"><div class="ticker-head"><div class="ticker-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="ticker-price-row"><span class="ticker-price '+priceClass+'">$'+t.price.toFixed(t.price<1?4:2)+'</span><span class="'+priceClass+'">'+t.trend+' '+t.pct+'</span><span class="ticker-score '+gradeClass+'">'+(t.score==null?'insufficient data':t.score+' '+t.grade)+'</span></div><div class="ticker-name">'+t.name+'</div><div class="ticker-desc">'+t.desc+'</div><div class="ticker-why">💡 '+t.why+'</div><div class="ticker-news-count">'+t.news.length+' news items</div><div class="ticker-signal"><div class="ticker-signal-label">Latest</div>'+(t.news[0]?t.news[0].title.slice(0,100)+'...':'No news')+'</div></div>';
 }
 
 // SECTOR GRIDS (now in separate pages: power.html, compute.html, etc.)
@@ -796,10 +689,10 @@ function tickerCard(t){
 // DETAIL VIEW
 function showTickerDetail(ticker){
   var t=TICKERS.find(function(x){return x.ticker===ticker});if(!t)return;
-  var tc=t.tier_emoji==='🔋'?'tier-1':t.tier_emoji==='🟠'?'tier-2':t.tier_emoji==='🟡'?'tier-3':'tier-4';
-  var tl=t.tier.match(/Tier\s*\d+/i)?.[0]?.toUpperCase() || 'TIER 4';
+  var tc=(t.conviction_tier==1?'tier-1':t.conviction_tier==2?'tier-2':t.conviction_tier==3?'tier-3':t.conviction_tier==4?'tier-4':'tier-unrated');
+  var tl=(t.tier||'Unrated').toUpperCase();
   var priceClass=t.trend==='↑'?'delta-up':'delta-down';
-  var gradeClass='grade-'+(t.grade==='B+'?'B-plus':t.grade.replace('+','-plus'));
+  var gradeClass='grade-'+(t.grade==null?'NA':(t.grade==='B+'?'B-plus':t.grade.replace('+','-plus')));
   document.getElementById('detailContent').innerHTML='<div class="detail-head"><div class="detail-head-row"><div class="detail-symbol">'+t.ticker+'</div><span class="sector-tier-badge '+tc+'">'+tl+'</span></div><div class="detail-name">'+t.name+'</div><div class="detail-desc">'+t.desc+'</div><div class="detail-why">💡 '+t.why+'</div><div class="detail-price-row"><span class="detail-price">$'+t.price.toFixed(t.price<1?4:2)+'</span><span class="detail-trend '+priceClass+'">'+t.trend+' '+t.pct+'</span><span class="detail-score-badge '+gradeClass+'">Score: '+t.score+' ('+t.grade+')</span></div></div><div class="detail-news-list">'+t.news.map(function(n){return '<a href="'+n.url.replace(/"/g, '&quot;')+'" target="_blank" rel="noopener" class="detail-news-item" style="display:block;"><div class="detail-news-meta"><span class="detail-news-source">'+n.source+'</span><span>·</span><span>'+n.date+'</span></div><div class="detail-news-title">'+n.title+'</div></a>'}).join('')+'</div>';
   switchView('detail');
 }
@@ -822,15 +715,16 @@ function renderScoringPage(){
     {range:'35\u201344',grade:'C',emoji:'\u{1F7E0}',meaning:'Marginal'},
     {range:'<35',grade:'D/F',emoji:'\u{1F534}',meaning:'Avoid'}
   ];
-  var ranked=TICKERS.slice().sort(function(a,b){return b.score-a.score});
+  var ranked=TICKERS.filter(function(t){return t.score!=null;}).sort(function(a,b){return b.score-a.score});
+  var unranked=TICKERS.filter(function(t){return t.score==null;}).sort(function(a,b){return a.ticker<b.ticker?-1:1});
   var gradeClassMap={'A':'grade-A','B+':'grade-B-plus','B':'grade-B','B-':'grade-B-minus','C+':'grade-C-plus','C':'grade-C','D/F':'grade-D'};
   var sectorMap={};
   var secKeys=Object.keys(SECTORS);
   secKeys.forEach(function(k){SECTORS[k].forEach(function(t){sectorMap[t]=k})});
   var sectorNames={'power':'Power','compute':'Compute','semis':'Semi','software':'Software','nonagi':'Non AGI'};
   var html='';
-  html+='<div class="scoring-section"><h2>Methodology \u2014 Aschenbrenner Situational Awareness</h2><p>Each stock is scored on <strong>5 dimensions \u00d7 20 pts = 100 pts</strong> conviction grade. Framework Fit <strong>hard-capped at 10 for non-AGI</strong> tickers (terminal value, no AGI beta). The biggest, longest bottleneck wins the highest scarcity + framework score.</p><p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Framework inspired by <em>Situational Awareness</em> (Leopold Aschenbrenner, 2023): power scarcity \u2192 compute bottleneck \u2192 AGI \u2192 superintelligence.</p></div>';
-  html+='<div class="scoring-section"><h2>5 Dimensions (100 pts)</h2><div class="scoring-dims">';
+  html+='<div class="scoring-section"><h2>Methodology \u2014 Aschenbrenner Situational Awareness</h2><p>Each stock is scored on <strong>5 dimensions, real ceiling 95 pts</strong> (19+20+19+19+18). Thresholds are unchanged; the scale is not normalised to 100. Framework Fit <strong>hard-capped at 10 for non-AGI</strong> tickers (terminal value, no AGI beta). The biggest, longest bottleneck wins the highest scarcity + framework score.</p><p style="font-size:12px;color:var(--text-muted);margin-top:8px;"><strong>Incomplete-data rule (2026-11-15):</strong> a dimension with no verified input scores nothing. If any of fundamentals / momentum / sentiment is missing, the stock gets no total, no grade, and is listed separately as <em>insufficient data</em> — it is never defaulted into the ranking. Valid components are still shown.</p><p style="font-size:12px;color:var(--text-muted);margin-top:8px;">Framework inspired by <em>Situational Awareness</em> (Leopold Aschenbrenner, 2023): power scarcity \u2192 compute bottleneck \u2192 AGI \u2192 superintelligence.</p></div>';
+  html+='<div class="scoring-section"><h2>5 Dimensions (95 pts max)</h2><div class="scoring-dims">';
   dims.forEach(function(d){html+='<div class="scoring-dim"><div class="scoring-dim-name">'+d.name+'</div><div class="scoring-dim-pts">'+d.pts+'</div><div class="scoring-dim-desc">'+d.desc+'</div></div>'});
   html+='</div></div>';
   html+='<div class="scoring-section"><h2>Grade Conversion</h2><table class="grade-table"><tr><th>Score</th><th>Grade</th><th>Meaning</th></tr>';
@@ -841,10 +735,19 @@ function renderScoringPage(){
     var sec=sectorNames[sectorMap[t.ticker]]||'Other';
     var gc=gradeClassMap[t.grade]||'grade-B';
     var d=t.dims||{};
-    html+='<tr><td class="rank-num">'+(i+1)+'</td><td><strong>'+t.ticker+'</strong></td><td><strong>'+t.score+'</strong></td><td><span class="detail-score-badge '+gc+'">'+t.grade+'</span></td><td>'+(d.framework!=null?d.framework:'\u2014')+'</td><td>'+(d.fundamental!=null?d.fundamental:'\u2014')+'</td><td>'+(d.momentum!=null?d.momentum:'\u2014')+'</td><td>'+(d.sentiment!=null?d.sentiment:'\u2014')+'</td><td>'+(d.scarcity!=null?d.scarcity:'\u2014')+'</td><td>'+sec+'</td></tr>';
+    html+='<tr><td class="rank-num">'+(i+1)+'</td><td><strong>'+t.ticker+'</strong></td><td><strong>'+t.score+'</strong></td><td><span class="detail-score-badge '+gc+'">'+t.grade+'</span></td><td>'+(d.framework!=null?d.framework:'\u2014')+'</td><td>'+(d.fundamental!=null?d.fundamental:'<em>missing</em>')+'</td><td>'+(d.momentum!=null?d.momentum:'<em>missing</em>')+'</td><td>'+(d.sentiment!=null?d.sentiment:'<em>missing</em>')+'</td><td>'+(d.scarcity!=null?d.scarcity:'\u2014')+'</td><td>'+sec+'</td></tr>';
   });
-  html+='</table></div><p style="font-size:11px;color:var(--text-muted);margin-top:12px;">Cols: Fw = Framework Fit \u00b7 Fund = Fundamental Quality \u00b7 Mom = Technical Momentum \u00b7 Sent = Sentiment &amp; Flow \u00b7 Scar = Bottleneck Scarcity. Each column max 20 pts; row sums to total score.</p></div>';
-  document.getElementById('scoringContent').innerHTML=html;
+  html+='</table></div><p style="font-size:11px;color:var(--text-muted);margin-top:12px;">Cols: Fw = Framework Fit \u00b7 Fund = Fundamental Quality \u00b7 Mom = Technical Momentum \u00b7 Sent = Sentiment &amp; Flow \u00b7 Scar = Bottleneck Scarcity. Column maxima: Fw 19, Fund 20, Mom 19, Sent 19, Scar 18 \u2014 ceiling 95. A row is scored only when every input is present.</p></div>';
+  if (unranked.length) {
+    html+='<div class="scoring-section"><h2>Excluded \u2014 insufficient data ('+unranked.length+')</h2><p style="font-size:12px;color:var(--text-muted);">No total score, because at least one verified input is missing. Valid components are still shown. Missing data means <em>review needed</em>, never a bad business.</p><div style="overflow-x:auto;"><table class="rank-table"><tr><th>Ticker</th><th>Missing</th><th>Fw</th><th>Fund</th><th>Mom</th><th>Sent</th><th>Scar</th><th>Sector</th></tr>';
+    unranked.forEach(function(t){
+      var sec=sectorNames[sectorMap[t.ticker]]||'Other';
+      var d=t.dims||{};
+      html+='<tr><td><strong>'+t.ticker+'</strong></td><td><em>'+((t.missing||[]).join(', '))+'</em></td><td>'+(d.framework!=null?d.framework:'\u2014')+'</td><td>'+(d.fundamental!=null?d.fundamental:'\u2014')+'</td><td>'+(d.momentum!=null?d.momentum:'\u2014')+'</td><td>'+(d.sentiment!=null?d.sentiment:'\u2014')+'</td><td>'+(d.scarcity!=null?d.scarcity:'\u2014')+'</td><td>'+sec+'</td></tr>';
+    });
+    html+='</table></div></div>';
+  }
+    document.getElementById('scoringContent').innerHTML=html;
 }
 
 // SCORING PAGE TRIGGER
