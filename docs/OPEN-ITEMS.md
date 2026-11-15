@@ -2,19 +2,20 @@
 
 Nothing in this file has been applied. Each item changes a decision, not a bug.
 
-## 1. Gate arithmetic: weights total 105, not 100
+## 1. Gate arithmetic — RESOLVED 2026-11-15 (Pirry chose option A)
 
-`investment-quality-gate-v2` lists Framework 25 + Sleeve quality 25 + Munger 20 + Bezos 15 +
-Buffett 20 = **105**, then says "reweighted to 100%" without ever computing the factors. Two
-reports on the same inputs can therefore disagree.
+The five weights summed to **105** while the doc called the result "100%". Decision: renormalise to a
+true 100-point scale as **24 + 24 + 19 + 14 + 19**, anchor points scaled ×100/105 and rounded to
+integers, verdict thresholds left at 80 / 60 / 40. Implemented in `apply_framework.py`; component
+maxima now sum to exactly 100.0.
 
-| Option | What it does | Effect on existing scores |
-|---|---|---|
-| **A (recommended)** | Renormalise to 100: ×0.952 → 23.8 / 23.8 / 19.0 / 14.3 / 19.0 | All historical 105-point totals shrink ~4.8%; verdict thresholds unchanged, so borderline names can drop one band |
-| B | Keep 105 as the declared ceiling; rescale tier thresholds (≥95% ⇒ ≥99.75) | Totals unchanged; every threshold moves |
-| C | Reweight components so they sum to 100 by construction | Cleanest long-run, but changes the meaning of each component's contribution |
+**Comparing to an older report:** multiply the old 105-scale total by **0.95238** first. Names that
+sat just above a band edge may now sit below it — that is the decision's intended effect.
 
-Not applied. Current behaviour: raw 105 total reported next to the verdict, nothing scaled.
+**Open defect found while verifying (approval-only, NOT fixed):** a Munger hard fail still scores
+~81/100 and returns 🟢 BUY, because the verdict gate ignores `munger_hard_fails`. The locked rule says
+a hard fail exits DCF and sizing, so the verdict should be forced to AVOID. Needs your sign-off
+because it changes recommendations, not arithmetic.
 
 ## 2. Staleness policy
 
