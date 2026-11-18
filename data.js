@@ -16,11 +16,11 @@
 // DATA_META — auto-managed by dashboard_data_writer.update_data_meta()
 var DATA_META = {
   "reporting_period": {
-    "start": "2026-11-10",
-    "end": "2026-11-17"
+    "start": "2026-11-11",
+    "end": "2026-11-18"
   },
-  "prices_as_of": "2026-11-17T00:00:57Z",
-  "fundamentals_as_of": "2026-11-17T00:00:57Z",
+  "prices_as_of": "2026-11-18T00:01:25Z",
+  "fundamentals_as_of": "2026-11-18T00:01:25Z",
   "news_lookback_days": 3,
   "sources": {
     "price": {
@@ -45,7 +45,7 @@ var DATA_META = {
     "with_fundamentals": 39,
     "missing_data": 9
   },
-  "computed_at": "2026-11-17T00:00:57Z",
+  "computed_at": "2026-11-18T00:01:25Z",
   "schema_version": 1
 };
 
